@@ -1,7 +1,8 @@
-import "./App.css";
 import Login from "./components/Login";
 import { useRoutes } from "hookrouter";
 import Dashboard from "./components/Dashboard";
+import UserDetails from "./components/UserDetails";
+import AddToMap from "./components/AddToMap";
 
 const isAuthenticated = () => {
   return !!localStorage.getItem("token");
@@ -10,6 +11,9 @@ const isAuthenticated = () => {
 const routes = {
   "/": () => <Login />,
   "/dashboard": () => (isAuthenticated() ? <Dashboard /> : <Login />),
+  "/dashboard/userDetails": () =>
+    isAuthenticated() ? <UserDetails /> : <Login />,
+  "/dashboard/addToMap": () => (isAuthenticated() ? <AddToMap /> : <Login />),
 };
 
 function App() {

@@ -3,7 +3,7 @@ import { navigate } from "hookrouter";
 import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { validatePhone, validateOtp } from "../utils";
+import { validateOtp, validatePhone } from "../utils";
 import Header from "./Header";
 import "./Login.css";
 
@@ -49,7 +49,7 @@ export default function Login() {
     generateOTP({ variables: { phone } });
   }
 
-  const [login, { loading: authenticating }] = useMutation(LOGIN, {
+  const [login] = useMutation(LOGIN, {
     onCompleted({ login: { token } }) {
       console.log({ token });
       setAuthenticated(token);
