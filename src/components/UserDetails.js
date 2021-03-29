@@ -72,7 +72,7 @@ function Dashboard() {
               </Form.Group>
             </Form>
           </Col>
-          <Col md="auto" style={{ display: "flex", justifyContent: "center" }}>
+          <Col md="auto">
             <Form inline onSubmit={submitUsername}>
               <Form.Group>
                 <Form.Control
