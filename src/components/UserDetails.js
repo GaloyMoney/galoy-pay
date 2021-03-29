@@ -33,7 +33,9 @@ function Dashboard() {
       setUserDetails(getUserDetails);
     },
     onError(error) {
-      console.error(error);
+      alert(error.message);
+      setUsername("");
+      setPhone("");
     },
   });
 
