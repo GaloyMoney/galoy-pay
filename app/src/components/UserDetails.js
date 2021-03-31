@@ -1,12 +1,12 @@
-import { gql, useLazyQuery } from "@apollo/client";
-import { useState } from "react";
-import { Container, Form } from "react-bootstrap";
-import Button from "react-bootstrap/Button";
-import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
-import Table from "react-bootstrap/Table";
-import { validatePhone, validateUsername } from "../utils";
-import Header from "./Header";
+import { gql, useLazyQuery } from '@apollo/client'
+import { useState } from 'react'
+import { Container, Form } from 'react-bootstrap'
+import Button from 'react-bootstrap/Button'
+import Col from 'react-bootstrap/Col'
+import Row from 'react-bootstrap/Row'
+import Table from 'react-bootstrap/Table'
+import { validatePhone, validateUsername } from '../utils'
+import Header from './Header'
 
 const GET_USER = gql`
   query getUserDetails($phone: String, $username: String) {
@@ -21,34 +21,38 @@ const GET_USER = gql`
       title
     }
   }
-`;
+`
 
-function Dashboard() {
-  const [phone, setPhone] = useState("");
-  const [username, setUsername] = useState("");
-  const [userDetails, setUserDetails] = useState("");
+function UserDetails() {
+  const token = localStorage.getItem('token')
+  const [phone, setPhone] = useState('')
+  const [username, setUsername] = useState('')
+  const [userDetails, setUserDetails] = useState('')
 
   const [getUser, { loading: gettingUser }] = useLazyQuery(GET_USER, {
+    context: {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    },
     onCompleted({ getUserDetails }) {
-      setUserDetails(getUserDetails);
+      setUserDetails(getUserDetails)
     },
     onError(error) {
-      alert(error.message);
-      setUsername("");
-      setPhone("");
-    },
-  });
+      alert(error.message)
+      setUsername('')
+      setPhone('')
+    }
+  })
 
   function submitPhone(event) {
-    event.preventDefault();
-    console.log({ phone });
-    getUser({ variables: { phone } });
+    event.preventDefault()
+    getUser({ variables: { phone } })
   }
 
   function submitUsername(event) {
-    event.preventDefault();
-    console.log({ username });
-    getUser({ variables: { username } });
+    event.preventDefault()
+    getUser({ variables: { username } })
   }
 
   return (
@@ -64,7 +68,7 @@ function Dashboard() {
                   type="tel"
                   placeholder="Enter user's phone number"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={e => setPhone(e.target.value)}
                 />
                 <Button type="submit" disabled={!validatePhone(phone)}>
                   Submit
@@ -78,7 +82,7 @@ function Dashboard() {
                 <Form.Control
                   placeholder="Enter user's username"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={e => setUsername(e.target.value)}
                 />
                 <Button type="submit" disabled={!validateUsername(username)}>
                   Submit
@@ -88,9 +92,9 @@ function Dashboard() {
           </Col>
         </Row>
         <Row>
-          {gettingUser && <p>Getting user details...</p>}
+          {gettingUser && <Col md="auto">Getting user details...</Col>}
           {userDetails && (
-            <Table bordered hover striped style={{ margin: "15px" }}>
+            <Table bordered hover striped style={{ margin: '15px' }}>
               <thead>
                 <tr>
                   <th>Phone</th>
@@ -114,7 +118,7 @@ function Dashboard() {
         </Row>
       </Container>
     </div>
-  );
+  )
 }
 
-export default Dashboard;
+export default UserDetails

@@ -1,24 +1,32 @@
-import Login from "./components/Login";
-import { useRoutes } from "hookrouter";
-import Dashboard from "./components/Dashboard";
-import UserDetails from "./components/UserDetails";
-import AddToMap from "./components/AddToMap";
-
-const isAuthenticated = () => {
-  return !!localStorage.getItem("token");
-};
+import Login from './components/Login'
+import { useRoutes, navigate } from 'hookrouter'
+import Dashboard from './components/Dashboard'
+import UserDetails from './components/UserDetails'
+import AddToMap from './components/AddToMap'
+import { isAuthenticated } from './utils'
 
 const routes = {
-  "/": () => <Login />,
-  "/dashboard": () => (isAuthenticated() ? <Dashboard /> : <Login />),
-  "/dashboard/userDetails": () =>
-    isAuthenticated() ? <UserDetails /> : <Login />,
-  "/dashboard/addToMap": () => (isAuthenticated() ? <AddToMap /> : <Login />),
-};
+  '/': () => <Login />,
+  '/dashboard*': () => <AuthedPages />
+}
+
+const dashboardRoutes = {
+  '/': () => <Dashboard />,
+  '/userDetails': () => <UserDetails />,
+  '/addToMap': () => <AddToMap />
+}
+
+const AuthedPages = () => {
+  const routeResult = useRoutes(dashboardRoutes)
+  if (!isAuthenticated()) {
+    navigate('/')
+  }
+  return routeResult
+}
 
 function App() {
-  let routeResult = useRoutes(routes);
+  const routeResult = useRoutes(routes)
 
-  return routeResult || <Login />;
+  return routeResult || <Login />
 }
-export default App;
+export default App
