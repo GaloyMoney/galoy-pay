@@ -49,6 +49,9 @@ export default function Login() {
 
   const [login] = useMutation(LOGIN, {
     onCompleted({ login: { token } }) {
+      if(!token) {
+        alert('Incorrect OTP')
+      }
       setAuthenticated(token)
       navigate('/dashboard', true)
     },
