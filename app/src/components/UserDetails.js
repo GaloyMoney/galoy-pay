@@ -19,6 +19,7 @@ const GET_USER = gql`
         longitude
       }
       title
+      created_at
     }
   }
 `
@@ -102,6 +103,7 @@ function UserDetails() {
                   <th>Title</th>
                   <th>Latitude</th>
                   <th>Longtitude</th>
+                  <th>Created At</th>
                 </tr>
               </thead>
               <tbody>
@@ -111,6 +113,7 @@ function UserDetails() {
                   <td>{userDetails.title}</td>
                   <td>{userDetails.coordinate ? userDetails.coordinate.latitude : ""}</td>
                   <td>{userDetails.coordinate? userDetails.coordinate.longitude : ""}</td>
+                  <td>{new Date(userDetails.created_at)}</td>
                 </tr>
               </tbody>
             </Table>
