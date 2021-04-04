@@ -113,7 +113,7 @@ function UserDetails() {
                   <td>{userDetails.title}</td>
                   <td>{userDetails.coordinate ? userDetails.coordinate.latitude : ""}</td>
                   <td>{userDetails.coordinate? userDetails.coordinate.longitude : ""}</td>
-                  <td>{new Date(parseInt(userDetails.created_at))}</td>
+                  <td>{new Date(parseInt(userDetails.created_at)).toString()}</td>
                 </tr>
               </tbody>
             </Table>
