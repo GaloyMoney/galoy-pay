@@ -1,4 +1,4 @@
-import { gql, useLazyQuery } from '@apollo/client'
+import { gql, useLazyQuery, useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { Container, Form } from 'react-bootstrap'
 import Button from 'react-bootstrap/Button'
@@ -11,6 +11,7 @@ import Header from './Header'
 const GET_USER = gql`
   query getUserDetails($phone: String, $username: String) {
     getUserDetails(phone: $phone, username: $username) {
+      id
       phone
       username
       created_at
@@ -20,12 +21,23 @@ const GET_USER = gql`
       }
       title
       created_at
+      status
+    }
+  }
+`
+
+const SET_ACCOUNT_STATUS = gql`
+  mutation setAccountStatus($username: String, $phone: String, $status: AccountStatus!) {
+    setAccountStatus(username: $username, phone: $phone, status: $status) {
+        status
+        id
+        __typename
     }
   }
 `
 
 function UserDetails() {
-  const token = localStorage.getItem('token')
+  const token = sessionStorage.getItem('token')
   const [phone, setPhone] = useState('')
   const [username, setUsername] = useState('')
   const [userDetails, setUserDetails] = useState('')
@@ -46,6 +58,22 @@ function UserDetails() {
     }
   })
 
+  const [setAccountStatus] = useMutation(SET_ACCOUNT_STATUS, {
+    context: {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    },
+    onCompleted({ setAccountStatus }) {
+      console.log({ setAccountStatus })
+      alert(`${userDetails.username}'s account status has been changed successfully`)
+    },
+    onError(error) {
+      console.error(error)
+      alert(error.message)
+    }
+  })
+
   function submitPhone(event) {
     event.preventDefault()
     getUser({ variables: { phone } })
@@ -54,6 +82,14 @@ function UserDetails() {
   function submitUsername(event) {
     event.preventDefault()
     getUser({ variables: { username } })
+  }
+
+  function changeAccountStatus() {
+    const targetStatus = userDetails.status === "active" ? "locked" : "active"
+    const confirmation = window.confirm(`Clicking OK will change ${userDetails.phone}'s status to ${targetStatus}. Do you wish to proceed?`)
+    if (confirmation) {
+      setAccountStatus({ variables: { phone: userDetails.phone, status: targetStatus } })
+    }
   }
 
   return (
@@ -104,6 +140,7 @@ function UserDetails() {
                   <th>Latitude</th>
                   <th>Longtitude</th>
                   <th>Created At</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -112,8 +149,9 @@ function UserDetails() {
                   <td>{userDetails.username}</td>
                   <td>{userDetails.title}</td>
                   <td>{userDetails.coordinate ? userDetails.coordinate.latitude : ""}</td>
-                  <td>{userDetails.coordinate? userDetails.coordinate.longitude : ""}</td>
+                  <td>{userDetails.coordinate ? userDetails.coordinate.longitude : ""}</td>
                   <td>{new Date(parseInt(userDetails.created_at)).toString()}</td>
+                  <td>{userDetails.status} <Button variant="outline-danger" size='sm' onClick={changeAccountStatus}>Change</Button> </td>
                 </tr>
               </tbody>
             </Table>

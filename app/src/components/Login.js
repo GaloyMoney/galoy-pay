@@ -29,7 +29,7 @@ export default function Login() {
   const [otp, setOtp] = useState('')
 
   function setAuthenticated(token) {
-    localStorage.setItem('token', token)
+    sessionStorage.setItem('token', token)
   }
 
   const [generateOTP, { loading: otpGenerating }] = useMutation(GENERATE_OTP, {

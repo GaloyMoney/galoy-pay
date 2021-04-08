@@ -14,7 +14,7 @@ const ADD_TO_MAP = gql`
 `
 
 function AddToMap() {
-  const token = localStorage.getItem('token')
+  const token = sessionStorage.getItem('token')
   const [title, setTitle] = useState('')
   const [username, setUsername] = useState('')
   const [latitude, setLatitude] = useState('')
