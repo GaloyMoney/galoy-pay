@@ -34,8 +34,8 @@ const GET_USER = gql`
 `
 
 const SET_ACCOUNT_STATUS = gql`
-  mutation setAccountStatus($username: String, $phone: String, $status: AccountStatus!) {
-    setAccountStatus(username: $username, phone: $phone, status: $status) {
+  mutation setAccountStatus($uid: ID!, $status: AccountStatus!) {
+    setAccountStatus(uid: $uid, status: $status) {
         status
         id
         __typename
@@ -151,7 +151,7 @@ function UserDetails() {
     const targetStatus = userDetails.status === "active" ? "locked" : "active"
     const confirmation = window.confirm(`Clicking OK will change ${userDetails.phone}'s status to ${targetStatus}. Do you wish to proceed?`)
     if (confirmation) {
-      setAccountStatus({ variables: { phone: userDetails.phone, status: targetStatus } })
+      setAccountStatus({ variables: { uid, status: targetStatus } })
     }
   }
 
