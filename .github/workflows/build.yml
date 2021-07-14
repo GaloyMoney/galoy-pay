@@ -8,7 +8,7 @@ on:
       - ".github/**"
 
 jobs:
-   build-and-push:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -16,14 +16,12 @@ jobs:
         env:
           CI: false
         run: |
-          cd app
           npm i
           npm run build
           rm -rf node_modules
           rm package-lock.json
-          cd ..
           git rm -rf .
-          mv app/build/* .
+          mv build/* .
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git pull -q
@@ -34,4 +32,3 @@ jobs:
           git add .
           git diff-index --quiet HEAD || git commit -m 'Build'
           git push origin build
-
