@@ -1,12 +1,12 @@
-import { gql, useLazyQuery, useMutation } from '@apollo/client'
-import { useState } from 'react'
-import { Container, Form } from 'react-bootstrap'
-import Button from 'react-bootstrap/Button'
-import Col from 'react-bootstrap/Col'
-import Row from 'react-bootstrap/Row'
-import Table from 'react-bootstrap/Table'
-import { validatePhone, validateUsername } from '../utils'
-import Header from './Header'
+import { gql, useLazyQuery, useMutation } from "@apollo/client"
+import { useState } from "react"
+import { Container, Form } from "react-bootstrap"
+import Button from "react-bootstrap/Button"
+import Col from "react-bootstrap/Col"
+import Row from "react-bootstrap/Row"
+import Table from "react-bootstrap/Table"
+import { validatePhone, validateUsername } from "../utils"
+import Header from "./Header"
 
 const GET_UID = gql`
   query getUid($phone: String, $username: String) {
@@ -36,9 +36,9 @@ const GET_USER = gql`
 const SET_ACCOUNT_STATUS = gql`
   mutation setAccountStatus($uid: ID!, $status: AccountStatus!) {
     setAccountStatus(uid: $uid, status: $status) {
-        status
-        id
-        __typename
+      status
+      id
+      __typename
     }
   }
 `
@@ -52,37 +52,37 @@ const GET_LEVELS = gql`
 const SET_LEVEL = gql`
   mutation setlevel($uid: ID!, $level: Int!) {
     setLevel(uid: $uid, level: $level) {
-      id,
+      id
       level
     }
   }
 `
 
 function UserDetails() {
-  const token = sessionStorage.getItem('token')
-  const [phone, setPhone] = useState('')
-  const [uid, setUid] = useState('')
+  const token = sessionStorage.getItem("token")
+  const [phone, setPhone] = useState("")
+  const [uid, setUid] = useState("")
   const [levels, setLevels] = useState(null)
-  const [username, setUsername] = useState('')
-  const [userDetails, setUserDetails] = useState('')
+  const [username, setUsername] = useState("")
+  const [userDetails, setUserDetails] = useState("")
 
-  const [getUid, {loading: gettingUid}] = useLazyQuery(GET_UID, {
+  const [getUid, { loading: gettingUid }] = useLazyQuery(GET_UID, {
     context: {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     },
-    onCompleted({getUid: uid}) {
+    onCompleted({ getUid: uid }) {
       setUid(uid)
-      getUser({variables: {uid}})
-    }
+      getUser({ variables: { uid } })
+    },
   })
 
   const [getUser, { loading: gettingUser }] = useLazyQuery(GET_USER, {
     context: {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     },
     onCompleted({ getUserDetails }) {
       setUserDetails(getUserDetails)
@@ -90,43 +90,43 @@ function UserDetails() {
     },
     onError(error) {
       alert(error.message)
-      setUsername('')
-      setPhone('')
-    }
+      setUsername("")
+      setPhone("")
+    },
   })
 
   const [getLevels] = useLazyQuery(GET_LEVELS, {
     context: {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     },
-    onCompleted({getLevels: levels}) {
+    onCompleted({ getLevels: levels }) {
       setLevels(levels)
-    }
+    },
   })
 
   const [setLevel] = useMutation(SET_LEVEL, {
     context: {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     },
     onCompleted({ setLevel }) {
-      setUserDetails({...userDetails, level: setLevel.level})
+      setUserDetails({ ...userDetails, level: setLevel.level })
       alert(`${userDetails.username}'s account level has been changed successfully`)
     },
     onError(error) {
       console.error(error)
       alert(error.message)
-    }
+    },
   })
 
   const [setAccountStatus] = useMutation(SET_ACCOUNT_STATUS, {
     context: {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     },
     onCompleted({ setAccountStatus }) {
       alert(`${userDetails.username}'s account status has been changed successfully`)
@@ -134,7 +134,7 @@ function UserDetails() {
     onError(error) {
       console.error(error)
       alert(error.message)
-    }
+    },
   })
 
   function submitPhone(event) {
@@ -149,7 +149,9 @@ function UserDetails() {
 
   function changeAccountStatus() {
     const targetStatus = userDetails.status === "active" ? "locked" : "active"
-    const confirmation = window.confirm(`Clicking OK will change ${userDetails.phone}'s status to ${targetStatus}. Do you wish to proceed?`)
+    const confirmation = window.confirm(
+      `Clicking OK will change ${userDetails.phone}'s status to ${targetStatus}. Do you wish to proceed?`,
+    )
     if (confirmation) {
       setAccountStatus({ variables: { uid, status: targetStatus } })
     }
@@ -157,7 +159,7 @@ function UserDetails() {
 
   function changeLevel() {
     const targetLevel = levels?.[levels.indexOf(userDetails.level) + 1]
-    setLevel({variables: {uid, level: targetLevel}})
+    setLevel({ variables: { uid, level: targetLevel } })
   }
 
   return (
@@ -173,7 +175,7 @@ function UserDetails() {
                   type="tel"
                   placeholder="Enter user's phone number"
                   value={phone}
-                  onChange={e => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(e.target.value)}
                 />
                 <Button type="submit" disabled={!validatePhone(phone)}>
                   Submit
@@ -187,7 +189,7 @@ function UserDetails() {
                 <Form.Control
                   placeholder="Enter user's username"
                   value={username}
-                  onChange={e => setUsername(e.target.value)}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
                 <Button type="submit" disabled={!validateUsername(username)}>
                   Submit
@@ -199,7 +201,7 @@ function UserDetails() {
         <Row>
           {gettingUser && <Col md="auto">Getting user details...</Col>}
           {userDetails && (
-            <Table bordered hover striped style={{ margin: '15px' }}>
+            <Table bordered hover striped style={{ margin: "15px" }}>
               <thead>
                 <tr>
                   <th>Phone</th>
@@ -218,10 +220,31 @@ function UserDetails() {
                   <td>{userDetails.username}</td>
                   <td>{userDetails.title}</td>
                   <td>{userDetails.coordinate ? userDetails.coordinate.latitude : ""}</td>
-                  <td>{userDetails.coordinate ? userDetails.coordinate.longitude : ""}</td>
+                  <td>
+                    {userDetails.coordinate ? userDetails.coordinate.longitude : ""}
+                  </td>
                   <td>{new Date(parseInt(userDetails.created_at)).toString()}</td>
-                  <td>{userDetails.level} <Button variant="outline-danger" disabled={userDetails.level === levels?.[levels.length - 1]} size="sm" onClick={changeLevel}>Upgrade</Button> </td>
-                  <td>{userDetails.status} <Button variant="outline-danger" size='sm' onClick={changeAccountStatus}>Change</Button> </td>
+                  <td>
+                    {userDetails.level}{" "}
+                    <Button
+                      variant="outline-danger"
+                      disabled={userDetails.level === levels?.[levels.length - 1]}
+                      size="sm"
+                      onClick={changeLevel}
+                    >
+                      Upgrade
+                    </Button>{" "}
+                  </td>
+                  <td>
+                    {userDetails.status}{" "}
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      onClick={changeAccountStatus}
+                    >
+                      Change
+                    </Button>{" "}
+                  </td>
                 </tr>
               </tbody>
             </Table>

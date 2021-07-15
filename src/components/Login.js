@@ -1,11 +1,11 @@
-import { gql, useMutation } from '@apollo/client'
-import { navigate } from 'hookrouter'
-import React, { useState } from 'react'
-import Button from 'react-bootstrap/Button'
-import Form from 'react-bootstrap/Form'
-import { validateOtp, validatePhone } from '../utils'
-import Header from './Header'
-import './Login.css'
+import { gql, useMutation } from "@apollo/client"
+import { navigate } from "hookrouter"
+import React, { useState } from "react"
+import Button from "react-bootstrap/Button"
+import Form from "react-bootstrap/Form"
+import { validateOtp, validatePhone } from "../utils"
+import Header from "./Header"
+import "./Login.css"
 
 const GENERATE_OTP = gql`
   mutation requestPhoneCode($phone: String!) {
@@ -24,12 +24,12 @@ const LOGIN = gql`
 `
 
 export default function Login() {
-  const [phone, setPhone] = useState('')
+  const [phone, setPhone] = useState("")
   const [otpGenerated, setOtpGenerated] = useState(false)
-  const [otp, setOtp] = useState('')
+  const [otp, setOtp] = useState("")
 
   function setAuthenticated(token) {
-    sessionStorage.setItem('token', token)
+    sessionStorage.setItem("token", token)
   }
 
   const [generateOTP, { loading: otpGenerating }] = useMutation(GENERATE_OTP, {
@@ -39,7 +39,7 @@ export default function Login() {
     onError(error) {
       console.error(error)
       alert(error.message)
-    }
+    },
   })
 
   function submitPhone(event) {
@@ -49,15 +49,15 @@ export default function Login() {
 
   const [login] = useMutation(LOGIN, {
     onCompleted({ login: { token } }) {
-      if(!token) {
-        alert('Incorrect OTP')
+      if (!token) {
+        alert("Incorrect OTP")
       }
       setAuthenticated(token)
-      navigate('/dashboard', true)
+      navigate("/dashboard", true)
     },
     onError(error) {
       console.error(error.message)
-    }
+    },
   })
 
   function submitOtp(event) {
@@ -77,7 +77,7 @@ export default function Login() {
                 type="tel"
                 placeholder="Enter phone number"
                 value={phone}
-                onChange={e => setPhone(e.target.value)}
+                onChange={(e) => setPhone(e.target.value)}
               />
             </Form.Group>
             <Button block size="lg" type="submit" disabled={!validatePhone(phone)}>
@@ -94,7 +94,7 @@ export default function Login() {
                 type="number"
                 placeholder="Enter OTP"
                 value={otp}
-                onChange={e => setOtp(e.target.value)}
+                onChange={(e) => setOtp(e.target.value)}
               />
             </Form.Group>
             <Button block size="lg" type="submit" disabled={!validateOtp(otp)}>

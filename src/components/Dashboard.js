@@ -1,8 +1,8 @@
-import React from "react";
-import { Container, Row } from "react-bootstrap";
-import Button from "react-bootstrap/Button";
-import Col from "react-bootstrap/Col";
-import Header from "./Header";
+import React from "react"
+import { Container, Row } from "react-bootstrap"
+import Button from "react-bootstrap/Button"
+import Col from "react-bootstrap/Col"
+import Header from "./Header"
 
 export default function Dashboard() {
   return (
@@ -23,5 +23,5 @@ export default function Dashboard() {
         </Row>
       </Container>
     </div>
-  );
+  )
 }
