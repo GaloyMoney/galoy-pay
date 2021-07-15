@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client"
-import { useState } from "react"
+import * as React from "react"
 import { Container, Form } from "react-bootstrap"
 import Button from "react-bootstrap/Button"
 import Col from "react-bootstrap/Col"
@@ -25,12 +25,12 @@ const ADD_TO_MAP = gql`
 
 function AddToMap() {
   const token = sessionStorage.getItem("token")
-  const [title, setTitle] = useState("")
-  const [username, setUsername] = useState("")
-  const [latitude, setLatitude] = useState("")
-  const [longitude, setLongitude] = useState("")
+  const [title, setTitle] = React.useState("")
+  const [username, setUsername] = React.useState("")
+  const [latitude, setLatitude] = React.useState("")
+  const [longitude, setLongitude] = React.useState("")
 
-  const [addToMap, { loading: addingToMap }] = useMutation(ADD_TO_MAP, {
+  const [addToMap] = useMutation(ADD_TO_MAP, {
     context: {
       headers: {
         Authorization: `Bearer ${token}`,

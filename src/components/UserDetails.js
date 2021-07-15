@@ -1,5 +1,5 @@
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
-import { useState } from "react"
+import * as React from "react"
 import { Container, Form } from "react-bootstrap"
 import Button from "react-bootstrap/Button"
 import Col from "react-bootstrap/Col"
@@ -60,13 +60,13 @@ const SET_LEVEL = gql`
 
 function UserDetails() {
   const token = sessionStorage.getItem("token")
-  const [phone, setPhone] = useState("")
-  const [uid, setUid] = useState("")
-  const [levels, setLevels] = useState(null)
-  const [username, setUsername] = useState("")
-  const [userDetails, setUserDetails] = useState("")
+  const [phone, setPhone] = React.useState("")
+  const [uid, setUid] = React.useState("")
+  const [levels, setLevels] = React.useState(null)
+  const [username, setUsername] = React.useState("")
+  const [userDetails, setUserDetails] = React.useState("")
 
-  const [getUid, { loading: gettingUid }] = useLazyQuery(GET_UID, {
+  const [getUid] = useLazyQuery(GET_UID, {
     context: {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -129,6 +129,7 @@ function UserDetails() {
       },
     },
     onCompleted({ setAccountStatus }) {
+      console.log({ setAccountStatus }) // TODO: What do we do with this?
       alert(`${userDetails.username}'s account status has been changed successfully`)
     },
     onError(error) {

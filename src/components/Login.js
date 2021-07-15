@@ -34,6 +34,9 @@ export default function Login() {
 
   const [generateOTP, { loading: otpGenerating }] = useMutation(GENERATE_OTP, {
     onCompleted({ requestPhoneCode: { success } }) {
+      if (!success) {
+        throw new Error("Operation failed")
+      }
       setOtpGenerated(true)
     },
     onError(error) {

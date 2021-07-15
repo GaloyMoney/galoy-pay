@@ -1,3 +1,4 @@
+import * as React from "react"
 import Login from "./components/Login"
 import { useRoutes, navigate } from "hookrouter"
 import Dashboard from "./components/Dashboard"
