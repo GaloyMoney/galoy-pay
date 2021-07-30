@@ -50,7 +50,7 @@
     "eslint-plugin-testing-library": "^3.9.2",
     "eslint-webpack-plugin": "^2.5.2",
     "file-loader": "6.1.1",
-    "fs-extra": "^9.0.1",
+    "fs-extra": "^10.0.0",
     "graphql": "^15.3.0",
     "hookrouter": "^1.2.3",
     "html-webpack-plugin": "4.5.0",
