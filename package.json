@@ -53,7 +53,7 @@
     "fs-extra": "^9.0.1",
     "graphql": "^15.3.0",
     "hookrouter": "^1.2.3",
-    "html-webpack-plugin": "4.5.0",
+    "html-webpack-plugin": "4.5.2",
     "identity-obj-proxy": "3.0.0",
     "jest": "27.1.0",
     "jest-circus": "27.1.0",
