@@ -5,116 +5,130 @@ import Button from "react-bootstrap/Button"
 import Col from "react-bootstrap/Col"
 import Row from "react-bootstrap/Row"
 import Table from "react-bootstrap/Table"
-import { validatePhone, validateUsername } from "../utils"
+import { validPhone, validWalletName, reportError } from "../utils"
 import Header from "./Header"
 
-const GET_UID = gql`
-  query getUid($phone: String, $username: String) {
-    getUid(phone: $phone, username: $username)
-  }
-`
+// TODO: use fragment for userDetails
 
-const GET_USER = gql`
-  query getUserDetails($uid: ID!) {
-    getUserDetails(uid: $uid) {
+const GET_USER_BY_PHONE = gql`
+  query getUserDetails($phone: Phone!) {
+    userDetails: userDetailsByPhone(phone: $phone) {
       id
       phone
-      username
-      created_at
+      walletName
       level
-      coordinate {
+      status
+      title
+      coordinates {
         latitude
         longitude
       }
-      title
-      created_at
-      status
+      createdAt
     }
   }
 `
 
-const SET_ACCOUNT_STATUS = gql`
-  mutation setAccountStatus($uid: ID!, $status: AccountStatus!) {
-    setAccountStatus(uid: $uid, status: $status) {
-      status
+const GET_USER_BY_USERNAME = gql`
+  query getUserDetails($walletName: WalletName!) {
+    userDetails: userDetailsByWalletName(walletName: $walletName) {
       id
-      __typename
-    }
-  }
-`
-
-const GET_LEVELS = gql`
-  query getLevels {
-    getLevels
-  }
-`
-
-const SET_LEVEL = gql`
-  mutation setlevel($uid: ID!, $level: Int!) {
-    setLevel(uid: $uid, level: $level) {
-      id
+      phone
+      walletName
       level
+      status
+      title
+      coordinates {
+        latitude
+        longitude
+      }
+      createdAt
     }
   }
 `
 
+const USER_UPDATE_STATUS = gql`
+  mutation userUpdateStatus($input: UserUpdateStatusInput!) {
+    mutationData: userUpdateStatus(input: $input) {
+      errors {
+        message
+      }
+      userDetails {
+        id
+        phone
+        walletName
+        level
+        status
+        title
+        coordinates {
+          latitude
+          longitude
+        }
+        createdAt
+      }
+    }
+  }
+`
+
+const USER_UPDATE_LEVEL = gql`
+  mutation userUpdateLevel($input: UserUpdateLevelInput!) {
+    mutationData: userUpdateLevel(input: $input) {
+      errors {
+        message
+      }
+      userDetails {
+        id
+        phone
+        walletName
+        level
+        status
+        title
+        coordinates {
+          latitude
+          longitude
+        }
+        createdAt
+      }
+    }
+  }
+`
+
+// TODO: Split into 3 components
 function UserDetails() {
-  const token = sessionStorage.getItem("token")
   const [phone, setPhone] = React.useState("")
-  const [uid, setUid] = React.useState("")
-  const [levels, setLevels] = React.useState(null)
-  const [username, setUsername] = React.useState("")
+  const [walletName, setWalletName] = React.useState("")
   const [userDetails, setUserDetails] = React.useState("")
 
-  const [getUid] = useLazyQuery(GET_UID, {
-    context: {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-    onCompleted({ getUid: uid }) {
-      setUid(uid)
-      getUser({ variables: { uid } })
-    },
-  })
+  // TODO: get rid of onCompleted and use hooks data directly
 
-  const [getUser, { loading: gettingUser }] = useLazyQuery(GET_USER, {
-    context: {
-      headers: {
-        Authorization: `Bearer ${token}`,
+  const [getUserByPhone, { loading: gettingUserByPhone }] = useLazyQuery(
+    GET_USER_BY_PHONE,
+    {
+      onCompleted({ userDetails }) {
+        setUserDetails(userDetails)
+      },
+      onError(error) {
+        reportError(error.message)
+        setPhone("")
       },
     },
-    onCompleted({ getUserDetails }) {
-      setUserDetails(getUserDetails)
-      getLevels()
+  )
+  const [getUserByUsername, { loading: gettingUserByUsername }] = useLazyQuery(
+    GET_USER_BY_USERNAME,
+    {
+      onCompleted({ userDetails }) {
+        setUserDetails(userDetails)
+      },
+      onError(error) {
+        reportError(error.message)
+        setWalletName("")
+      },
     },
-    onError(error) {
-      alert(error.message)
-      setUsername("")
-      setPhone("")
-    },
-  })
+  )
 
-  const [getLevels] = useLazyQuery(GET_LEVELS, {
-    context: {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-    onCompleted({ getLevels: levels }) {
-      setLevels(levels)
-    },
-  })
-
-  const [setLevel] = useMutation(SET_LEVEL, {
-    context: {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-    onCompleted({ setLevel }) {
-      setUserDetails({ ...userDetails, level: setLevel.level })
-      alert(`${userDetails.username}'s account level has been changed successfully`)
+  const [updateUserStatus] = useMutation(USER_UPDATE_STATUS, {
+    onCompleted({ mutationData }) {
+      setUserDetails(mutationData.userDetails)
+      alert(`${userDetails.walletName}'s account level has been changed successfully`)
     },
     onError(error) {
       console.error(error)
@@ -122,15 +136,10 @@ function UserDetails() {
     },
   })
 
-  const [setAccountStatus] = useMutation(SET_ACCOUNT_STATUS, {
-    context: {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-    onCompleted({ setAccountStatus }) {
-      console.log({ setAccountStatus }) // TODO: What do we do with this?
-      alert(`${userDetails.username}'s account status has been changed successfully`)
+  const [updateUserLevel] = useMutation(USER_UPDATE_LEVEL, {
+    onCompleted({ mutationData }) {
+      setUserDetails(mutationData.userDetails)
+      alert(`${userDetails.walletName}'s account status has been changed successfully`)
     },
     onError(error) {
       console.error(error)
@@ -140,27 +149,28 @@ function UserDetails() {
 
   function submitPhone(event) {
     event.preventDefault()
-    getUid({ variables: { phone } })
+    getUserByPhone({ variables: { phone } })
   }
 
   function submitUsername(event) {
     event.preventDefault()
-    getUid({ variables: { username } })
+    getUserByUsername({ variables: { walletName } })
   }
 
   function changeAccountStatus() {
-    const targetStatus = userDetails.status === "active" ? "locked" : "active"
+    const targetStatus = userDetails.status === "ACTIVE" ? "LOCKED" : "ACTIVE"
     const confirmation = window.confirm(
       `Clicking OK will change ${userDetails.phone}'s status to ${targetStatus}. Do you wish to proceed?`,
     )
     if (confirmation) {
-      setAccountStatus({ variables: { uid, status: targetStatus } })
+      updateUserStatus({
+        variables: { input: { uid: userDetails.id, status: targetStatus } },
+      })
     }
   }
 
   function changeLevel() {
-    const targetLevel = levels?.[levels.indexOf(userDetails.level) + 1]
-    setLevel({ variables: { uid, level: targetLevel } })
+    updateUserLevel({ variables: { input: { uid: userDetails.id, level: "TWO" } } })
   }
 
   return (
@@ -178,7 +188,7 @@ function UserDetails() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                 />
-                <Button type="submit" disabled={!validatePhone(phone)}>
+                <Button type="submit" disabled={!validPhone(phone)}>
                   Submit
                 </Button>
               </Form.Group>
@@ -188,11 +198,11 @@ function UserDetails() {
             <Form inline onSubmit={submitUsername}>
               <Form.Group>
                 <Form.Control
-                  placeholder="Enter user's username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Enter user's wallet name"
+                  value={walletName}
+                  onChange={(e) => setWalletName(e.target.value)}
                 />
-                <Button type="submit" disabled={!validateUsername(username)}>
+                <Button type="submit" disabled={!validWalletName(walletName)}>
                   Submit
                 </Button>
               </Form.Group>
@@ -200,13 +210,15 @@ function UserDetails() {
           </Col>
         </Row>
         <Row>
-          {gettingUser && <Col md="auto">Getting user details...</Col>}
+          {(gettingUserByPhone || gettingUserByUsername) && (
+            <Col md="auto">Getting user details...</Col>
+          )}
           {userDetails && (
             <Table bordered hover striped style={{ margin: "15px" }}>
               <thead>
                 <tr>
                   <th>Phone</th>
-                  <th>Username</th>
+                  <th>Wallet Name</th>
                   <th>Title</th>
                   <th>Latitude</th>
                   <th>Longtitude</th>
@@ -218,18 +230,20 @@ function UserDetails() {
               <tbody>
                 <tr>
                   <td>{userDetails.phone}</td>
-                  <td>{userDetails.username}</td>
+                  <td>{userDetails.walletName}</td>
                   <td>{userDetails.title}</td>
-                  <td>{userDetails.coordinate ? userDetails.coordinate.latitude : ""}</td>
                   <td>
-                    {userDetails.coordinate ? userDetails.coordinate.longitude : ""}
+                    {userDetails.coordinates ? userDetails.coordinates.latitude : ""}
                   </td>
-                  <td>{new Date(parseInt(userDetails.created_at)).toString()}</td>
+                  <td>
+                    {userDetails.coordinates ? userDetails.coordinates.longitude : ""}
+                  </td>
+                  <td>{new Date(parseInt(userDetails.createdAt)).toString()}</td>
                   <td>
                     {userDetails.level}{" "}
                     <Button
                       variant="outline-danger"
-                      disabled={userDetails.level === levels?.[levels.length - 1]}
+                      disabled={userDetails.level === "TWO"}
                       size="sm"
                       onClick={changeLevel}
                     >

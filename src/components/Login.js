@@ -3,108 +3,126 @@ import { navigate } from "hookrouter"
 import React, { useState } from "react"
 import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
-import { validateOtp, validatePhone } from "../utils"
+import { validAuthCode, validPhone, reportError } from "../utils"
 import Header from "./Header"
 import "./Login.css"
 
-const GENERATE_OTP = gql`
-  mutation requestPhoneCode($phone: String!) {
-    requestPhoneCode(phone: $phone) {
+const REQUEST_AUTH_CODE = gql`
+  mutation userRequestAuthCode($input: UserRequestAuthCodeInput!) {
+    mutationData: userRequestAuthCode(input: $input) {
+      errors {
+        message
+      }
       success
     }
   }
 `
 
 const LOGIN = gql`
-  mutation login($phone: String!, $otp: Int!) {
-    login(phone: $phone, code: $otp) {
-      token
+  mutation login($input: UserLoginInput!) {
+    mutationData: userLogin(input: $input) {
+      errors {
+        message
+      }
+      authToken
     }
   }
 `
 
 export default function Login() {
   const [phone, setPhone] = useState("")
-  const [otpGenerated, setOtpGenerated] = useState(false)
   const [otp, setOtp] = useState("")
+  const [otpGenerated, setOtpGenerated] = useState(false)
 
-  function setAuthenticated(token) {
-    sessionStorage.setItem("token", token)
+  const [requestAuthCode, { loading: requestAuthCodeLoading }] =
+    useMutation(REQUEST_AUTH_CODE)
+  const [login, { loading: userLoginLoading }] = useMutation(LOGIN)
+
+  const PhoneForm = () => {
+    async function submitPhone(event) {
+      event.preventDefault()
+      const { error, data } = await requestAuthCode({ variables: { input: { phone } } })
+      if (error) {
+        return reportError(error.message)
+      }
+
+      const { errors, success } = data.mutationData
+      if (errors.length > 0) {
+        return reportError(errors[0].message)
+      }
+      if (success) {
+        setOtpGenerated(true)
+      } else {
+        reportError("Could not execute operation")
+      }
+    }
+
+    return (
+      <Form onSubmit={submitPhone}>
+        <Form.Group size="lg">
+          <Form.Control
+            autoFocus
+            type="tel"
+            placeholder="Enter phone number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+        </Form.Group>
+        <Button block size="lg" type="submit" disabled={!validPhone(phone)}>
+          Login
+        </Button>
+      </Form>
+    )
   }
 
-  const [generateOTP, { loading: otpGenerating }] = useMutation(GENERATE_OTP, {
-    onCompleted({ requestPhoneCode: { success } }) {
-      if (!success) {
-        throw new Error("Operation failed")
+  const OTPForm = () => {
+    async function submitOtp(event) {
+      event.preventDefault()
+      const { error, data } = await login({ variables: { input: { phone, code: otp } } })
+
+      if (error) {
+        return reportError(error.message)
       }
-      setOtpGenerated(true)
-    },
-    onError(error) {
-      console.error(error)
-      alert(error.message)
-    },
-  })
 
-  function submitPhone(event) {
-    event.preventDefault()
-    generateOTP({ variables: { phone } })
-  }
+      const { errors, authToken } = data.mutationData
 
-  const [login] = useMutation(LOGIN, {
-    onCompleted({ login: { token } }) {
-      if (!token) {
-        alert("Incorrect OTP")
+      if (errors.length > 0) {
+        return reportError(errors[0].message)
       }
-      setAuthenticated(token)
-      navigate("/dashboard", true)
-    },
-    onError(error) {
-      console.error(error.message)
-    },
-  })
 
-  function submitOtp(event) {
-    event.preventDefault()
-    login({ variables: { phone, otp: parseInt(otp) } })
+      if (authToken) {
+        window.sessionStorage.setItem("token", authToken)
+        navigate("/dashboard", true)
+      } else {
+        reportError("Could not execute operation")
+      }
+    }
+
+    return (
+      <Form onSubmit={submitOtp}>
+        <Form.Group size="lg">
+          <Form.Control
+            autoFocus
+            type="text"
+            placeholder="Enter Auth Code"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+          />
+        </Form.Group>
+        <Button block size="lg" type="submit" disabled={!validAuthCode(otp)}>
+          Login
+        </Button>
+      </Form>
+    )
   }
 
   return (
     <div>
       <Header />
       <div className="Login">
-        {!otpGenerated && (
-          <Form onSubmit={submitPhone}>
-            <Form.Group size="lg">
-              <Form.Control
-                autoFocus
-                type="tel"
-                placeholder="Enter phone number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            </Form.Group>
-            <Button block size="lg" type="submit" disabled={!validatePhone(phone)}>
-              Login
-            </Button>
-          </Form>
-        )}
-        {otpGenerating && <p>Loading...</p>}
-        {otpGenerated && (
-          <Form onSubmit={submitOtp}>
-            <Form.Group size="lg">
-              <Form.Control
-                autoFocus
-                type="number"
-                placeholder="Enter OTP"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-              />
-            </Form.Group>
-            <Button block size="lg" type="submit" disabled={!validateOtp(otp)}>
-              Submit
-            </Button>
-          </Form>
-        )}
+        {!otpGenerated && <PhoneForm />}
+        {otpGenerated && <OTPForm />}
+        {(requestAuthCodeLoading || userLoginLoading) && <p>Loading...</p>}
       </div>
     </div>
   )

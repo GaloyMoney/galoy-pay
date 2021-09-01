@@ -1,37 +1,34 @@
-export function validatePhone(phone) {
+export function reportError(errorMesssage) {
+  console.error(errorMesssage)
+  alert(errorMesssage)
+}
+
+// TODO: Match validation with server
+export function validPhone(phone) {
   return phone.length > 10 && phone.length <= 15
 }
-
-export function validateOtp(otp) {
-  return otp.length === 6
+export function validAuthCode(authCode) {
+  return authCode.length === 6
 }
-
-export function validateUsername(username) {
-  return username.length >= 3
+export function validWalletName(walletName) {
+  return walletName.length >= 3
 }
-
-export function validateAddToMapInputs(username, title, latitude, longitude) {
-  //coordinate validation
+export function validAddToMapInputs({ walletName, title, latitude, longitude }) {
+  // coordinates validation
   if (!isFinite(latitude) || !(Math.abs(latitude) <= 90)) {
     return false
   }
-
   if (!isFinite(longitude) || !(Math.abs(longitude) <= 180)) {
     return false
   }
-
-  if (!validateUsername(username)) {
-    return false
-  }
-
-  return title.length >= 3
+  return walletName.length >= 3 && title.length >= 3
 }
 
 export const logout = () => {
-  sessionStorage.clear()
+  window.sessionStorage.clear()
   window.location.href = "/"
 }
 
 export const isAuthenticated = () => {
-  return !!sessionStorage.getItem("token")
+  return Boolean(window.sessionStorage.getItem("token"))
 }
