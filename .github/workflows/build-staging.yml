@@ -1,0 +1,34 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build and push
+        env:
+          CI: false
+          GRAPHQL_URI: ${{ env.GRAPHQL_URI }}
+          GRAPHQL_SUBSCRIPTION_URI: ${{ env.GRAPHQL_SUBSCRIPTION_URI }}
+        run: |
+          echo $(ls)
+          yarn
+          yarn build
+          rm -rf node_modules
+          git rm -rf .
+          mv build/* build/.well* .
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git pull -q
+          git stash -u
+          git checkout build-staging --
+          git rm -rf .
+          git stash pop
+          git add .
+          git diff-index --quiet HEAD || git commit -m 'Build'
+          git push origin build
