@@ -29,9 +29,9 @@ export function validateAddToMapInputs(username, title, latitude, longitude) {
 
 export const logout = () => {
   sessionStorage.clear()
-  window.location.href = '/'
+  window.location.href = "/"
 }
 
 export const isAuthenticated = () => {
-  return !!sessionStorage.getItem('token')
+  return !!sessionStorage.getItem("token")
 }

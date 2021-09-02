@@ -1,25 +1,26 @@
-import Login from './components/Login'
-import { useRoutes, navigate } from 'hookrouter'
-import Dashboard from './components/Dashboard'
-import UserDetails from './components/UserDetails'
-import AddToMap from './components/AddToMap'
-import { isAuthenticated } from './utils'
+import * as React from "react"
+import Login from "./components/Login"
+import { useRoutes, navigate } from "hookrouter"
+import Dashboard from "./components/Dashboard"
+import UserDetails from "./components/UserDetails"
+import AddToMap from "./components/AddToMap"
+import { isAuthenticated } from "./utils"
 
 const routes = {
-  '/': () => <Login />,
-  '/dashboard*': () => <AuthedPages />
+  "/": () => <Login />,
+  "/dashboard*": () => <AuthedPages />,
 }
 
 const dashboardRoutes = {
-  '/': () => <Dashboard />,
-  '/userDetails': () => <UserDetails />,
-  '/addToMap': () => <AddToMap />
+  "/": () => <Dashboard />,
+  "/userDetails": () => <UserDetails />,
+  "/addToMap": () => <AddToMap />,
 }
 
 const AuthedPages = () => {
   const routeResult = useRoutes(dashboardRoutes)
   if (!isAuthenticated()) {
-    navigate('/')
+    navigate("/")
   }
   return routeResult
 }
