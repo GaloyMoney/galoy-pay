@@ -615,6 +615,9 @@ module.exports = function (webpackEnv) {
           filename: "static/css/[name].[contenthash:8].css",
           chunkFilename: "static/css/[name].[contenthash:8].chunk.css",
         }),
+
+      new webpack.EnvironmentPlugin(["GRAPHQL_URI"]),
+
       // Generate an asset manifest file with the following content:
       // - "files" key: Mapping of all asset filenames to their corresponding
       //   output file so that tools can pick it up without having to parse

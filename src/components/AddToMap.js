@@ -4,63 +4,61 @@ import { Container, Form } from "react-bootstrap"
 import Button from "react-bootstrap/Button"
 import Col from "react-bootstrap/Col"
 import Row from "react-bootstrap/Row"
-import { validateAddToMapInputs } from "../utils"
+import { validAddToMapInputs } from "../utils"
 import Header from "./Header"
 
-const ADD_TO_MAP = gql`
-  mutation addToMap(
-    $username: String!
-    $title: String!
-    $latitude: Float!
-    $longitude: Float!
-  ) {
-    addToMap(
-      username: $username
-      title: $title
-      latitude: $latitude
-      longitude: $longitude
-    )
+const BUSINESS_UPDATE_MAP_INFO = gql`
+  mutation businessUpdateMapInfo($input: BusinessUpdateMapInfoInput!) {
+    mutationData: businessUpdateMapInfo(input: $input) {
+      errors {
+        message
+      }
+      userDetails {
+        id
+      }
+    }
   }
 `
 
 function AddToMap() {
-  const token = sessionStorage.getItem("token")
-  const [title, setTitle] = React.useState("")
-  const [username, setUsername] = React.useState("")
-  const [latitude, setLatitude] = React.useState("")
-  const [longitude, setLongitude] = React.useState("")
+  const [businessUpdateMapInfo] = useMutation(BUSINESS_UPDATE_MAP_INFO)
 
-  const [addToMap] = useMutation(ADD_TO_MAP, {
-    context: {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-    onCompleted() {
-      alert("Added successfully!")
-      resetValues()
-    },
-    onError(error) {
-      alert(error.message)
-    },
-  })
-
-  const resetValues = () => {
-    const states = [setLatitude, setLongitude, setUsername, setTitle]
-    states.forEach((state) => state(""))
-  }
-
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault()
 
-    addToMap({
+    const { walletName, title, longitude, latitude } = event.target
+
+    const businessInfo = {
+      walletName: walletName.value,
+      title: title.value,
+      longitude: parseFloat(longitude.value),
+      latitude: parseFloat(latitude.value),
+    }
+
+    if (!validAddToMapInputs(businessInfo)) {
+      alert("Invalid input values")
+      return
+    }
+
+    const { data, errors } = await businessUpdateMapInfo({
       variables: {
-        username,
-        title,
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
+        input: businessInfo,
       },
     })
+
+    // TODO: update UI (instead of alerts)
+
+    if (errors || data?.mutationData?.errors.length > 0) {
+      console.error({ errors, userErrors: data.mutationData.errors })
+      alert("Error adding merchant to map")
+    } else {
+      alert("Added successfully!")
+    }
+
+    walletName.value = ""
+    title.value = ""
+    longitude.value = ""
+    latitude.value = ""
   }
 
   return (
@@ -72,32 +70,11 @@ function AddToMap() {
           <Col md="auto">
             <Form onSubmit={submit}>
               <Form.Group>
-                <Form.Control
-                  placeholder="Enter username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-                <Form.Control
-                  placeholder="Enter title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-                <Form.Control
-                  placeholder="Enter latitude"
-                  value={latitude}
-                  onChange={(e) => setLatitude(e.target.value)}
-                />
-                <Form.Control
-                  placeholder="Enter longitude"
-                  value={longitude}
-                  onChange={(e) => setLongitude(e.target.value)}
-                />
-                <Button
-                  type="submit"
-                  disabled={!validateAddToMapInputs(username, title, latitude, longitude)}
-                >
-                  Submit
-                </Button>
+                <Form.Control placeholder="Enter wallet name" name="walletName" />
+                <Form.Control placeholder="Enter title" name="title" />
+                <Form.Control placeholder="Enter latitude" name="latitude" />
+                <Form.Control placeholder="Enter longitude" name="longitude" />
+                <Button type="submit">Submit</Button>
               </Form.Group>
             </Form>
           </Col>

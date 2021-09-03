@@ -3,11 +3,26 @@ import ReactDOM from "react-dom"
 import "./index.css"
 import App from "./App"
 import reportWebVitals from "./reportWebVitals"
-import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client"
+import { ApolloProvider, ApolloClient, InMemoryCache, HttpLink } from "@apollo/client"
+import { setContext } from "@apollo/client/link/context"
+import { GRAPHQL_URI } from "./config"
+
+const cache = new InMemoryCache()
+const httpLink = new HttpLink({ uri: GRAPHQL_URI, fetch })
+
+const authLink = setContext((_, { headers }) => {
+  const token = window.sessionStorage.getItem("token")
+  return {
+    headers: {
+      ...headers,
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+  }
+})
 
 const client = new ApolloClient({
-  uri: window.env.GRAPHQL_URI,
-  cache: new InMemoryCache(),
+  link: authLink.concat(httpLink),
+  cache,
 })
 
 ReactDOM.render(
