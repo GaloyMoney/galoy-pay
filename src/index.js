@@ -5,9 +5,10 @@ import App from "./App"
 import reportWebVitals from "./reportWebVitals"
 import { ApolloProvider, ApolloClient, InMemoryCache, HttpLink } from "@apollo/client"
 import { setContext } from "@apollo/client/link/context"
+import { GRAPHQL_URI } from "./config"
 
 const cache = new InMemoryCache()
-const httpLink = new HttpLink({ uri: window.env.GRAPHQL_URI, fetch })
+const httpLink = new HttpLink({ uri: GRAPHQL_URI, fetch })
 
 const authLink = setContext((_, { headers }) => {
   const token = window.sessionStorage.getItem("token")
