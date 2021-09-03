@@ -20,7 +20,7 @@ jobs:
           yarn build
           rm -rf node_modules
           git rm -rf .
-          mv build/* build/.well* .
+          mv build/* .
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git pull -q
@@ -47,7 +47,7 @@ jobs:
           yarn build
           rm -rf node_modules
           git rm -rf .
-          mv build/* build/.well* .
+          mv build/* .
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git pull -q
