@@ -26,10 +26,10 @@ function AddToMap() {
   const submit = async (event) => {
     event.preventDefault()
 
-    const { walletName, title, longitude, latitude } = event.target
+    const { username, title, longitude, latitude } = event.target
 
     const businessInfo = {
-      walletName: walletName.value,
+      username: username.value,
       title: title.value,
       longitude: parseFloat(longitude.value),
       latitude: parseFloat(latitude.value),
@@ -55,7 +55,7 @@ function AddToMap() {
       alert("Added successfully!")
     }
 
-    walletName.value = ""
+    username.value = ""
     title.value = ""
     longitude.value = ""
     latitude.value = ""
@@ -70,7 +70,7 @@ function AddToMap() {
           <Col md="auto">
             <Form onSubmit={submit}>
               <Form.Group>
-                <Form.Control placeholder="Enter wallet name" name="walletName" />
+                <Form.Control placeholder="Enter user name" name="username" />
                 <Form.Control placeholder="Enter title" name="title" />
                 <Form.Control placeholder="Enter latitude" name="latitude" />
                 <Form.Control placeholder="Enter longitude" name="longitude" />

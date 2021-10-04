@@ -5,7 +5,7 @@ import Button from "react-bootstrap/Button"
 import Col from "react-bootstrap/Col"
 import Row from "react-bootstrap/Row"
 import Table from "react-bootstrap/Table"
-import { validPhone, validWalletName, reportError } from "../utils"
+import { validPhone, validUsername, reportError } from "../utils"
 import Header from "./Header"
 
 // TODO: use fragment for userDetails
@@ -15,7 +15,7 @@ const GET_USER_BY_PHONE = gql`
     userDetails: userDetailsByPhone(phone: $phone) {
       id
       phone
-      walletName
+      username
       level
       status
       title
@@ -29,11 +29,11 @@ const GET_USER_BY_PHONE = gql`
 `
 
 const GET_USER_BY_USERNAME = gql`
-  query getUserDetails($walletName: WalletName!) {
-    userDetails: userDetailsByWalletName(walletName: $walletName) {
+  query getUserDetails($username: Username!) {
+    userDetails: userDetailsByUsername(username: $username) {
       id
       phone
-      walletName
+      username
       level
       status
       title
@@ -55,7 +55,7 @@ const USER_UPDATE_STATUS = gql`
       userDetails {
         id
         phone
-        walletName
+        username
         level
         status
         title
@@ -78,7 +78,7 @@ const USER_UPDATE_LEVEL = gql`
       userDetails {
         id
         phone
-        walletName
+        username
         level
         status
         title
@@ -95,7 +95,7 @@ const USER_UPDATE_LEVEL = gql`
 // TODO: Split into 3 components
 function UserDetails() {
   const [phone, setPhone] = React.useState("")
-  const [walletName, setWalletName] = React.useState("")
+  const [username, setUsername] = React.useState("")
   const [userDetails, setUserDetails] = React.useState("")
 
   // TODO: get rid of onCompleted and use hooks data directly
@@ -120,7 +120,7 @@ function UserDetails() {
       },
       onError(error) {
         reportError(error.message)
-        setWalletName("")
+        setUsername("")
       },
     },
   )
@@ -128,7 +128,7 @@ function UserDetails() {
   const [updateUserStatus] = useMutation(USER_UPDATE_STATUS, {
     onCompleted({ mutationData }) {
       setUserDetails(mutationData.userDetails)
-      alert(`${userDetails.walletName}'s account level has been changed successfully`)
+      alert(`${userDetails.username}'s account level has been changed successfully`)
     },
     onError(error) {
       console.error(error)
@@ -139,7 +139,7 @@ function UserDetails() {
   const [updateUserLevel] = useMutation(USER_UPDATE_LEVEL, {
     onCompleted({ mutationData }) {
       setUserDetails(mutationData.userDetails)
-      alert(`${userDetails.walletName}'s account status has been changed successfully`)
+      alert(`${userDetails.username}'s account status has been changed successfully`)
     },
     onError(error) {
       console.error(error)
@@ -154,7 +154,7 @@ function UserDetails() {
 
   function submitUsername(event) {
     event.preventDefault()
-    getUserByUsername({ variables: { walletName } })
+    getUserByUsername({ variables: { username } })
   }
 
   function changeAccountStatus() {
@@ -198,11 +198,11 @@ function UserDetails() {
             <Form inline onSubmit={submitUsername}>
               <Form.Group>
                 <Form.Control
-                  placeholder="Enter user's wallet name"
-                  value={walletName}
-                  onChange={(e) => setWalletName(e.target.value)}
+                  placeholder="Enter user's user name"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
-                <Button type="submit" disabled={!validWalletName(walletName)}>
+                <Button type="submit" disabled={!validUsername(username)}>
                   Submit
                 </Button>
               </Form.Group>
@@ -218,7 +218,7 @@ function UserDetails() {
               <thead>
                 <tr>
                   <th>Phone</th>
-                  <th>Wallet Name</th>
+                  <th>Username</th>
                   <th>Title</th>
                   <th>Latitude</th>
                   <th>Longtitude</th>
@@ -230,7 +230,7 @@ function UserDetails() {
               <tbody>
                 <tr>
                   <td>{userDetails.phone}</td>
-                  <td>{userDetails.walletName}</td>
+                  <td>{userDetails.username}</td>
                   <td>{userDetails.title}</td>
                   <td>
                     {userDetails.coordinates ? userDetails.coordinates.latitude : ""}
