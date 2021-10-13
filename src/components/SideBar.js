@@ -3,6 +3,7 @@ import PropTypes from "prop-types"
 import { A, usePath } from "hookrouter"
 import Icon from "./Icon"
 import { dashboardRoutes } from "../routes"
+import { logout } from "../utils"
 
 function SideBar({ basePath }) {
   const currentPath = usePath()
@@ -36,6 +37,16 @@ function SideBar({ basePath }) {
             </li>
           ))}
         </ul>
+      </div>
+      <div className="px-6 py-3 fixed bottom-0 text-gray-500">
+        <A
+          href="#"
+          onClick={logout}
+          className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800"
+        >
+          <Icon className="w-5 h-5" aria-hidden="true" icon="LogoutIcon" />
+          <span className="ml-4">Logout</span>
+        </A>
       </div>
     </aside>
   )
