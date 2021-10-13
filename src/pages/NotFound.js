@@ -8,7 +8,7 @@ function NotFound() {
         <h1 className="text-6xl font-semibold text-gray-800">404</h1>
         <p className="text-gray-600">
           Page not found. Please check the address or{" "}
-          <a className="text-blue-600 hover:underline" href="/dashboard">
+          <a className="text-blue-600 hover:underline" href="/dashboard/">
             go to dashboard
           </a>
         </p>
