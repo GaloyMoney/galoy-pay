@@ -1,12 +1,7 @@
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
-import * as React from "react"
-import { Container, Form } from "react-bootstrap"
-import Button from "react-bootstrap/Button"
-import Col from "react-bootstrap/Col"
-import Row from "react-bootstrap/Row"
-import Table from "react-bootstrap/Table"
+import React, { useState } from "react"
 import { validPhone, validUsername, reportError } from "../utils"
-import Header from "./Header"
+import SearchHeader from "./SearchHeader"
 
 // TODO: use fragment for userDetails
 
@@ -92,10 +87,21 @@ const USER_UPDATE_LEVEL = gql`
   }
 `
 
+const emptyUserDetails = {
+  phone: "+11111111111",
+  username: "username",
+  level: "ONE",
+  status: "ACTIVE",
+  title: "title",
+  coordinates: {
+    latitude: 13.4972747,
+    longitude: -89.4435569,
+  },
+  createdAt: 1633992340
+}
+
 // TODO: Split into 3 components
 function UserDetails() {
-  const [phone, setPhone] = React.useState("")
-  const [username, setUsername] = React.useState("")
   const [userDetails, setUserDetails] = React.useState("")
 
   // TODO: get rid of onCompleted and use hooks data directly
@@ -108,7 +114,8 @@ function UserDetails() {
       },
       onError(error) {
         reportError(error.message)
-        setPhone("")
+        setSearchValue("")
+        setUserDetails(emptyUserDetails)
       },
     },
   )
@@ -120,7 +127,8 @@ function UserDetails() {
       },
       onError(error) {
         reportError(error.message)
-        setUsername("")
+        setSearchValue("")
+        setUserDetails(emptyUserDetails)
       },
     },
   )
@@ -147,16 +155,6 @@ function UserDetails() {
     },
   })
 
-  function submitPhone(event) {
-    event.preventDefault()
-    getUserByPhone({ variables: { phone } })
-  }
-
-  function submitUsername(event) {
-    event.preventDefault()
-    getUserByUsername({ variables: { username } })
-  }
-
   function changeAccountStatus() {
     const targetStatus = userDetails.status === "ACTIVE" ? "LOCKED" : "ACTIVE"
     const confirmation = window.confirm(
@@ -173,99 +171,101 @@ function UserDetails() {
     updateUserLevel({ variables: { input: { uid: userDetails.id, level: "TWO" } } })
   }
 
+  const [searchValue, setSearchValue] = useState("")
+
+  const search = () => {
+    if (!searchValue) return
+    
+    if (validPhone(searchValue)) {
+      return getUserByPhone({ variables: { phone: searchValue } })
+    }
+
+    if (validUsername(searchValue)) {
+      return getUserByUsername({ variables: { username: searchValue } })
+    }
+
+    setUserDetails(emptyUserDetails)
+    reportError("User not found")
+  }
+  const loading = gettingUserByPhone || gettingUserByUsername
+  let detailClass = userDetails === emptyUserDetails || loading ? "filter blur-sm" : ""
+  detailClass = detailClass + (loading ? " animate-pulse" : "")
+  if (!userDetails) setUserDetails(emptyUserDetails)
+
   return (
     <div>
-      <Header />
-      <Container fluid>
-        <br />
-        <Row className="justify-content-md-center">
-          <Col md="auto">
-            <Form inline onSubmit={submitPhone}>
-              <Form.Group>
-                <Form.Control
-                  type="tel"
-                  placeholder="Enter user's phone number"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-                <Button type="submit" disabled={!validPhone(phone)}>
-                  Submit
-                </Button>
-              </Form.Group>
-            </Form>
-          </Col>
-          <Col md="auto">
-            <Form inline onSubmit={submitUsername}>
-              <Form.Group>
-                <Form.Control
-                  placeholder="Enter user's user name"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-                <Button type="submit" disabled={!validUsername(username)}>
-                  Submit
-                </Button>
-              </Form.Group>
-            </Form>
-          </Col>
-        </Row>
-        <Row>
-          {(gettingUserByPhone || gettingUserByUsername) && (
-            <Col md="auto">Getting user details...</Col>
-          )}
-          {userDetails && (
-            <Table bordered hover striped style={{ margin: "15px" }}>
-              <thead>
-                <tr>
-                  <th>Phone</th>
-                  <th>Username</th>
-                  <th>Title</th>
-                  <th>Latitude</th>
-                  <th>Longtitude</th>
-                  <th>Created At</th>
-                  <th>Level</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>{userDetails.phone}</td>
-                  <td>{userDetails.username}</td>
-                  <td>{userDetails.title}</td>
-                  <td>
-                    {userDetails.coordinates ? userDetails.coordinates.latitude : ""}
-                  </td>
-                  <td>
-                    {userDetails.coordinates ? userDetails.coordinates.longitude : ""}
-                  </td>
-                  <td>{new Date(parseInt(userDetails.createdAt)).toString()}</td>
-                  <td>
-                    {userDetails.level}{" "}
-                    <Button
-                      variant="outline-danger"
-                      disabled={userDetails.level === "TWO"}
-                      size="sm"
-                      onClick={changeLevel}
-                    >
-                      Upgrade
-                    </Button>{" "}
-                  </td>
-                  <td>
-                    {userDetails.status}{" "}
-                    <Button
-                      variant="outline-danger"
-                      size="sm"
-                      onClick={changeAccountStatus}
-                    >
-                      Change
-                    </Button>{" "}
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-          )}
-        </Row>
-      </Container>
+      <SearchHeader
+        placeholder="Enter user's phone number or user name"
+        value={searchValue}
+        onChange={setSearchValue}
+        onEnter={search}
+      />
+      <h1 className="mx-6 mt-6 text-2xl font-semibold text-gray-700">
+      User details
+      {(gettingUserByPhone || gettingUserByUsername) && (
+        <small className="animate-pulse font-thin text-sm">  (loading...)</small>
+      )}
+      </h1>
+      <div className="grid gap-6 mb-8 md:grid-cols-2 p-6">
+        <div className="p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-2 gap-4">
+          <div className="">
+            <p className="mb-4 font-semibold text-gray-600">Phone</p>
+            <p className={`text-gray-600 ${detailClass}`}>{userDetails.phone}</p>
+          </div>
+          <div className="">
+            <p className="mb-4 font-semibold text-gray-600">Username</p>
+            <p className={`text-gray-600 ${detailClass}`}>
+              {userDetails.username ?? "--"}
+            </p>
+          </div>
+          <div className="">
+            <p className="mb-4 font-semibold text-gray-600">Title</p>
+            <p className={`text-gray-600 ${detailClass}`}>{userDetails.title ?? "--"}</p>
+          </div>
+          <div className="">
+            <p className="mb-4 font-semibold text-gray-600">Coordinates</p>
+            <p className={`text-gray-600 ${detailClass}`}>
+              {userDetails.coordinates
+                ? userDetails.coordinates.latitude + ", " + userDetails.coordinates.longitude
+                : "--"}
+            </p>
+          </div>
+          <div className="col-span-2">
+            <p className="mb-4 font-semibold text-gray-600">Created At</p>
+            <p className={`text-gray-600 ${detailClass}`}>
+              {new Date(userDetails.createdAt * 1e3).toString()}
+            </p>
+          </div>
+        </div>
+        <div className="p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-1 gap-4">
+          <div className="">
+            <p className="mb-4 font-semibold text-gray-600">Level</p>
+            <p className={`text-gray-600 ${detailClass}`}>
+            {userDetails.level}
+            {userDetails.level === "ONE" && (
+              <button
+              onClick={changeLevel}
+              className="mx-4 bg-green-400 hover:bg-green-500 text-white font-bold p-2 border border-green-500 rounded disabled:opacity-50"
+              >
+              Upgrade
+              </button>
+            )}
+            </p>
+          </div>
+          <div className="">
+            <p className="mb-4 font-semibold text-gray-600">Status</p>
+            <p className={`text-gray-600 ${detailClass}`}>
+            {userDetails.status}
+            <button
+              onClick={changeAccountStatus}
+              className={`mx-4 bg-${userDetails.status === "ACTIVE" ? "red": "green"}-500 hover:bg-${userDetails.status === "ACTIVE" ? "red": "green"}-700 text-white font-bold p-2 border border-${userDetails.status === "ACTIVE" ? "red": "green"}-700 rounded disabled:opacity-50`}
+            >
+              {userDetails.status === "ACTIVE" ? "LOCK": "ACTIVATE"}
+            </button>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

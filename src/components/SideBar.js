@@ -19,7 +19,7 @@ function SideBar({ basePath }) {
           Admin Panel
         </a>
         <ul className="mt-6">
-          {dashboardRoutes.map((route) => (
+          {dashboardRoutes.filter(r => r.showInSidebar).map((route) => (
             <li className="relative px-6 py-3" key={route.name}>
               <A
                 href={basePath + route.path}

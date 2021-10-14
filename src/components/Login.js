@@ -3,6 +3,7 @@ import { navigate } from "hookrouter"
 import React, { useState } from "react"
 import { validAuthCode, validPhone, reportError } from "../utils"
 import Footer from "./Footer"
+import { isAuthenticated } from "../utils"
 
 const REQUEST_AUTH_CODE = gql`
   mutation userRequestAuthCode($input: UserRequestAuthCodeInput!) {
@@ -27,6 +28,8 @@ const LOGIN = gql`
 `
 
 export default function Login() {
+  if (isAuthenticated()) navigate("/dashboard")
+
   const [phone, setPhone] = useState("")
   const [otp, setOtp] = useState("")
   const [otpGenerated, setOtpGenerated] = useState(false)

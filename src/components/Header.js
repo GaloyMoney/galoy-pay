@@ -1,29 +1,18 @@
 import React from "react"
-import Navbar from "react-bootstrap/Navbar"
-import Nav from "react-bootstrap/Nav"
-import Container from "react-bootstrap/Container"
-import Image from "react-bootstrap/Image"
-import Button from "react-bootstrap/Button"
-import { logout } from "../utils"
+import PropTypes from "prop-types"
 
-function Header() {
+function Header({ children }) {
   return (
-    <Navbar bg="dark" variant="dark">
-      <Container>
-        <Navbar.Brand href="https://bitcoinbeach.com">
-          <Image src={process.env.PUBLIC_URL + "/BBLogo.png"} rounded />
-        </Navbar.Brand>
-        <Nav className="mr-auto">
-          <Nav.Link href="/dashboard">Home</Nav.Link>
-        </Nav>
-        <Nav>
-          <Button onClick={logout} variant="dark">
-            Logout
-          </Button>
-        </Nav>
-      </Container>
-    </Navbar>
+    <header className="z-40 py-4 bg-white shadow-bottom">
+      <div className="container flex items-center justify-between h-full px-6 mx-auto text-blue-600">
+        {children}
+      </div>
+    </header>
   )
+}
+
+Header.propTypes = {
+  children: PropTypes.node.isRequired,
 }
 
 export default Header

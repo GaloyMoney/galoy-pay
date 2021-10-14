@@ -1,6 +1,6 @@
 import React from "react"
 import PropTypes from "prop-types"
-import * as Icons from "../icons"
+import * as Icons from "./icons"
 
 function Icon({ icon, ...props }) {
   const Icon = Icons[icon]
