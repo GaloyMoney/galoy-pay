@@ -1,11 +1,7 @@
+import React, { useState, useEffect } from "react"
+import PropTypes from "prop-types"
 import { gql, useMutation } from "@apollo/client"
-import * as React from "react"
-import { Container, Form } from "react-bootstrap"
-import Button from "react-bootstrap/Button"
-import Col from "react-bootstrap/Col"
-import Row from "react-bootstrap/Row"
 import { validAddToMapInputs } from "../utils"
-import Header from "./Header"
 
 const BUSINESS_UPDATE_MAP_INFO = gql`
   mutation businessUpdateMapInfo($input: BusinessUpdateMapInfoInput!) {
@@ -20,19 +16,29 @@ const BUSINESS_UPDATE_MAP_INFO = gql`
   }
 `
 
-function AddToMap() {
-  const [businessUpdateMapInfo] = useMutation(BUSINESS_UPDATE_MAP_INFO)
+function useStateWithDep(defaultValue) {
+  const [value, setValue] = useState(defaultValue)
+
+  useEffect(() => {
+    setValue(defaultValue)
+  }, [defaultValue])
+  return [value, setValue]
+}
+
+function AddToMap({ disabledClass, username, title, latitude, longitude, onChange }) {
+  const [businessUpdateMapInfo, { loading }] = useMutation(BUSINESS_UPDATE_MAP_INFO)
+  const [titleVal, setTitleVal] = useStateWithDep(title)
+  const [latitudeVal, setLatitudeVal] = useStateWithDep(latitude)
+  const [longitudeVal, setLongitudeVal] = useStateWithDep(longitude)
 
   const submit = async (event) => {
     event.preventDefault()
 
-    const { username, title, longitude, latitude } = event.target
-
     const businessInfo = {
-      username: username.value,
-      title: title.value,
-      longitude: parseFloat(longitude.value),
-      latitude: parseFloat(latitude.value),
+      username: username,
+      title: titleVal,
+      longitude: parseFloat(longitudeVal),
+      latitude: parseFloat(latitudeVal),
     }
 
     if (!validAddToMapInputs(businessInfo)) {
@@ -52,36 +58,78 @@ function AddToMap() {
       console.error({ errors, userErrors: data.mutationData.errors })
       alert("Error adding merchant to map")
     } else {
-      alert("Added successfully!")
+      onChange(businessInfo)
+      alert("Updated successfully!")
     }
-
-    username.value = ""
-    title.value = ""
-    longitude.value = ""
-    latitude.value = ""
   }
 
   return (
-    <div>
-      <Header />
-      <Container fluid>
-        <br />
-        <Row className="justify-content-md-center">
-          <Col md="auto">
-            <Form onSubmit={submit}>
-              <Form.Group>
-                <Form.Control placeholder="Enter user name" name="username" />
-                <Form.Control placeholder="Enter title" name="title" />
-                <Form.Control placeholder="Enter latitude" name="latitude" />
-                <Form.Control placeholder="Enter longitude" name="longitude" />
-                <Button type="submit">Submit</Button>
-              </Form.Group>
-            </Form>
-          </Col>
-        </Row>
-      </Container>
-    </div>
+    <form className="grid grid-cols-2 gap-4" onSubmit={submit}>
+      <div className="">
+        <label htmlFor="latitude" className="font-semibold text-gray-600">
+          Latitude
+        </label>
+        <input
+          id="latitude"
+          required
+          type="text"
+          placeholder="Enter longitude"
+          value={latitudeVal}
+          onChange={(e) => setLatitudeVal(e.target.value)}
+          disabled={!!disabledClass}
+          className={`${disabledClass} mt-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-600 focus:outline-none focus:shadow-outline`}
+        />
+      </div>
+      <div className="">
+        <label htmlFor="longitude" className="font-semibold text-gray-600">
+          Longitude
+        </label>
+        <input
+          id="longitude"
+          required
+          type="text"
+          placeholder="Enter longitude"
+          value={longitudeVal}
+          onChange={(e) => setLongitudeVal(e.target.value)}
+          disabled={!!disabledClass}
+          className={`${disabledClass} mt-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-600 focus:outline-none focus:shadow-outline`}
+        />
+      </div>
+      <div className="">
+        <label htmlFor="title" className="font-semibold text-gray-600">
+          Title
+        </label>
+        <input
+          id="title"
+          required
+          type="text"
+          placeholder="Enter title"
+          value={titleVal}
+          onChange={(e) => setTitleVal(e.target.value)}
+          disabled={!!disabledClass}
+          className={`${disabledClass} mt-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-600 focus:outline-none focus:shadow-outline`}
+        />
+      </div>
+      <div className={`${disabledClass} flex items-end justify-end`}>
+        <button
+          type="submit"
+          disabled={!titleVal || !latitudeVal || !longitudeVal}
+          className="mb-0 w-full bg-blue-400 hover:bg-blue-500 text-white font-bold p-2 my-4 border border-blue-500 rounded disabled:opacity-50"
+        >
+          {loading ? "updating..." : "Update"}
+        </button>
+      </div>
+    </form>
   )
+}
+
+AddToMap.propTypes = {
+  disabledClass: PropTypes.string,
+  username: PropTypes.string,
+  title: PropTypes.string,
+  latitude: PropTypes.string,
+  longitude: PropTypes.string,
+  onChange: PropTypes.func,
 }
 
 export default AddToMap

@@ -1,7 +1,6 @@
 import React from "react"
 import Dashboard from "./components/Dashboard"
 import UserDetails from "./components/UserDetails"
-import AddToMap from "./components/AddToMap"
 
 export const dashboardRoutes = [
   {
@@ -17,12 +16,5 @@ export const dashboardRoutes = [
     path: "/userDetails",
     showInSidebar: true,
     component: () => <UserDetails />,
-  },
-  {
-    name: "Add to map",
-    icon: "LocationIcon",
-    path: "/addToMap",
-    showInSidebar: true,
-    component: () => <AddToMap />,
   },
 ]

@@ -1,7 +1,8 @@
-import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import React, { useState } from "react"
+import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { validPhone, validUsername, reportError } from "../utils"
 import SearchHeader from "./SearchHeader"
+import AddToMap from "./AddToMap"
 
 // TODO: use fragment for userDetails
 
@@ -94,10 +95,10 @@ const emptyUserDetails = {
   status: "ACTIVE",
   title: "title",
   coordinates: {
-    latitude: 13.4972747,
-    longitude: -89.4435569,
+    latitude: "13.4972747",
+    longitude: "-89.4435569",
   },
-  createdAt: 1633992340
+  createdAt: 1633992340,
 }
 
 // TODO: Split into 3 components
@@ -130,6 +131,7 @@ function UserDetails() {
         setSearchValue("")
         setUserDetails(emptyUserDetails)
       },
+      fetchPolicy: "no-cache",
     },
   )
 
@@ -175,7 +177,7 @@ function UserDetails() {
 
   const search = () => {
     if (!searchValue) return
-    
+
     if (validPhone(searchValue)) {
       return getUserByPhone({ variables: { phone: searchValue } })
     }
@@ -187,6 +189,11 @@ function UserDetails() {
     setUserDetails(emptyUserDetails)
     reportError("User not found")
   }
+
+  const userDetailsUpdated = ({ username }) => {
+    getUserByUsername({ variables: { username } })
+  }
+
   const loading = gettingUserByPhone || gettingUserByUsername
   let detailClass = userDetails === emptyUserDetails || loading ? "filter blur-sm" : ""
   detailClass = detailClass + (loading ? " animate-pulse" : "")
@@ -201,13 +208,13 @@ function UserDetails() {
         onEnter={search}
       />
       <h1 className="mx-6 mt-6 text-2xl font-semibold text-gray-700">
-      User details
-      {(gettingUserByPhone || gettingUserByUsername) && (
-        <small className="animate-pulse font-thin text-sm">  (loading...)</small>
-      )}
+        User details
+        {(gettingUserByPhone || gettingUserByUsername) && (
+          <small className="animate-pulse font-thin text-sm"> (loading...)</small>
+        )}
       </h1>
       <div className="grid gap-6 mb-8 md:grid-cols-2 p-6">
-        <div className="p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-2 gap-4">
+        <div className="shadow p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-2 gap-4">
           <div className="">
             <p className="mb-4 font-semibold text-gray-600">Phone</p>
             <p className={`text-gray-600 ${detailClass}`}>{userDetails.phone}</p>
@@ -225,9 +232,24 @@ function UserDetails() {
           <div className="">
             <p className="mb-4 font-semibold text-gray-600">Coordinates</p>
             <p className={`text-gray-600 ${detailClass}`}>
-              {userDetails.coordinates
-                ? userDetails.coordinates.latitude + ", " + userDetails.coordinates.longitude
-                : "--"}
+              {userDetails.coordinates ? (
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline"
+                  href={`https://maps.google.com/?q=${
+                    userDetails.coordinates.latitude +
+                    "," +
+                    userDetails.coordinates.longitude
+                  }`}
+                >
+                  {userDetails.coordinates.latitude +
+                    ", " +
+                    userDetails.coordinates.longitude}
+                </a>
+              ) : (
+                "--"
+              )}
             </p>
           </div>
           <div className="col-span-2">
@@ -237,32 +259,60 @@ function UserDetails() {
             </p>
           </div>
         </div>
-        <div className="p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-1 gap-4">
-          <div className="">
-            <p className="mb-4 font-semibold text-gray-600">Level</p>
-            <p className={`text-gray-600 ${detailClass}`}>
-            {userDetails.level}
-            {userDetails.level === "ONE" && (
-              <button
-              onClick={changeLevel}
-              className="mx-4 bg-green-400 hover:bg-green-500 text-white font-bold p-2 border border-green-500 rounded disabled:opacity-50"
-              >
-              Upgrade
-              </button>
-            )}
-            </p>
+        <div className="grid grid-cols-1 gap-4">
+          <div className="shadow p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-2 gap-4">
+            <div className="">
+              <p className="mb-4 font-semibold text-gray-600">Level</p>
+              <p className={`text-gray-600 ${detailClass}`}>
+                {userDetails.level}
+                {userDetails.level === "ONE" && (
+                  <button
+                    onClick={changeLevel}
+                    className="text-sm mx-4 bg-green-500 hover:bg-green-700 text-white font-bold p-2 border border-green-700 rounded disabled:opacity-50"
+                  >
+                    Upgrade
+                  </button>
+                )}
+              </p>
+            </div>
+            <div className="">
+              <p className="mb-4 font-semibold text-gray-600">Status</p>
+              <p className={`text-gray-600 ${detailClass}`}>
+                {userDetails.status}
+                <button
+                  onClick={changeAccountStatus}
+                  className={`text-sm mx-4 bg-${
+                    userDetails.status === "ACTIVE" ? "red" : "green"
+                  }-500 hover:bg-${
+                    userDetails.status === "ACTIVE" ? "red" : "green"
+                  }-700 text-white font-bold p-2 border border-${
+                    userDetails.status === "ACTIVE" ? "red" : "green"
+                  }-700 rounded disabled:opacity-50`}
+                >
+                  {userDetails.status === "ACTIVE" ? "Lock" : "Activate"}
+                </button>
+              </p>
+            </div>
           </div>
-          <div className="">
-            <p className="mb-4 font-semibold text-gray-600">Status</p>
-            <p className={`text-gray-600 ${detailClass}`}>
-            {userDetails.status}
-            <button
-              onClick={changeAccountStatus}
-              className={`mx-4 bg-${userDetails.status === "ACTIVE" ? "red": "green"}-500 hover:bg-${userDetails.status === "ACTIVE" ? "red": "green"}-700 text-white font-bold p-2 border border-${userDetails.status === "ACTIVE" ? "red": "green"}-700 rounded disabled:opacity-50`}
-            >
-              {userDetails.status === "ACTIVE" ? "LOCK": "ACTIVATE"}
-            </button>
-            </p>
+          <div className="shadow p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-1 gap-4">
+            <AddToMap
+              disabledClass={detailClass}
+              username={
+                userDetails !== emptyUserDetails ? userDetails.username || "" : ""
+              }
+              title={userDetails !== emptyUserDetails ? userDetails.title || "" : ""}
+              latitude={
+                userDetails !== emptyUserDetails && userDetails.coordinates
+                  ? userDetails.coordinates.latitude + ""
+                  : ""
+              }
+              longitude={
+                userDetails !== emptyUserDetails && userDetails.coordinates
+                  ? userDetails.coordinates.longitude + ""
+                  : ""
+              }
+              onChange={userDetailsUpdated}
+            />
           </div>
         </div>
       </div>
