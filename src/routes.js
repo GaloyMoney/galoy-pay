@@ -1,6 +1,7 @@
 import React from "react"
 import Dashboard from "./components/Dashboard"
 import UserDetails from "./components/UserDetails"
+import Transactions from "./components/Transactions"
 
 export const dashboardRoutes = [
   {
@@ -16,5 +17,12 @@ export const dashboardRoutes = [
     path: "/userDetails",
     showInSidebar: true,
     component: () => <UserDetails />,
+  },
+  {
+    name: "Transactions",
+    icon: "TransactionsIcon",
+    path: "/transactions",
+    showInSidebar: true,
+    component: () => <Transactions />,
   },
 ]

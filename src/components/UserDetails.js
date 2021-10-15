@@ -255,7 +255,7 @@ function UserDetails() {
           <div className="col-span-2">
             <p className="mb-4 font-semibold text-gray-600">Created At</p>
             <p className={`text-gray-600 ${detailClass}`}>
-              {new Date(userDetails.createdAt * 1e3).toString()}
+              {new Date(userDetails.createdAt * 1e3).toLocaleString()}
             </p>
           </div>
         </div>
