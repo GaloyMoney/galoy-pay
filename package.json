@@ -13,7 +13,7 @@
     "test": "node scripts/test.js"
   },
   "dependencies": {
-    "@apollo/client": "^3.3.21",
+    "@apollo/client": "^3.4.16",
     "@babel/core": "7.15.4",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",
     "@svgr/webpack": "5.5.0",
