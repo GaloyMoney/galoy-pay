@@ -222,12 +222,12 @@ function UserDetails() {
           <div>
             <p className="mb-4 font-semibold text-gray-600">Username</p>
             <p className={`text-gray-600 ${detailClass}`}>
-              {userDetails.username ?? "--"}
+              {userDetails.username || "--"}
             </p>
           </div>
           <div>
             <p className="mb-4 font-semibold text-gray-600">Title</p>
-            <p className={`text-gray-600 ${detailClass}`}>{userDetails.title ?? "--"}</p>
+            <p className={`text-gray-600 ${detailClass}`}>{userDetails.title || "--"}</p>
           </div>
           <div>
             <p className="mb-4 font-semibold text-gray-600">Coordinates</p>
