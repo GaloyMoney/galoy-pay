@@ -21,23 +21,23 @@ function LnPayment({ payment, loading = false }) {
 
   return (
     <div className="shadow p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-2 gap-4">
-      <div className="">
+      <div>
         <p className="mb-4 font-semibold text-gray-600">Status</p>
         <p className={`text-gray-600 ${emptyClass}`}>{data.status}</p>
       </div>
-      <div className="">
+      <div>
         <p className="mb-4 font-semibold text-gray-600">Created At</p>
         <p className={`text-gray-600 ${emptyClass}`}>{formatDate(data.createdAt)}</p>
       </div>
-      <div className="">
+      <div>
         <p className="mb-4 font-semibold text-gray-600">Amount</p>
         <p className={`text-gray-600 ${emptyClass}`}>{data.amount}</p>
       </div>
-      <div className="">
+      <div>
         <p className="mb-4 font-semibold text-gray-600">Fee</p>
         <p className={`text-gray-600 ${emptyClass}`}>{data.roundedUpFee}</p>
       </div>
-      <div className="">
+      <div>
         <p className="mb-4 font-semibold text-gray-600">Confirmed At</p>
         <p className={`text-gray-600 ${emptyClass}`}>
           {data.confirmedAt ? formatDate(data.confirmedAt) : "--"}

@@ -20,31 +20,31 @@ function LnInvoice({ invoice, loading = false }) {
 
   return (
     <div className="shadow p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-2 gap-4">
-      <div className="">
+      <div>
         <p className="mb-4 font-semibold text-gray-600">Settled</p>
         <p className={`text-gray-600 ${emptyClass}`}>{data.isSettled ? "Yes" : "No"}</p>
       </div>
-      <div className="">
+      <div>
         <p className="mb-4 font-semibold text-gray-600">Created At</p>
         <p className={`text-gray-600 ${emptyClass}`}>{formatDate(data.createdAt)}</p>
       </div>
-      <div className="">
+      <div>
         <p className="mb-4 font-semibold text-gray-600">Amount</p>
         <p className={`text-gray-600 ${emptyClass}`}>{data.received || 0}</p>
       </div>
-      <div className="">
+      <div>
         <p className="mb-4 font-semibold text-gray-600">Memo</p>
         <p className={`text-gray-600 break-all ${emptyClass}`}>
           {data.description || "--"}
         </p>
       </div>
-      <div className="">
+      <div>
         <p className="mb-4 font-semibold text-gray-600">Confirmed At</p>
         <p className={`text-gray-600 ${emptyClass}`}>
           {data.confirmedAt ? formatDate(data.confirmedAt) : "--"}
         </p>
       </div>
-      <div className="">
+      <div>
         <p className="mb-4 font-semibold text-gray-600">Expires At</p>
         <p className={`text-gray-600 ${emptyClass}`}>
           {data.expiresAt ? formatDate(data.expiresAt) : "--"}

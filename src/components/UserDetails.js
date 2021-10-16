@@ -215,21 +215,21 @@ function UserDetails() {
       </h1>
       <div className="grid gap-6 mb-8 md:grid-cols-2 p-6">
         <div className="shadow p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-2 gap-4">
-          <div className="">
+          <div>
             <p className="mb-4 font-semibold text-gray-600">Phone</p>
             <p className={`text-gray-600 ${detailClass}`}>{userDetails.phone}</p>
           </div>
-          <div className="">
+          <div>
             <p className="mb-4 font-semibold text-gray-600">Username</p>
             <p className={`text-gray-600 ${detailClass}`}>
               {userDetails.username ?? "--"}
             </p>
           </div>
-          <div className="">
+          <div>
             <p className="mb-4 font-semibold text-gray-600">Title</p>
             <p className={`text-gray-600 ${detailClass}`}>{userDetails.title ?? "--"}</p>
           </div>
-          <div className="">
+          <div>
             <p className="mb-4 font-semibold text-gray-600">Coordinates</p>
             <p className={`text-gray-600 ${detailClass}`}>
               {userDetails.coordinates ? (
@@ -261,7 +261,7 @@ function UserDetails() {
         </div>
         <div className="grid grid-cols-1 gap-4">
           <div className="shadow p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-2 gap-4">
-            <div className="">
+            <div>
               <p className="mb-4 font-semibold text-gray-600">Level</p>
               <p className={`text-gray-600 ${detailClass}`}>
                 {userDetails.level}
@@ -275,7 +275,7 @@ function UserDetails() {
                 )}
               </p>
             </div>
-            <div className="">
+            <div>
               <p className="mb-4 font-semibold text-gray-600">Status</p>
               <p className={`text-gray-600 ${detailClass}`}>
                 {userDetails.status}

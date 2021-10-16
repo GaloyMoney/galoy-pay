@@ -65,7 +65,7 @@ function AddToMap({ disabledClass, username, title, latitude, longitude, onChang
 
   return (
     <form className="grid grid-cols-2 gap-4" onSubmit={submit}>
-      <div className="">
+      <div>
         <label htmlFor="latitude" className="font-semibold text-gray-600">
           Latitude
         </label>
@@ -80,7 +80,7 @@ function AddToMap({ disabledClass, username, title, latitude, longitude, onChang
           className={`${disabledClass} mt-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-600 focus:outline-none focus:shadow-outline`}
         />
       </div>
-      <div className="">
+      <div>
         <label htmlFor="longitude" className="font-semibold text-gray-600">
           Longitude
         </label>
@@ -95,7 +95,7 @@ function AddToMap({ disabledClass, username, title, latitude, longitude, onChang
           className={`${disabledClass} mt-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-600 focus:outline-none focus:shadow-outline`}
         />
       </div>
-      <div className="">
+      <div>
         <label htmlFor="title" className="font-semibold text-gray-600">
           Title
         </label>
