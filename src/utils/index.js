@@ -34,3 +34,5 @@ export const logout = () => {
 export const isAuthenticated = () => {
   return Boolean(window.sessionStorage.getItem("token"))
 }
+
+export const formatDate = (timestamp) => new Date(timestamp * 1e3).toLocaleString()

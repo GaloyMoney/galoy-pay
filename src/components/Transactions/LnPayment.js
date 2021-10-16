@@ -1,5 +1,6 @@
 import React from "react"
 import PropTypes from "prop-types"
+import { formatDate } from "../../utils"
 
 const emptyPayment = {
   hash: "0000000000000000000000000000000000000000000000000000000000000000",
@@ -26,9 +27,7 @@ function LnPayment({ payment, loading = false }) {
       </div>
       <div className="">
         <p className="mb-4 font-semibold text-gray-600">Created At</p>
-        <p className={`text-gray-600 ${emptyClass}`}>
-          {new Date(data.createdAt * 1e3).toString()}
-        </p>
+        <p className={`text-gray-600 ${emptyClass}`}>{formatDate(data.createdAt)}</p>
       </div>
       <div className="">
         <p className="mb-4 font-semibold text-gray-600">Amount</p>
@@ -41,7 +40,7 @@ function LnPayment({ payment, loading = false }) {
       <div className="">
         <p className="mb-4 font-semibold text-gray-600">Confirmed At</p>
         <p className={`text-gray-600 ${emptyClass}`}>
-          {data.confirmedAt ? new Date(data.confirmedAt * 1e3).toLocaleString() : "--"}
+          {data.confirmedAt ? formatDate(data.confirmedAt) : "--"}
         </p>
       </div>
       <div className="col-span-2">

@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
-import { validPhone, validUsername, reportError } from "../utils"
+import { validPhone, validUsername, reportError, formatDate } from "../utils"
 import SearchHeader from "./SearchHeader"
 import AddToMap from "./AddToMap"
 
@@ -255,7 +255,7 @@ function UserDetails() {
           <div className="col-span-2">
             <p className="mb-4 font-semibold text-gray-600">Created At</p>
             <p className={`text-gray-600 ${detailClass}`}>
-              {new Date(userDetails.createdAt * 1e3).toLocaleString()}
+              {formatDate(userDetails.createdAt)}
             </p>
           </div>
         </div>

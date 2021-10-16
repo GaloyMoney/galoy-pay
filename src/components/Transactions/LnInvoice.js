@@ -1,5 +1,6 @@
 import React from "react"
 import PropTypes from "prop-types"
+import { formatDate } from "../../utils"
 
 const emptyInvoice = {
   createdAt: 0,
@@ -25,9 +26,7 @@ function LnInvoice({ invoice, loading = false }) {
       </div>
       <div className="">
         <p className="mb-4 font-semibold text-gray-600">Created At</p>
-        <p className={`text-gray-600 ${emptyClass}`}>
-          {new Date(data.createdAt * 1e3).toLocaleString()}
-        </p>
+        <p className={`text-gray-600 ${emptyClass}`}>{formatDate(data.createdAt)}</p>
       </div>
       <div className="">
         <p className="mb-4 font-semibold text-gray-600">Amount</p>
@@ -42,13 +41,13 @@ function LnInvoice({ invoice, loading = false }) {
       <div className="">
         <p className="mb-4 font-semibold text-gray-600">Confirmed At</p>
         <p className={`text-gray-600 ${emptyClass}`}>
-          {data.confirmedAt ? new Date(data.confirmedAt * 1e3).toLocaleString() : "--"}
+          {data.confirmedAt ? formatDate(data.confirmedAt) : "--"}
         </p>
       </div>
       <div className="">
         <p className="mb-4 font-semibold text-gray-600">Expires At</p>
         <p className={`text-gray-600 ${emptyClass}`}>
-          {data.expiresAt ? new Date(data.expiresAt * 1e3).toLocaleString() : "--"}
+          {data.expiresAt ? formatDate(data.expiresAt) : "--"}
         </p>
       </div>
       <div className="col-span-2">
