@@ -14,7 +14,7 @@ import {
 import { validPhone, validUsername, reportError } from "../../utils"
 
 function UserDetails() {
-  const [data, setData] = React.useState(null)
+  const [data, setData] = useState(null)
   const [searchValue, setSearchValue] = useState("")
   const onError = (error) => {
     reportError(error.message)

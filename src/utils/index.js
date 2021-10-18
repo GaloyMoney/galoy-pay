@@ -25,3 +25,10 @@ export const isAuthenticated = () => {
 }
 
 export const formatDate = (timestamp) => new Date(timestamp * 1e3).toLocaleString()
+export const formatNumber = (val) =>
+  countDecimals(val) > 8 ? Number(val).toFixed(8) : val
+
+const countDecimals = (val) => {
+  if (Math.floor(val.valueOf()) === val.valueOf()) return 0
+  return val.toString().split(".")[1].length || 0
+}

@@ -19,14 +19,10 @@ function LnInvoice({ invoice, loading = false }) {
   emptyClass = emptyClass + (loading ? " animate-pulse" : "")
 
   return (
-    <div className="shadow p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-2 gap-4">
+    <div className="shadow p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-3 gap-4">
       <div>
         <p className="mb-4 font-semibold text-gray-600">Settled</p>
         <p className={`text-gray-600 ${emptyClass}`}>{data.isSettled ? "Yes" : "No"}</p>
-      </div>
-      <div>
-        <p className="mb-4 font-semibold text-gray-600">Created At</p>
-        <p className={`text-gray-600 ${emptyClass}`}>{formatDate(data.createdAt)}</p>
       </div>
       <div>
         <p className="mb-4 font-semibold text-gray-600">Amount</p>
@@ -37,6 +33,10 @@ function LnInvoice({ invoice, loading = false }) {
         <p className={`text-gray-600 break-all ${emptyClass}`}>
           {data.description || "--"}
         </p>
+      </div>
+      <div>
+        <p className="mb-4 font-semibold text-gray-600">Created At</p>
+        <p className={`text-gray-600 ${emptyClass}`}>{formatDate(data.createdAt)}</p>
       </div>
       <div>
         <p className="mb-4 font-semibold text-gray-600">Confirmed At</p>
@@ -50,11 +50,11 @@ function LnInvoice({ invoice, loading = false }) {
           {data.expiresAt ? formatDate(data.expiresAt) : "--"}
         </p>
       </div>
-      <div className="col-span-2">
+      <div className="col-span-3">
         <p className="mb-4 font-semibold text-gray-600">Secret</p>
         <p className={`text-gray-600 break-all ${emptyClass}`}>{data.secret}</p>
       </div>
-      <div className="col-span-2">
+      <div className="col-span-3">
         <p className="mb-4 font-semibold text-gray-600">Request</p>
         <p className={`text-gray-600 break-all ${emptyClass}`}>{data.request || "--"}</p>
       </div>
