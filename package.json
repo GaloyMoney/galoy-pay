@@ -167,7 +167,7 @@
     "@types/case-sensitive-paths-webpack-plugin": "2.1.6",
     "@types/eslint": "^7.28.0",
     "@types/file-loader": "5.0.1",
-    "@types/fs-extra": "^9.0.12",
+    "@types/fs-extra": "^9.0.13",
     "@types/hookrouter": "^2.2.5",
     "@types/mini-css-extract-plugin": "2.0.1",
     "@types/optimize-css-assets-webpack-plugin": "5.0.4",
