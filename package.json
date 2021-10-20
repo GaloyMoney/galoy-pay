@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.3.18",
-    "@babel/core": "7.15.0",
+    "@babel/core": "7.15.8",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",
     "@svgr/webpack": "5.5.0",
     "@testing-library/jest-dom": "^5.11.4",
