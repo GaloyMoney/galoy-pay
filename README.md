@@ -2,7 +2,7 @@
 
 ## What is it for?
 
-Admin Panel let the support team access users and internal transaction information
+Admin Panel lets the support team access users and internal transaction information.
 
 Admin Panel is packaged as a docker image, and is automatically installed as part of the galoy helm charts.
 
