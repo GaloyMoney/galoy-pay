@@ -3,25 +3,16 @@ export function reportError(errorMesssage) {
   alert(errorMesssage)
 }
 
-// TODO: Match validation with server
 export function validPhone(phone) {
-  return phone.length > 10 && phone.length <= 15
+  return phone.length > 8 && phone.length <= 15 && phone.match(/^\+[1-9][0-9]{7,}$/)
 }
+
 export function validAuthCode(authCode) {
   return authCode.length === 6
 }
+
 export function validUsername(username) {
-  return username.length >= 3
-}
-export function validAddToMapInputs({ username, title, latitude, longitude }) {
-  // coordinates validation
-  if (!isFinite(latitude) || !(Math.abs(latitude) <= 90)) {
-    return false
-  }
-  if (!isFinite(longitude) || !(Math.abs(longitude) <= 180)) {
-    return false
-  }
-  return username.length >= 3 && title.length >= 3
+  return username.length >= 3 && username.match(/(?!^(1|3|bc1|lnbc1))^[0-9a-z_]{3,50}$/i)
 }
 
 export const logout = () => {
@@ -31,4 +22,13 @@ export const logout = () => {
 
 export const isAuthenticated = () => {
   return Boolean(window.sessionStorage.getItem("token"))
+}
+
+export const formatDate = (timestamp) => new Date(timestamp * 1e3).toLocaleString()
+export const formatNumber = (val) =>
+  countDecimals(val) > 8 ? Number(val).toFixed(8) : val
+
+const countDecimals = (val) => {
+  if (Math.floor(val.valueOf()) === val.valueOf()) return 0
+  return val.toString().split(".")[1].length || 0
 }
