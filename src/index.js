@@ -5,8 +5,9 @@ import App from "./App"
 import reportWebVitals from "./reportWebVitals"
 import { ApolloProvider, ApolloClient, InMemoryCache, HttpLink } from "@apollo/client"
 import { setContext } from "@apollo/client/link/context"
-import { GRAPHQL_URI } from "./config"
+import config from "./config"
 
+const { GRAPHQL_URI } = config()
 const cache = new InMemoryCache()
 const httpLink = new HttpLink({ uri: GRAPHQL_URI, fetch })
 
