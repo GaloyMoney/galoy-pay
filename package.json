@@ -7,7 +7,7 @@
     "eslint-fix": "eslint \"src/**/*.js\" --fix",
     "prettier-check": "prettier --check .",
     "prettier-write": "prettier --write .",
-    "check-code": "yarn eslint-check && yarn prettier-check",
+    "check-code": "yarn eslint-check && yarn prettier-check && yarn test --watchAll=false",
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js"
@@ -50,7 +50,7 @@
     "html-webpack-plugin": "4.5.0",
     "identity-obj-proxy": "3.0.0",
     "jest": "27.1.0",
-    "jest-circus": "27.1.0",
+    "jest-circus": "^27.3.1",
     "jest-resolve": "27.1.0",
     "jest-watch-typeahead": "0.6.4",
     "mini-css-extract-plugin": "0.11.3",
@@ -120,7 +120,7 @@
       "<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"
     ],
     "testEnvironment": "jsdom",
-    "testRunner": "/Users/samer/Work/GaloyMoney/admin-panel/node_modules/jest-circus/runner.js",
+    "testRunner": "<rootDir>/node_modules/jest-circus/runner.js",
     "transform": {
       "^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": "<rootDir>/config/jest/babelTransform.js",
       "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
