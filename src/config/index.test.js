@@ -5,7 +5,7 @@ describe("config", () => {
     jest.resetModules()
     process.env = { ...ENV }
     delete window.location
-    window.location = new URL("https://admin.mainnet.galoy.io")
+    window.location = new URL("https://admin.xyz.example.com")
   })
 
   afterAll(() => {
@@ -23,13 +23,13 @@ describe("config", () => {
     process.env.GRAPHQL_URI = undefined
     const config = require("./index").default
     const { GRAPHQL_URI } = config()
-    expect(GRAPHQL_URI).toBe("https://admin-api.mainnet.galoy.io/graphql")
+    expect(GRAPHQL_URI).toBe("https://admin-api.xyz.example.com/graphql")
   })
 
   it("works only for a.b.c.d domains", () => {
     process.env.GRAPHQL_URI = undefined
     delete window.location
-    window.location = new URL("https://galoy.io")
+    window.location = new URL("https://example.com")
     const config = require("./index").default
     expect(() => config()).toThrow()
   })
