@@ -22,5 +22,5 @@ fi
   git merge --no-edit ${BRANCH}
   git add -A
   git status
-  git commit -m "Bump galoy image to '${digest}'"
+  git commit -m "Bump admin-panel image to '${digest}'"
 )
