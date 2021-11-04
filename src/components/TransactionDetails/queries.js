@@ -52,7 +52,7 @@ export const GET_TRANSACTIONS_BY_HASH = gql`
         paymentHash
       }
       ... on OnChainTransaction {
-        addresses
+        address
         transactionHash
       }
       ... on IntraLedgerTransaction {
@@ -84,7 +84,7 @@ export const GET_TRANSACTION_BY_ID = gql`
         paymentHash
       }
       ... on OnChainTransaction {
-        addresses
+        address
         transactionHash
       }
       ... on IntraLedgerTransaction {
