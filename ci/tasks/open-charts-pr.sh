@@ -6,9 +6,9 @@ export digest=$(cat ./edge-image/digest)
 
 pushd charts-repo
 
-ref=$(yq e '.admin-panel.image.git_ref' charts/galoy/values.yaml)
+ref=$(yq e '.image.git_ref' charts/admin-panel/values.yaml)
 git checkout ${BRANCH}
-old_ref=$(yq e '.admin-panel.image.git_ref' charts/galoy/values.yaml)
+old_ref=$(yq e '.image.git_ref' charts/admin-panel/values.yaml)
 
 cat <<EOF >> ../body.md
 # Bump admin-panel image
