@@ -8,6 +8,7 @@ import { setContext } from "@apollo/client/link/context"
 import config from "./config"
 
 const { GRAPHQL_URI } = config()
+
 const cache = new InMemoryCache()
 const httpLink = new HttpLink({ uri: GRAPHQL_URI, fetch })
 
