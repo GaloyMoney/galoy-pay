@@ -34,8 +34,32 @@ export const GET_TRANSACTIONS_BY_HASH = gql`
   query TransactionsByHash($hash: PaymentHash!) {
     transactions: transactionsByHash(hash: $hash) {
       id
-      initiationVia
-      settlementVia
+      initiationVia {
+        __typename
+        ... on InitiationViaIntraLedger {
+          counterPartyWalletId
+          counterPartyUsername
+        }
+        ... on InitiationViaLn {
+          paymentHash
+        }
+        ... on InitiationViaOnChain {
+          address
+        }
+      }
+      settlementVia {
+        __typename
+        ... on SettlementViaIntraLedger {
+          counterPartyWalletId
+          counterPartyUsername
+        }
+        ... on SettlementViaLn {
+          paymentSecret
+        }
+        ... on SettlementViaOnChain {
+          transactionHash
+        }
+      }
       settlementAmount
       settlementFee
       settlementPrice {
@@ -48,16 +72,6 @@ export const GET_TRANSACTIONS_BY_HASH = gql`
       status
       memo
       createdAt
-      ... on LnTransaction {
-        paymentHash
-      }
-      ... on OnChainTransaction {
-        address
-        transactionHash
-      }
-      ... on IntraLedgerTransaction {
-        otherPartyUsername
-      }
     }
   }
 `
@@ -66,8 +80,32 @@ export const GET_TRANSACTION_BY_ID = gql`
   query TransactionById($id: ID!) {
     transaction: transactionById(id: $id) {
       id
-      initiationVia
-      settlementVia
+      initiationVia {
+        __typename
+        ... on InitiationViaIntraLedger {
+          counterPartyWalletId
+          counterPartyUsername
+        }
+        ... on InitiationViaLn {
+          paymentHash
+        }
+        ... on InitiationViaOnChain {
+          address
+        }
+      }
+      settlementVia {
+        __typename
+        ... on SettlementViaIntraLedger {
+          counterPartyWalletId
+          counterPartyUsername
+        }
+        ... on SettlementViaLn {
+          paymentSecret
+        }
+        ... on SettlementViaOnChain {
+          transactionHash
+        }
+      }
       settlementAmount
       settlementFee
       settlementPrice {
@@ -80,16 +118,6 @@ export const GET_TRANSACTION_BY_ID = gql`
       status
       memo
       createdAt
-      ... on LnTransaction {
-        paymentHash
-      }
-      ... on OnChainTransaction {
-        address
-        transactionHash
-      }
-      ... on IntraLedgerTransaction {
-        otherPartyUsername
-      }
     }
   }
 `
