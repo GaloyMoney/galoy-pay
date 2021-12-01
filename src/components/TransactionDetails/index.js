@@ -30,7 +30,13 @@ function TransactionDetails() {
       setInvoice(null)
       setData(txs)
 
-      const hash = txs.length > 0 && (txs[0].paymentHash || txs[0].transactionHash)
+      const tx = txs.find(
+        (t) =>
+          t.initiationVia.__typename !== "InitiationViaIntraLedger" &&
+          t.settlementVia.__typename !== "SettlementViaIntraLedger",
+      )
+      const hash =
+        tx && (tx.initiationVia.paymentHash || tx.settlementVia.transactionHash)
       if (hash) {
         getLnPayment({ variables: { hash } })
         getLnInvoice({ variables: { hash } })

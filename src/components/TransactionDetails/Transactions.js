@@ -3,8 +3,25 @@ import PropTypes from "prop-types"
 import { formatDate, formatNumber } from "../../utils"
 
 function Transactions({ transactions, loading = false }) {
+  const mapViaType = (value) => {
+    switch (value) {
+      case "InitiationViaIntraLedger":
+      case "SettlementViaIntraLedger":
+        return "Intra ledger"
+      case "InitiationViaLn":
+      case "SettlementViaLn":
+        return "Lightning"
+      case "InitiationViaOnChain":
+      case "SettlementViaOnChain":
+        return "OnChain"
+      default:
+        return value
+    }
+  }
   const hasData = transactions && transactions.length > 0
-  const isInternalTx = hasData && transactions[0].settlementVia === "INTRA_LEDGER"
+  const isInternalTx =
+    hasData &&
+    transactions.every((t) => t.initiationVia.__typename === "InitiationViaIntraLedger")
   return (
     <div className="shadow w-full overflow-hidden rounded-lg shadow-xs">
       <div className="w-full overflow-x-auto">
@@ -20,7 +37,7 @@ function Transactions({ transactions, loading = false }) {
               <th className="px-4 py-3">Direction</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Memo</th>
-              <th className="px-4 py-3">{isInternalTx ? "Other Party" : "Hash"}</th>
+              <th className="px-4 py-3">{isInternalTx ? "Counter Party" : "Hash"}</th>
               <th className="px-4 py-3">Date</th>
             </tr>
           </thead>
@@ -29,8 +46,8 @@ function Transactions({ transactions, loading = false }) {
               transactions.map((tx) => (
                 <tr key={tx.id} className="text-gray-700 dark:text-gray-400">
                   <td className="px-4 py-3">{tx.id}</td>
-                  <td className="px-4 py-3">{tx.initiationVia}</td>
-                  <td className="px-4 py-3">{tx.settlementVia}</td>
+                  <td className="px-4 py-3">{mapViaType(tx.initiationVia.__typename)}</td>
+                  <td className="px-4 py-3">{mapViaType(tx.settlementVia.__typename)}</td>
                   <td className="px-4 py-3">{formatNumber(tx.settlementAmount)}</td>
                   <td className="px-4 py-3">{formatNumber(tx.settlementFee)}</td>
                   <td className="px-4 py-3">
@@ -40,17 +57,20 @@ function Transactions({ transactions, loading = false }) {
                   <td className="px-4 py-3">{tx.status}</td>
                   <td className="px-4 py-3 break-all">{tx.memo}</td>
                   <td className="px-4 py-3 break-all">
-                    {tx.transactionHash ? (
+                    {tx.settlementVia.transactionHash ? (
                       <a
                         target="_blank"
                         rel="noreferrer"
                         className="underline"
-                        href={`https://mempool.space/tx/${tx.transactionHash}`}
+                        href={`https://mempool.space/tx/${tx.settlementVia.transactionHash}`}
                       >
-                        {tx.transactionHash}
+                        {tx.settlementVia.transactionHash}
                       </a>
                     ) : (
-                      tx.paymentHash || tx.otherPartyUsername || "--"
+                      tx.initiationVia.paymentHash ||
+                      tx.settlementVia.counterPartyUsername ||
+                      tx.settlementVia.counterPartyWalletId ||
+                      "--"
                     )}
                   </td>
                   <td className="px-4 py-3">{formatDate(tx.createdAt)}</td>
