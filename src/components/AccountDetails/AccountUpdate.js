@@ -6,15 +6,15 @@ const defaultData = {
   status: "ACTIVE",
 }
 
-function UserUpdate({
-  userDetails,
+function AccountUpdate({
+  accountDetails,
   udpateLevel,
   updateStatus,
   loading = false,
   updatingLevel = false,
   updatingStatus = false,
 }) {
-  const data = userDetails || defaultData
+  const data = accountDetails || defaultData
 
   let emptyClass = data === defaultData || loading ? "filter blur-sm" : ""
   emptyClass = emptyClass + (loading ? " animate-pulse" : "")
@@ -55,8 +55,8 @@ function UserUpdate({
   )
 }
 
-UserUpdate.propTypes = {
-  userDetails: PropTypes.shape({
+AccountUpdate.propTypes = {
+  accountDetails: PropTypes.shape({
     level: PropTypes.oneOf(["ONE", "TWO"]),
     status: PropTypes.oneOf(["LOCKED", "ACTIVE"]),
   }),
@@ -67,4 +67,4 @@ UserUpdate.propTypes = {
   loading: PropTypes.bool,
 }
 
-export default UserUpdate
+export default AccountUpdate

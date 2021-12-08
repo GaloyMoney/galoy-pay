@@ -2,18 +2,18 @@ import React, { useState } from "react"
 import { useLazyQuery, useMutation } from "@apollo/client"
 import SearchHeader from "../SearchHeader"
 import Details from "./Details"
-import UserUpdate from "./UserUpdate"
+import AccountUpdate from "./AccountUpdate"
 import BusinessMapUpdate from "./BusinessMapUpdate"
 import {
-  GET_USER_BY_PHONE,
-  GET_USER_BY_USERNAME,
-  USER_UPDATE_STATUS,
-  USER_UPDATE_LEVEL,
+  GET_ACCOUNT_BY_PHONE,
+  GET_ACCOUNT_BY_USERNAME,
+  ACCOUNT_UPDATE_STATUS,
+  ACCOUNT_UPDATE_LEVEL,
   BUSINESS_UPDATE_MAP_INFO,
 } from "./queries"
 import { validPhone, validUsername, reportError } from "../../utils"
 
-function UserDetails() {
+function AccountDetails() {
   const [data, setData] = useState(null)
   const [searchValue, setSearchValue] = useState("")
   const onError = (error) => {
@@ -22,28 +22,28 @@ function UserDetails() {
   }
 
   const queryOptions = {
-    onCompleted({ userDetails }) {
-      setData(userDetails)
+    onCompleted({ accountDetails }) {
+      setData(accountDetails)
     },
     onError,
     fetchPolicy: "no-cache",
   }
 
-  const [getUserByPhone, { loading: loadingUserByPhone }] = useLazyQuery(
-    GET_USER_BY_PHONE,
+  const [getAccountByUserPhone, { loading: loadingAccountByPhone }] = useLazyQuery(
+    GET_ACCOUNT_BY_PHONE,
     queryOptions,
   )
 
-  const [getUserByUsername, { loading: loadingUserByUsername }] = useLazyQuery(
-    GET_USER_BY_USERNAME,
+  const [getAccountByUsername, { loading: loadingAccountByUsername }] = useLazyQuery(
+    GET_ACCOUNT_BY_USERNAME,
     queryOptions,
   )
 
-  const [updateUserStatus, { loading: loadingUserStatus }] = useMutation(
-    USER_UPDATE_STATUS,
+  const [updateAccountStatus, { loading: loadingAccountStatus }] = useMutation(
+    ACCOUNT_UPDATE_STATUS,
     {
       onCompleted({ mutationData }) {
-        setData(mutationData.userDetails)
+        setData(mutationData.accountDetails)
         alert(
           `${data.username || data.phone}'s account status has been changed successfully`,
         )
@@ -53,11 +53,11 @@ function UserDetails() {
     },
   )
 
-  const [updateUserLevel, { loading: loadingUserLevel }] = useMutation(
-    USER_UPDATE_LEVEL,
+  const [updateAccountLevel, { loading: loadingAccountLevel }] = useMutation(
+    ACCOUNT_UPDATE_LEVEL,
     {
       onCompleted({ mutationData }) {
-        setData(mutationData.userDetails)
+        setData(mutationData.accountDetails)
         alert(
           `${data.username || data.phone}'s account level has been changed successfully`,
         )
@@ -71,7 +71,7 @@ function UserDetails() {
     BUSINESS_UPDATE_MAP_INFO,
     {
       onCompleted({ mutationData }) {
-        setData(mutationData.userDetails)
+        setData(mutationData.accountDetails)
         alert(
           `${
             data.username || data.phone
@@ -83,20 +83,20 @@ function UserDetails() {
     },
   )
 
-  const loading = loadingUserByPhone || loadingUserByUsername
+  const loading = loadingAccountByPhone || loadingAccountByUsername
 
   const search = () => {
     if (searchValue && validPhone(searchValue)) {
-      return getUserByPhone({ variables: { phone: searchValue } })
+      return getAccountByUserPhone({ variables: { phone: searchValue } })
     }
 
     if (searchValue && validUsername(searchValue)) {
-      return getUserByUsername({ variables: { username: searchValue } })
+      return getAccountByUsername({ variables: { username: searchValue } })
     }
   }
 
   const changeLevel = () => {
-    updateUserLevel({ variables: { input: { uid: data.id, level: "TWO" } } })
+    updateAccountLevel({ variables: { input: { uid: data.id, level: "TWO" } } })
   }
 
   const changeAccountStatus = () => {
@@ -105,7 +105,7 @@ function UserDetails() {
       `Clicking OK will change ${data.phone}'s status to ${targetStatus}. Do you wish to proceed?`,
     )
     if (confirmation) {
-      updateUserStatus({
+      updateAccountStatus({
         variables: { input: { uid: data.id, status: targetStatus } },
       })
     }
@@ -128,24 +128,24 @@ function UserDetails() {
         onEnter={search}
       />
       <h1 className="mx-6 mt-6 text-2xl font-semibold text-gray-700">
-        User details
+        Account details
         {loading && (
           <small className="animate-pulse font-thin text-sm"> (loading...)</small>
         )}
       </h1>
       <div className="grid gap-6 mb-8 md:grid-cols-2 p-6">
-        <Details userDetails={data} loading={loading} />
+        <Details accountDetails={data} loading={loading} />
         <div className="grid grid-cols-1 gap-4">
-          <UserUpdate
-            userDetails={data}
+          <AccountUpdate
+            accountDetails={data}
             udpateLevel={data && changeLevel}
-            updatingLevel={loadingUserLevel}
+            updatingLevel={loadingAccountLevel}
             updateStatus={data && changeAccountStatus}
-            updatingStatus={loadingUserStatus}
+            updatingStatus={loadingAccountStatus}
             loading={loading}
           />
           <BusinessMapUpdate
-            userDetails={data?.username && data}
+            accountDetails={data?.username && data}
             udpate={data && changeBusinessMapDetails}
             updating={loadingBusinessMap}
             loading={loading}
@@ -156,4 +156,4 @@ function UserDetails() {
   )
 }
 
-export default UserDetails
+export default AccountDetails

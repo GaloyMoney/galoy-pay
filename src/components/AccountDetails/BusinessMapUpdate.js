@@ -15,8 +15,13 @@ const isValidTitle = (title) => title.length >= 3
 const isValidBusinessInfo = ({ title, latitude, longitude }) =>
   isValidLatitud(latitude) && isValidLongitude(longitude) && isValidTitle(title)
 
-function BusinessMapUpdate({ userDetails, udpate, updating = false, loading = false }) {
-  const data = userDetails || defaultData
+function BusinessMapUpdate({
+  accountDetails,
+  udpate,
+  updating = false,
+  loading = false,
+}) {
+  const data = accountDetails || defaultData
   data.title = data.title || defaultData.title
   data.coordinates = data.coordinates || defaultData.coordinates
 
@@ -118,7 +123,7 @@ function BusinessMapUpdate({ userDetails, udpate, updating = false, loading = fa
 }
 
 BusinessMapUpdate.propTypes = {
-  userDetails: PropTypes.shape({
+  accountDetails: PropTypes.shape({
     title: PropTypes.string,
     coordinates: PropTypes.shape({
       latitude: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),

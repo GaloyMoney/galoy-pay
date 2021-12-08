@@ -3,7 +3,9 @@ import PropTypes from "prop-types"
 import { formatDate } from "../../utils"
 
 const defaultData = {
-  phone: "+11111111111",
+  owner: {
+    phone: "+11111111111",
+  },
   username: "username",
   level: "ONE",
   status: "ACTIVE",
@@ -15,8 +17,8 @@ const defaultData = {
   createdAt: 1633992340,
 }
 
-function Details({ userDetails, loading = false }) {
-  const data = userDetails || defaultData
+function Details({ accountDetails, loading = false }) {
+  const data = accountDetails || defaultData
   let emptyClass = data === defaultData || loading ? "filter blur-sm" : ""
   emptyClass = emptyClass + (loading ? " animate-pulse" : "")
 
@@ -24,7 +26,7 @@ function Details({ userDetails, loading = false }) {
     <div className="shadow p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-2 gap-4">
       <div>
         <p className="mb-4 font-semibold text-gray-600">Phone</p>
-        <p className={`text-gray-600 ${emptyClass}`}>{data.phone}</p>
+        <p className={`text-gray-600 ${emptyClass}`}>{data.owner.phone}</p>
       </div>
       <div>
         <p className="mb-4 font-semibold text-gray-600">Username</p>
@@ -62,7 +64,7 @@ function Details({ userDetails, loading = false }) {
 }
 
 Details.propTypes = {
-  userDetails: PropTypes.object,
+  accountDetails: PropTypes.object,
   loading: PropTypes.bool,
 }
 

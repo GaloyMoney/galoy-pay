@@ -1,6 +1,6 @@
 import React from "react"
 import Dashboard from "./components/Dashboard"
-import UserDetails from "./components/UserDetails"
+import AccountDetails from "./components/AccountDetails"
 import TransactionDetails from "./components/TransactionDetails"
 
 export const dashboardRoutes = [
@@ -12,11 +12,11 @@ export const dashboardRoutes = [
     component: () => <Dashboard />,
   },
   {
-    name: "User details",
+    name: "Account details",
     icon: "PeopleIcon",
-    path: "/userDetails",
+    path: "/accountDetails",
     showInSidebar: true,
-    component: () => <UserDetails />,
+    component: () => <AccountDetails />,
   },
   {
     name: "Transactions",
