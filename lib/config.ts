@@ -5,7 +5,7 @@ if (!GRAPHQL_HOSTNAME) {
     let hostParts = window.location.host.split(".")
     if (hostParts.length <= 3) {
       // throw new Error("Missing env variables")
-      hostParts = "pay.staging.galoy.io".split(".")
+      hostParts = "pay.mainnet.galoy.io".split(".")
     }
     hostParts[0] = "api"
     GRAPHQL_HOSTNAME = hostParts.join(".")
