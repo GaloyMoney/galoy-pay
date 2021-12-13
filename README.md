@@ -15,7 +15,7 @@ Galoy-Pay uses query, mutation, and subscription operations from the Galoy's gra
 In the project directory, create a file name `.env.local` and fill it with
 
 ```
-NEXT_PUBLIC_GRAPHQL_HOSTNAME='api.mainnet.galoy.io'
+NEXT_PUBLIC_GRAPHQL_HOSTNAME='api.staging.galoy.io'
 ```
 
 (or use your custom API URL), then run
