@@ -25,7 +25,11 @@ const LNURL_INVOICE = gql`
     $descriptionHash: Hex32Bytes!
   ) {
     mutationData: lnInvoiceCreateOnBehalfOfRecipient(
-      input: { recipientWalletId: $walletId, amount: $amount, descriptionHash: $descriptionHash }
+      input: {
+        recipientWalletId: $walletId
+        amount: $amount
+        descriptionHash: $descriptionHash
+      }
     ) {
       errors {
         message
