@@ -1,9 +1,12 @@
 import crypto from "crypto"
 import originalUrl from "original-url"
-import { ApolloClient, gql, HttpLink, InMemoryCache } from "@apollo/client"
+import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client"
 import type { NextApiRequest, NextApiResponse } from "next"
 
 import { GRAPHQL_URI } from "../../../lib/config"
+
+import USER_WALLET_ID from "./user-wallet-id.gql"
+import LNURL_INVOICE from "./lnurl-invoice.gql"
 
 const client = new ApolloClient({
   link: new HttpLink({
@@ -11,35 +14,6 @@ const client = new ApolloClient({
   }),
   cache: new InMemoryCache(),
 })
-
-const USER_WALLET_ID = gql`
-  query userDefaultWalletId($username: Username!) {
-    userDefaultWalletId(username: $username)
-  }
-`
-
-const LNURL_INVOICE = gql`
-  mutation lnInvoiceCreateOnBehalfOfRecipient(
-    $walletId: WalletId!
-    $amount: SatAmount!
-    $descriptionHash: Hex32Bytes!
-  ) {
-    mutationData: lnInvoiceCreateOnBehalfOfRecipient(
-      input: {
-        recipientWalletId: $walletId
-        amount: $amount
-        descriptionHash: $descriptionHash
-      }
-    ) {
-      errors {
-        message
-      }
-      invoice {
-        paymentRequest
-      }
-    }
-  }
-`
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   const { username, amount } = req.query

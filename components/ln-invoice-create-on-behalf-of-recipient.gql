@@ -1,0 +1,12 @@
+mutation lnInvoiceCreateOnBehalfOfRecipient($walletId: WalletId!, $amount: SatAmount!) {
+  mutationData: lnInvoiceCreateOnBehalfOfRecipient(
+    input: { recipientWalletId: $walletId, amount: $amount }
+  ) {
+    errors {
+      message
+    }
+    invoice {
+      paymentRequest
+    }
+  }
+}

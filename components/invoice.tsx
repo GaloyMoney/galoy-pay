@@ -1,28 +1,17 @@
+import { useSubscription } from "@apollo/client"
+import copy from "copy-to-clipboard"
 import { useState } from "react"
-import { gql, useSubscription } from "@apollo/client"
 import Card from "react-bootstrap/Card"
 import OverlayTrigger from "react-bootstrap/OverlayTrigger"
 import Tooltip from "react-bootstrap/Tooltip"
-import { QRCode } from "react-qrcode-logo"
-import copy from "copy-to-clipboard"
 import Lottie from "react-lottie"
-
+import { QRCode } from "react-qrcode-logo"
+import LN_INVOICE_PAYMENT_STATUS from "./ln-invoice-payment-status.gql"
 import animationData from "./success-animation.json"
 
 type OperationError = {
   message: string
 }
-
-const LN_INVOICE_PAYMENT_STATUS = gql`
-  subscription lnInvoicePaymentStatus($input: LnInvoicePaymentStatusInput!) {
-    lnInvoicePaymentStatus(input: $input) {
-      errors {
-        message
-      }
-      status
-    }
-  }
-`
 
 export default function Invoice({
   paymentRequest,

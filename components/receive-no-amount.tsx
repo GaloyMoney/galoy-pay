@@ -1,7 +1,7 @@
+import { useMutation } from "@apollo/client"
 import { useEffect } from "react"
-import { gql, useMutation } from "@apollo/client"
-
 import Invoice from "./invoice"
+import LN_NOAMOUNT_INVOICE_CREATE_ON_BEHALF_OF_RECIPIENT from "./ln-noamount-create-on-behalf-of-recipient.gql"
 
 type OperationError = {
   message: string
@@ -10,21 +10,6 @@ type OperationError = {
 type LnInvoiceObject = {
   paymentRequest: string
 }
-
-const LN_NOAMOUNT_INVOICE_CREATE_ON_BEHALF_OF_RECIPIENT = gql`
-  mutation lnNoAmountInvoiceCreateOnBehalfOfRecipient($walletId: WalletId!) {
-    mutationData: lnNoAmountInvoiceCreateOnBehalfOfRecipient(
-      input: { recipientWalletId: $walletId }
-    ) {
-      errors {
-        message
-      }
-      invoice {
-        paymentRequest
-      }
-    }
-  }
-`
 
 export default function ReceiveNoAmount({
   recipientWalletId,

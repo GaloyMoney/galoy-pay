@@ -1,21 +1,14 @@
+import { useQuery } from "@apollo/client"
 import { useRouter } from "next/router"
-import Row from "react-bootstrap/Row"
-import Col from "react-bootstrap/Col"
 import Card from "react-bootstrap/Card"
+import Col from "react-bootstrap/Col"
 import Container from "react-bootstrap/Container"
 import Image from "react-bootstrap/Image"
-import { gql, useQuery } from "@apollo/client"
-
+import Row from "react-bootstrap/Row"
 import ReceiveAmount from "../components/receive-amount"
 import ReceiveNoAmount from "../components/receive-no-amount"
-
-import { getOS, playStoreLink, appStoreLink } from "../lib/download"
-
-const RECIPIENT_WALLET_ID = gql`
-  query userDefaultWalletId($username: Username!) {
-    recipientWalletId: userDefaultWalletId(username: $username)
-  }
-`
+import { appStoreLink, getOS, playStoreLink } from "../lib/download"
+import RECIPIENT_WALLET_ID from "./recipient-wallet-id.gql"
 
 export default function Receive() {
   const router = useRouter()

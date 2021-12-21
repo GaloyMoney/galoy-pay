@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from "react"
-import { gql, useMutation } from "@apollo/client"
-
+import { useMutation } from "@apollo/client"
+import React, { useEffect, useRef, useState } from "react"
 import Invoice from "./invoice"
+import LN_INVOICE_CREATE_ON_BEHALF_OF_RECIPIENT from "./ln-invoice-create-on-behalf-of-recipient.gql"
 
 type OperationError = {
   message: string
@@ -10,21 +10,6 @@ type OperationError = {
 type LnInvoiceObject = {
   paymentRequest: string
 }
-
-const LN_INVOICE_CREATE_ON_BEHALF_OF_RECIPIENT = gql`
-  mutation lnInvoiceCreateOnBehalfOfRecipient($walletId: WalletId!, $amount: SatAmount!) {
-    mutationData: lnInvoiceCreateOnBehalfOfRecipient(
-      input: { recipientWalletId: $walletId, amount: $amount }
-    ) {
-      errors {
-        message
-      }
-      invoice {
-        paymentRequest
-      }
-    }
-  }
-`
 
 const INVOICE_STALE_CHECK_INTERVAL = 5 * 60 * 1000
 const INVOICE_EXPIRE_INTERVAL = 60 * 60 * 1000

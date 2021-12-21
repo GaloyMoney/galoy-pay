@@ -1,20 +1,12 @@
-import Container from "react-bootstrap/Container"
-import Row from "react-bootstrap/Row"
-import Col from "react-bootstrap/Col"
+import { useQuery } from "@apollo/client"
 import Card from "react-bootstrap/Card"
-import ListGroup from "react-bootstrap/ListGroup"
+import Col from "react-bootstrap/Col"
+import Container from "react-bootstrap/Container"
 import Jumbotron from "react-bootstrap/Jumbotron"
-import { gql, useQuery } from "@apollo/client"
-
+import ListGroup from "react-bootstrap/ListGroup"
+import Row from "react-bootstrap/Row"
 import { GRAPHQL_URI } from "../lib/config"
-
-const GET_NODE_STATS = gql`
-  query nodeIds {
-    globals {
-      nodesIds
-    }
-  }
-`
+import GET_NODE_STATS from "./get-node-stats.gql"
 
 function Home() {
   const nodeUrl =

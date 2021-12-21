@@ -1,36 +1,11 @@
-import { gql, useSubscription } from "@apollo/client"
+import { useSubscription } from "@apollo/client"
 import * as React from "react"
-
-const QUERY_PRICE = gql`
-  subscription price(
-    $amount: SatAmount!
-    $amountCurrencyUnit: ExchangeCurrencyUnit!
-    $priceCurrencyUnit: ExchangeCurrencyUnit!
-  ) {
-    price(
-      input: {
-        amount: $amount
-        amountCurrencyUnit: $amountCurrencyUnit
-        priceCurrencyUnit: $priceCurrencyUnit
-      }
-    ) {
-      errors {
-        message
-      }
-      price {
-        base
-        offset
-        currencyUnit
-        formattedAmount
-      }
-    }
-  }
-`
+import SUBSCRIPTION_PRICE from "./subscription-price.gql"
 
 const useSatPrice = () => {
   const priceRef = React.useRef<number>(0)
 
-  const { data } = useSubscription(QUERY_PRICE, {
+  const { data } = useSubscription(SUBSCRIPTION_PRICE, {
     variables: {
       amount: 1,
       amountCurrencyUnit: "BTCSAT",
