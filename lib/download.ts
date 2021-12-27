@@ -6,6 +6,11 @@ export const getOS = () => {
   if (/windows phone/i.test(userAgent)) {
     return undefined
   }
+  
+  // Non-Google Huawei detection from: https://stackoverflow.com/questions/66048820
+  if(/HMSCore\//.test(userAgent) && !/GMS\//.test(userAgent)) {
+    return "huawei"
+  }
 
   if (/android/i.test(userAgent)) {
     return "android"
