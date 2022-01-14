@@ -45,7 +45,7 @@ function LnPayment({ payment, loading = false }) {
       </div>
       <div className="col-span-3">
         <p className="mb-4 font-semibold text-gray-600">Secret</p>
-        <p className={`text-gray-600 break-all ${emptyClass}`}>{data.secret}</p>
+        <p className={`text-gray-600 break-all ${emptyClass}`}>{data.revealedPreImage}</p>
       </div>
       <div className="col-span-3">
         <p className="mb-4 font-semibold text-gray-600">Destination</p>

@@ -8,7 +8,7 @@ export const GET_LNPAYMENT_BY_HASH = gql`
       status
       amount
       roundedUpFee
-      secret
+      revealedPreImage
       request
       destination
     }
@@ -25,7 +25,7 @@ export const GET_LNINVOICE_BY_HASH = gql`
       isSettled
       received
       request
-      secret
+      secretPreImage
     }
   }
 `
