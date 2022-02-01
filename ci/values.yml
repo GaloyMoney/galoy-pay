@@ -13,6 +13,6 @@ docker_registry_password: ((docker-creds.password))
 docker_host_ip: ((staging-ssh.docker_host_ip))
 meta_release_git_uri: git@github.com:GaloyMoney/meta-release.git
 meta_release_git_branch: main
-meta_release_git_version_branch: version
+meta_release_git_version_branch: versions
 gh_org: GaloyMoney
 gh_repository: admin-panel
