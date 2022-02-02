@@ -10,3 +10,8 @@ github_token: ((github.api_token))
 docker_registry: us.gcr.io/galoy-org
 docker_registry_user: ((docker-creds.username))
 docker_registry_password: ((docker-creds.password))
+meta_release_git_uri: git@github.com:GaloyMoney/meta-release.git
+meta_release_git_branch: main
+meta_release_git_version_branch: versions
+gh_org: GaloyMoney
+gh_repository: galoy-pay
