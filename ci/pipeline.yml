@@ -74,6 +74,7 @@ jobs:
           image: image/image.tar
   
   - name: release
+    serial: true
     plan:
     - in_parallel:
       - get: repo
@@ -83,7 +84,7 @@ jobs:
         passed: [ build-edge-image ]
         params:
           format: oci
-      - get: meta-release
+      - get: pipeline-tasks
       - get: version
       - get: charts-repo
     - task: prep-release
@@ -92,29 +93,28 @@ jobs:
         image_resource: #@ release_task_image_config()
         inputs:
         - name: repo
+        - name: pipeline-tasks
         - name: edge-image
-        - name: meta-release
         - name: version
         - name: charts-repo
         outputs:
         - name: version
         - name: artifacts
-        params:
-          CHART: admin-panel
         run:
-          path: meta-release/ci/tasks/prep-release-src.sh
-    - put: versioned-image
-      params:
-        image: edge-image/image.tar
-        additional_tags: artifacts/gh-release-tag
-    - put: gh-release
-      params:
-        name: artifacts/gh-release-name
-        tag: artifacts/gh-release-tag
-        body: artifacts/gh-release-notes.md
-    - put: version
-      params:
-        file: version/version
+          path: pipeline-tasks/ci/tasks/vendor/prep-release-src.sh
+    - in_parallel:
+      - put: versioned-image
+        params:
+          image: edge-image/image.tar
+          additional_tags: artifacts/gh-release-tag
+      - put: gh-release
+        params:
+          name: artifacts/gh-release-name
+          tag: artifacts/gh-release-tag
+          body: artifacts/gh-release-notes.md
+      - put: version
+        params:
+          file: version/version
 
   - name: bump-image-in-chart
     plan:
@@ -171,6 +171,7 @@ resources:
     type: git
     source:
       ignore_paths: ["ci/*[^md]"]
+      fetch_tags: true
       uri: #@ data.values.git_uri
       branch: #@ data.values.git_branch
       private_key: #@ data.values.github_private_key
@@ -180,9 +181,9 @@ resources:
     source:
       initial_version: 0.0.0
       driver: git
-      file: admin-panel-src-version
-      uri: #@ data.values.meta_release_git_uri
-      branch: #@ data.values.meta_release_git_version_branch
+      file: version
+      uri: #@ data.values.git_uri
+      branch: #@ data.values.git_version_branch
       private_key: #@ data.values.github_private_key
 
   - name: gh-release
@@ -191,13 +192,6 @@ resources:
       owner: #@ data.values.gh_org
       repository: #@ data.values.gh_repository
       access_token: #@ data.values.github_token
-
-  - name: meta-release
-    type: git
-    source:
-      uri: #@ data.values.meta_release_git_uri
-      branch: #@ data.values.meta_release_git_branch
-      private_key: #@ data.values.github_private_key
 
   - name: charts-repo-bot-branch
     type: git
@@ -231,7 +225,7 @@ resources:
   - name: pipeline-tasks
     type: git
     source:
-      paths: [ci/tasks/*, Makefile]
+      paths: [ci/tasks/*, ci/config/*, Makefile]
       uri: #@ data.values.git_uri
       branch: #@ data.values.git_branch
       private_key: #@ data.values.github_private_key
