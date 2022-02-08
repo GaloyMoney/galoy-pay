@@ -120,16 +120,17 @@ jobs:
     plan:
       - in_parallel:
           - get: edge-image
-            trigger: true
-            passed: [build-edge-image]
+            passed: [ release ]
             params: { skip_download: true }
           - get: repo
             trigger: true
-            passed:
-              - build-edge-image
+            passed: [ release ]
+          - get: version
+            passed: [ release ]
           - get: charts-repo
             params: { skip_download: true }
           - get: pipeline-tasks
+          - get: version
       - task: bump-image-digest-in-values
         config:
           platform: linux
@@ -139,6 +140,7 @@ jobs:
             - name: edge-image
             - name: pipeline-tasks
             - name: charts-repo
+            - name: version
           outputs:
             - name: charts-repo
           params:
