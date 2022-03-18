@@ -30,9 +30,6 @@ export default function Login() {
                 <CaptchaChallenge phoneNumber={phoneNumber} />
               ) : (
                 <div className="login">
-                  <div className="intro">
-                    Enter your phone number and we will text you an access code
-                  </div>
                   <PhoneNumberForm onSuccess={setPhoneNumber} />
                 </div>
               )}
