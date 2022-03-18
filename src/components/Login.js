@@ -1,136 +1,16 @@
-import { gql, useMutation } from "@apollo/client"
 import { navigate } from "hookrouter"
-import React, { useState } from "react"
-import { validAuthCode, validPhone, reportError } from "../utils"
-import Footer from "./Footer"
+import React from "react"
+
 import { isAuthenticated } from "../utils"
 
-const REQUEST_AUTH_CODE = gql`
-  mutation userRequestAuthCode($input: UserRequestAuthCodeInput!) {
-    mutationData: userRequestAuthCode(input: $input) {
-      errors {
-        message
-      }
-      success
-    }
-  }
-`
-
-const LOGIN = gql`
-  mutation login($input: UserLoginInput!) {
-    mutationData: userLogin(input: $input) {
-      errors {
-        message
-      }
-      authToken
-    }
-  }
-`
+import Footer from "./Footer"
+import PhoneNumberForm from "./PhoneNumberForm"
+import CaptchaChallenge from "./CaptchaChallenge"
 
 export default function Login() {
   if (isAuthenticated()) navigate("/dashboard")
 
-  const [phone, setPhone] = useState("")
-  const [otp, setOtp] = useState("")
-  const [otpGenerated, setOtpGenerated] = useState(false)
-
-  const [requestAuthCode, { loading: requestAuthCodeLoading }] =
-    useMutation(REQUEST_AUTH_CODE)
-  const [login, { loading: userLoginLoading }] = useMutation(LOGIN)
-
-  const PhoneForm = () => {
-    async function submitPhone(event) {
-      event.preventDefault()
-      const { error, data } = await requestAuthCode({ variables: { input: { phone } } })
-      if (error) {
-        return reportError(error.message)
-      }
-
-      const { errors, success } = data.mutationData
-      if (errors.length > 0) {
-        return reportError(errors[0].message)
-      }
-      if (success) {
-        setOtpGenerated(true)
-      } else {
-        reportError("Could not execute operation")
-      }
-    }
-
-    return (
-      <form onSubmit={submitPhone} className="w-full">
-        <input
-          id="phone"
-          autoFocus
-          required
-          type="tel"
-          placeholder="Enter phone number"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline"
-        />
-        <p className="text-red-500 mt-2 text-xs italic">
-          {phone && !validPhone(phone) ? "Invalid phone number" : ""}
-        </p>
-        <button
-          type="submit"
-          disabled={!validPhone(phone)}
-          className="bg-blue-400 hover:bg-blue-500 text-white font-bold p-2 my-4 w-full border border-blue-500 rounded disabled:opacity-50"
-        >
-          {requestAuthCodeLoading ? "Loading..." : "Request auth code"}
-        </button>
-      </form>
-    )
-  }
-
-  const OTPForm = () => {
-    async function submitOtp(event) {
-      event.preventDefault()
-      const { error, data } = await login({ variables: { input: { phone, code: otp } } })
-
-      if (error) {
-        return reportError(error.message)
-      }
-
-      const { errors, authToken } = data.mutationData
-
-      if (errors.length > 0) {
-        return reportError(errors[0].message)
-      }
-
-      if (authToken) {
-        window.sessionStorage.setItem("token", authToken)
-        navigate("/dashboard", true)
-      } else {
-        reportError("Could not execute operation")
-      }
-    }
-
-    return (
-      <form onSubmit={submitOtp}>
-        <input
-          id="otp"
-          autoFocus
-          required
-          type="text"
-          placeholder="Enter Auth Code"
-          value={otp}
-          onChange={(e) => setOtp(e.target.value)}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline"
-        />
-        <p className="text-red-500 mt-2 text-xs italic">
-          {otp && !validAuthCode(otp) ? "Invalid auth code" : ""}
-        </p>
-        <button
-          type="submit"
-          disabled={!validAuthCode(otp)}
-          className="bg-blue-400 hover:bg-blue-500 text-white font-bold p-2 my-4 w-full border border-blue-500 rounded disabled:opacity-50"
-        >
-          {userLoginLoading ? "Loading..." : "Login"}
-        </button>
-      </form>
-    )
-  }
+  const [phoneNumber, setPhoneNumber] = React.useState()
 
   return (
     <div className="flex items-center min-h-screen p-6 bg-gray-50">
@@ -146,8 +26,16 @@ export default function Login() {
           <main className="p-6 sm:p-12 md:w-1/2">
             <h1 className="block text-3xl font-extrabold text-gray-900">Welcome</h1>
             <div className="py-4">
-              {!otpGenerated && <PhoneForm />}
-              {otpGenerated && <OTPForm />}
+              {phoneNumber ? (
+                <CaptchaChallenge phoneNumber={phoneNumber} />
+              ) : (
+                <div className="login">
+                  <div className="intro">
+                    Enter your phone number and we will text you an access code
+                  </div>
+                  <PhoneNumberForm onSuccess={setPhoneNumber} />
+                </div>
+              )}
             </div>
           </main>
         </div>
