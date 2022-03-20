@@ -20,9 +20,11 @@ const satsFormatter = new Intl.NumberFormat("en-US", {
 export default function ReceiveAmount({
   recipientWalletId,
   recipientWalletCurrency,
+  memo,
 }: {
   recipientWalletId: string
   recipientWalletCurrency: string
+  memo: string
 }) {
   const router = useRouter()
   const { satsToUsd, usdToSats } = useSatPrice()
@@ -78,6 +80,7 @@ export default function ReceiveAmount({
     recipientWalletCurrency === "USD"
       ? triggerRegenerateUsdInvoice
       : triggerRegenerateBtcInvoice
+
   return (
     <>
       <div className="amount-input">
@@ -102,6 +105,7 @@ export default function ReceiveAmount({
           amountInBase={amountInBase}
           regenerate={triggerRegenerateInvoice}
           currency={currency}
+          memo={memo}
         />
       )}
     </>
