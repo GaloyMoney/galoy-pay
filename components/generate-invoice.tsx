@@ -92,7 +92,7 @@ function GenerateInvoice({
   }
   useEffect(() => {
     createInvoice({
-      variables: { walletId: recipientWalletId, amount: amountInBase, memo: memo },
+      variables: { walletId: recipientWalletId, amount: amountInBase, memo },
     })
     if (currency !== "SATS" || recipientWalletCurrency === "USD") {
       timerIds.current.push(
