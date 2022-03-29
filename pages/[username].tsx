@@ -5,6 +5,8 @@ import Card from "react-bootstrap/Card"
 import Container from "react-bootstrap/Container"
 import Image from "react-bootstrap/Image"
 import { gql, useQuery } from "@apollo/client"
+import { useState } from "react"
+import { useDebouncedCallback } from "use-debounce"
 
 import ReceiveAmount from "../components/receive-amount"
 import ReceiveNoAmount from "../components/receive-no-amount"
@@ -23,6 +25,11 @@ const RECIPIENT_WALLET_ID = gql`
 export default function Receive() {
   const router = useRouter()
   const { username, amount } = router.query
+
+  const [memo, setMemo] = useState("")
+  const debouncedMemo = useDebouncedCallback((memo) => {
+    setMemo(memo)
+  }, 1000)
 
   const { error, loading, data } = useQuery(RECIPIENT_WALLET_ID, {
     variables: {
@@ -53,15 +60,27 @@ export default function Receive() {
           <Card className="text-center">
             <Card.Header>Pay {username}</Card.Header>
 
+            <div className="memo-container">
+              <input
+                className="memo"
+                type="text"
+                maxLength={159}
+                placeholder="Optional memo"
+                onChange={(e) => debouncedMemo(e.target.value)}
+              />
+            </div>
+
             {isAmountInvoice ? (
               <ReceiveAmount
                 recipientWalletId={recipientWalletId}
                 recipientWalletCurrency={recipientWalletCurrency}
+                memo={memo}
               />
             ) : (
               <ReceiveNoAmount
                 recipientWalletId={recipientWalletId}
                 onSetAmountClick={onSetAmountClick}
+                memo={memo}
               />
             )}
 

@@ -12,9 +12,9 @@ type LnInvoiceObject = {
 }
 
 const LN_NOAMOUNT_INVOICE_CREATE_ON_BEHALF_OF_RECIPIENT = gql`
-  mutation lnNoAmountInvoiceCreateOnBehalfOfRecipient($walletId: WalletId!) {
+  mutation lnNoAmountInvoiceCreateOnBehalfOfRecipient($memo: Memo, $walletId: WalletId!) {
     mutationData: lnNoAmountInvoiceCreateOnBehalfOfRecipient(
-      input: { recipientWalletId: $walletId }
+      input: { memo: $memo, recipientWalletId: $walletId }
     ) {
       errors {
         message
@@ -29,9 +29,11 @@ const LN_NOAMOUNT_INVOICE_CREATE_ON_BEHALF_OF_RECIPIENT = gql`
 export default function ReceiveNoAmount({
   recipientWalletId,
   onSetAmountClick,
+  memo,
 }: {
   recipientWalletId: string
   onSetAmountClick: () => void
+  memo: string
 }) {
   const [createInvoice, { loading, error, data }] = useMutation<{
     mutationData: {
@@ -42,9 +44,9 @@ export default function ReceiveNoAmount({
 
   useEffect(() => {
     createInvoice({
-      variables: { walletId: recipientWalletId },
+      variables: { memo: memo, walletId: recipientWalletId },
     })
-  }, [createInvoice, recipientWalletId])
+  }, [createInvoice, recipientWalletId, memo])
 
   if (error) {
     return <div className="error">{error.message}</div>

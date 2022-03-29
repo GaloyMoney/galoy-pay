@@ -78,3 +78,15 @@ code {
 .invoice-container {
   max-width: 390px;
 }
+
+.memo-container {
+  padding: 0.5rem 0rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.memo {
+  flex-grow: 2;
+  max-width: 300px;
+}

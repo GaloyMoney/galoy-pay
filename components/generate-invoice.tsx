@@ -12,9 +12,13 @@ type LnInvoiceObject = {
 }
 
 const LN_INVOICE_CREATE_ON_BEHALF_OF_RECIPIENT = gql`
-  mutation lnInvoiceCreateOnBehalfOfRecipient($walletId: WalletId!, $amount: SatAmount!) {
+  mutation lnInvoiceCreateOnBehalfOfRecipient(
+    $walletId: WalletId!
+    $amount: SatAmount!
+    $memo: Memo
+  ) {
     mutationData: lnInvoiceCreateOnBehalfOfRecipient(
-      input: { recipientWalletId: $walletId, amount: $amount }
+      input: { recipientWalletId: $walletId, amount: $amount, memo: $memo }
     ) {
       errors {
         message
@@ -30,9 +34,10 @@ const LN_USD_INVOICE_CREATE_ON_BEHALF_OF_RECIPIENT = gql`
   mutation lnUsdInvoiceCreateOnBehalfOfRecipient(
     $walletId: WalletId!
     $amount: CentAmount!
+    $memo: memo
   ) {
     mutationData: lnUsdInvoiceCreateOnBehalfOfRecipient(
-      input: { recipientWalletId: $walletId, amount: $amount }
+      input: { recipientWalletId: $walletId, amount: $amount, memo: $memo }
     ) {
       errors {
         message
@@ -53,12 +58,14 @@ function GenerateInvoice({
   amountInBase,
   regenerate,
   currency,
+  memo,
 }: {
   recipientWalletId: string
   recipientWalletCurrency: string
   amountInBase: number
   regenerate: () => void
   currency: string
+  memo: string
 }) {
   const [invoiceStatus, setInvoiceStatus] = useState<
     "loading" | "new" | "need-update" | "expired"
@@ -85,7 +92,7 @@ function GenerateInvoice({
   }
   useEffect(() => {
     createInvoice({
-      variables: { walletId: recipientWalletId, amount: amountInBase },
+      variables: { walletId: recipientWalletId, amount: amountInBase, memo },
     })
     if (currency !== "SATS" || recipientWalletCurrency === "USD") {
       timerIds.current.push(
@@ -99,7 +106,7 @@ function GenerateInvoice({
       window.setTimeout(() => setInvoiceStatus("expired"), INVOICE_EXPIRE_INTERVAL),
     )
     return clearAllTimers
-  }, [recipientWalletId, amountInBase, currency, createInvoice])
+  }, [recipientWalletId, amountInBase, currency, createInvoice, memo])
 
   let errorString: string | null = error?.message || null
   let invoice
