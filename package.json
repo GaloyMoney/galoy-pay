@@ -61,6 +61,6 @@
     "@types/prettier": "^2.4.1",
     "@types/react-dev-utils": "^9.0.7",
     "@types/react-lottie": "^1.2.6",
-    "prettier": "^2.4.1"
+    "prettier": "^2.6.2"
   }
 }
