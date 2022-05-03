@@ -24,7 +24,3 @@ export const getOS = () => {
 
   return undefined
 }
-
-export const playStoreLink = "https://play.google.com/store/apps/details?id=com.galoyapp"
-export const appStoreLink = "https://apps.apple.com/app/bitcoin-beach-wallet/id1531383905"
-export const apkLink = "https://storage.googleapis.com/bitcoin-beach-wallet/latest.apk"

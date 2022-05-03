@@ -4,10 +4,13 @@ import "./index.css"
 import Head from "next/head"
 import dynamic from "next/dynamic"
 import { NextPage } from "next"
+import getConfig from "next/config"
 
 import Header from "../components/header"
 
 const GraphQLProvider = dynamic(() => import("../lib/graphql"), { ssr: false })
+
+const { publicRuntimeConfig } = getConfig()
 
 export default function Layout({
   Component,
@@ -24,7 +27,7 @@ export default function Layout({
         <meta name="theme-color" content="#000000" />
         <meta
           name="description"
-          content="Bitcoin Beach official lightning network node"
+          content={publicRuntimeConfig.appName + " official lightning network node"}
         />
 
         <script
@@ -42,10 +45,10 @@ export default function Layout({
     `,
           }}
         />
-        <title>BitcoinBeach Lightning Node</title>
+        <title>{publicRuntimeConfig.appName} Lightning Node</title>
       </Head>
       <GraphQLProvider>
-        <Header />
+        <Header link={publicRuntimeConfig.appUri} />
         <Component {...pageProps} />
       </GraphQLProvider>
     </>

@@ -9,8 +9,9 @@ import {
   InMemoryCache,
 } from "@apollo/client"
 import type { NextApiRequest, NextApiResponse } from "next"
+import getConfig from "next/config"
 
-import { GRAPHQL_URI_INTERNAL } from "../../../lib/config"
+const { serverRuntimeConfig } = getConfig()
 
 const ipForwardingMiddleware = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => ({
@@ -28,7 +29,7 @@ const client = new ApolloClient({
   link: concat(
     ipForwardingMiddleware,
     new HttpLink({
-      uri: GRAPHQL_URI_INTERNAL,
+      uri: serverRuntimeConfig.graphqlUriInternal,
     }),
   ),
   cache: new InMemoryCache(),

@@ -8,15 +8,16 @@ import {
 } from "@apollo/client"
 import { WebSocketLink } from "@apollo/client/link/ws"
 import { getMainDefinition } from "@apollo/client/utilities"
+import getConfig from "next/config"
 
-import { GRAPHQL_URI, GRAPHQL_SUBSCRIPTION_URI } from "./config"
+const { publicRuntimeConfig } = getConfig()
 
 const httpLink = new HttpLink({
-  uri: GRAPHQL_URI,
+  uri: publicRuntimeConfig.graphqlUri,
 })
 
 const wsLink = new WebSocketLink({
-  uri: GRAPHQL_SUBSCRIPTION_URI,
+  uri: publicRuntimeConfig.graphqlSubscriptionUri,
   options: {
     reconnect: true,
   },

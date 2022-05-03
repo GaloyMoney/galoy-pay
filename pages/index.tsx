@@ -5,8 +5,7 @@ import Card from "react-bootstrap/Card"
 import ListGroup from "react-bootstrap/ListGroup"
 import Jumbotron from "react-bootstrap/Jumbotron"
 import { gql, useQuery } from "@apollo/client"
-
-import { GRAPHQL_URI } from "../lib/config"
+import getConfig from "next/config"
 
 const GET_NODE_STATS = gql`
   query nodeIds {
@@ -16,9 +15,11 @@ const GET_NODE_STATS = gql`
   }
 `
 
+const { publicRuntimeConfig } = getConfig()
+
 function Home() {
   const nodeUrl =
-    GRAPHQL_URI.indexOf("testnet") === -1
+    publicRuntimeConfig.graphqlUri.indexOf("staging") === -1
       ? `https://1ml.com/node/`
       : `https://1ml.com/testnet/node/`
 
@@ -29,7 +30,7 @@ function Home() {
       <br />
       <Row>
         <Col>
-          <h2>Connect to the Bitcoin Beach Lightning Node</h2>
+          <h2>Connect to the {publicRuntimeConfig.appName} Lightning Node</h2>
           <br />
           <Jumbotron>
             <Container>
@@ -54,8 +55,11 @@ function Home() {
                           ) : loading ? (
                             "Loading..."
                           ) : (
-                            <a href={nodeUrl + `${data.globals.nodesIds[0]}`}>
-                              Connect the Bitcoin Beach Lightning node
+                            <a
+                              target="_blank"
+                              href={nodeUrl + `${data.globals.nodesIds[0]}`}
+                            >
+                              Connect to the {publicRuntimeConfig.appName} Lightning node
                             </a>
                           )}
                         </ListGroup.Item>
