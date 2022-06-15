@@ -14,7 +14,7 @@ In the project directory, you can run:
 
 ```
 yarn install
-export GRAPHQL_URI=`https://graphql-admin.domain.com`
+export GRAPHQL_URI="https://graphql-admin.domain.com"
 yarn start
 ```
 
