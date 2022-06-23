@@ -3,6 +3,7 @@ import { useLazyQuery, useMutation } from "@apollo/client"
 import SearchHeader from "../SearchHeader"
 import Details from "./Details"
 import AccountUpdate from "./AccountUpdate"
+import Wallets from "./Wallets"
 import BusinessMapUpdate from "./BusinessMapUpdate"
 import {
   GET_ACCOUNT_BY_PHONE,
@@ -10,6 +11,7 @@ import {
   ACCOUNT_UPDATE_STATUS,
   ACCOUNT_UPDATE_LEVEL,
   BUSINESS_UPDATE_MAP_INFO,
+  ADD_USD_WALLET,
 } from "./queries"
 import { validPhone, validUsername, reportError } from "../../utils"
 
@@ -53,6 +55,16 @@ function AccountDetails() {
       fetchPolicy: "no-cache",
     },
   )
+
+  const [updateUsdWallet, { loading: loadingUsdStatus }] = useMutation(ADD_USD_WALLET, {
+    onCompleted() {
+      alert(`USD wallet activated successfully`)
+      // refresh the data via search
+      search(data.username || data.phone)
+    },
+    onError,
+    fetchPolicy: "no-cache",
+  })
 
   const [updateAccountLevel, { loading: loadingAccountLevel }] = useMutation(
     ACCOUNT_UPDATE_LEVEL,
@@ -113,6 +125,17 @@ function AccountDetails() {
     }
   }
 
+  const addUsdWallet = () => {
+    const confirmation = window.confirm(
+      `Clicking OK will add a USD wallet to ${data.phone}'s account. This action cannot be reversed. Do you wish to proceed?`,
+    )
+    if (confirmation) {
+      updateUsdWallet({
+        variables: { input: { accountIds: [data.id] } },
+      })
+    }
+  }
+
   const changeBusinessMapDetails = (businessInfo) => {
     const input = { username: data.username, ...businessInfo }
     if (data.username) {
@@ -129,31 +152,41 @@ function AccountDetails() {
         onChange={setSearchValue}
         onEnter={search}
       />
-      <h1 className="mx-6 mt-6 text-2xl font-semibold text-gray-700">
-        Account details
-        {loading && (
-          <small className="animate-pulse font-thin text-sm"> (loading...)</small>
-        )}
-      </h1>
-      <div className="grid gap-6 mb-8 md:grid-cols-2 p-6">
-        <Details accountDetails={data} loading={loading} />
-        <div className="grid grid-cols-1 gap-4">
-          <AccountUpdate
-            accountDetails={data}
-            udpateLevel={data && changeLevel}
-            updatingLevel={loadingAccountLevel}
-            updateStatus={data && changeAccountStatus}
-            updatingStatus={loadingAccountStatus}
-            loading={loading}
-          />
-          <BusinessMapUpdate
-            accountDetails={data?.username && data}
-            udpate={data && changeBusinessMapDetails}
-            updating={loadingBusinessMap}
-            loading={loading}
-          />
-        </div>
-      </div>
+      {data && (
+        <>
+          <h1 className="mx-6 mt-6 text-2xl font-semibold text-gray-700">
+            Account details
+            {loading && (
+              <small className="animate-pulse font-thin text-sm"> (loading...)</small>
+            )}
+          </h1>
+          <div className="grid gap-6 mb-8 md:grid-cols-2 p-6">
+            <Details accountDetails={data} loading={loading} />
+            <div className="grid grid-cols-1 gap-4">
+              <AccountUpdate
+                accountDetails={data}
+                updateLevel={data && changeLevel}
+                updatingLevel={loadingAccountLevel}
+                updateStatus={data && changeAccountStatus}
+                updatingStatus={loadingAccountStatus}
+                loading={loading}
+              />
+              <Wallets
+                accountDetails={data}
+                update={data && addUsdWallet}
+                updating={loadingUsdStatus}
+                loading={loading}
+              />
+              <BusinessMapUpdate
+                accountDetails={data?.username && data}
+                update={data && changeBusinessMapDetails}
+                updating={loadingBusinessMap}
+                loading={loading}
+              />
+            </div>
+          </div>
+        </>
+      )}
     </>
   )
 }

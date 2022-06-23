@@ -17,6 +17,10 @@ export const GET_ACCOUNT_BY_PHONE = gql`
         latitude
         longitude
       }
+      wallets {
+        id
+        walletCurrency
+      }
       createdAt
     }
   }
@@ -39,7 +43,24 @@ export const GET_ACCOUNT_BY_USERNAME = gql`
         latitude
         longitude
       }
+      wallets {
+        id
+        walletCurrency
+      }
       createdAt
+    }
+  }
+`
+export const ADD_USD_WALLET = gql`
+  mutation accountsAddUsdWallet($input: AccountsAddUsdWalletInput!) {
+    mutationData: accountsAddUsdWallet(input: $input) {
+      errors {
+        message
+      }
+      walletDetails {
+        __typename
+        id
+      }
     }
   }
 `

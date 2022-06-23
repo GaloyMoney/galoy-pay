@@ -1,41 +1,30 @@
 import React, { useState, useEffect } from "react"
 import PropTypes from "prop-types"
 
-const defaultData = {
-  title: "",
-  coordinates: {
-    latitude: "",
-    longitude: "",
-  },
-}
-
-const isValidLatitud = (latitude) => isFinite(latitude) && Math.abs(latitude) <= 90
+const isValidLatitude = (latitude) => isFinite(latitude) && Math.abs(latitude) <= 90
 const isValidLongitude = (longitude) => isFinite(longitude) && Math.abs(longitude) <= 180
 const isValidTitle = (title) => title.length >= 3
 const isValidBusinessInfo = ({ title, latitude, longitude }) =>
-  isValidLatitud(latitude) && isValidLongitude(longitude) && isValidTitle(title)
+  isValidLatitude(latitude) && isValidLongitude(longitude) && isValidTitle(title)
 
 function BusinessMapUpdate({
   accountDetails,
-  udpate,
+  update,
   updating = false,
   loading = false,
 }) {
-  const data = accountDetails || defaultData
-  data.title = data.title || defaultData.title
-  data.coordinates = data.coordinates || defaultData.coordinates
+  const data = accountDetails
 
-  const [title, setTitle] = useState(data.title)
-  const [latitude, setLatitude] = useState(data.coordinates.latitude)
-  const [longitude, setLongitude] = useState(data.coordinates.longitude)
+  const [title, setTitle] = useState(data?.title || "")
+  const [latitude, setLatitude] = useState(data?.coordinates?.latitude || "")
+  const [longitude, setLongitude] = useState(data?.coordinates?.longitude || "")
 
-  let emptyClass = data === defaultData || loading ? "filter blur-sm" : ""
-  emptyClass = emptyClass + (loading ? " animate-pulse" : "")
+  let emptyClass = loading ? "filter blur-sm animate-pulse" : ""
 
   useEffect(() => {
-    setTitle(data.title)
-    setLatitude(data.coordinates.latitude)
-    setLongitude(data.coordinates.longitude)
+    setTitle(data?.title || "")
+    setLatitude(data?.coordinates?.latitude || "")
+    setLongitude(data?.coordinates?.longitude || "")
   }, [data])
 
   const submit = async (event) => {
@@ -48,7 +37,7 @@ function BusinessMapUpdate({
     }
 
     if (isValidBusinessInfo(businessInfo)) {
-      return udpate && udpate(businessInfo)
+      return update && update(businessInfo)
     }
 
     alert("Invalid business info")
@@ -70,7 +59,7 @@ function BusinessMapUpdate({
             onChange={(e) => setLatitude(e.target.value)}
             disabled={!!emptyClass}
             className={`${emptyClass} ${
-              !isValidLatitud(latitude) && "border-red-500"
+              !isValidLatitude(latitude) && "border-red-500"
             } mt-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-600 focus:outline-none focus:shadow-outline`}
           />
         </div>
@@ -130,7 +119,7 @@ BusinessMapUpdate.propTypes = {
       longitude: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     }),
   }),
-  udpate: PropTypes.func,
+  update: PropTypes.func,
   updating: PropTypes.bool,
   loading: PropTypes.bool,
 }
