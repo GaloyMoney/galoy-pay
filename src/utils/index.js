@@ -29,6 +29,7 @@ export const formatNumber = (val) =>
   countDecimals(val) > 8 ? Number(val).toFixed(8) : val
 
 const countDecimals = (val) => {
-  if (Math.floor(val.valueOf()) === val.valueOf()) return 0
-  return val.toString().split(".")[1].length || 0
+  const value = Number(val)
+  if (Math.floor(value.valueOf()) === value.valueOf()) return 0
+  return value.toString().split(".")[1].length || 0
 }
