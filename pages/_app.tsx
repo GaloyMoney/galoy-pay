@@ -5,8 +5,6 @@ import Head from "next/head"
 import dynamic from "next/dynamic"
 import { NextPage } from "next"
 
-import Header from "../components/header"
-
 const GraphQLProvider = dynamic(() => import("../lib/graphql"), { ssr: false })
 
 export default function Layout({
@@ -45,7 +43,6 @@ export default function Layout({
         <title>BitcoinBeach Lightning Node</title>
       </Head>
       <GraphQLProvider>
-        <Header />
         <Component {...pageProps} />
       </GraphQLProvider>
     </>
