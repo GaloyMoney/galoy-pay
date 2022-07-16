@@ -1,0 +1,136 @@
+import { useRouter } from "next/router"
+import { ParsedUrlQuery } from "querystring"
+import React from "react"
+import Container from "react-bootstrap/Container"
+import Image from "react-bootstrap/Image"
+import { useTimer } from "react-timer-hook"
+
+import useSatPrice from "../../lib/use-sat-price"
+import { formatOperand } from "../../utils/utils"
+import DigitButton from "./DigitButton"
+import styles from "./parsepayment.module.css"
+import RecieveInvoice from "./RecieveInvoice"
+import { ACTIONS, ACTIONTYPE } from "./reducer"
+
+interface Props {
+  defaultWalletCurrency?: string
+  walletId?: string
+  dispatch: React.Dispatch<ACTIONTYPE>
+  state: React.ComponentState
+}
+
+function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Props) {
+  const router = useRouter()
+  const { currency } = parseQueryAmount(router.query) // USD or SATs
+  const { usdToSats } = useSatPrice()
+
+  const time = new Date()
+  time.setSeconds(time.getSeconds() + 60 * 5) // default to five mins for USD invoice
+  const expiryTimestamp = time
+  const { seconds, minutes } = useTimer({
+    expiryTimestamp,
+    onExpire: () => console.warn("onExpire called"),
+  })
+
+  const valueInSats = `≈ ${formatOperand(
+    usdToSats(Number(state.currentAmount)).toFixed().toString(),
+  )} sats `
+  const valueInUSD = `$ ${formatOperand(state.currentAmount)}`
+
+  return (
+    <Container className={styles.digits_container}>
+      <div className={styles.output}>
+        <div
+          className={
+            state.currentAmount?.length >= 10
+              ? styles.curr_denomination_small
+              : styles.curr_denomination
+          }
+        >
+          {currency === "USD" ? valueInUSD : valueInSats.slice(1, -1)}
+        </div>
+        <div className={styles.other_denomination}>
+          {currency === "USD" ? valueInSats : valueInUSD}
+        </div>
+        <button>
+          <Image
+            src="/icons/convert-icon.svg"
+            alt="convert to SAT/USD icon"
+            width="24"
+            height="24"
+          />
+        </button>
+      </div>
+
+      {state.createInvoice ? (
+        <RecieveInvoice
+          minutes={minutes}
+          seconds={seconds}
+          state={state}
+          dispatch={dispatch}
+          recipientWalletCurrency={defaultWalletCurrency}
+          walletId={walletId}
+        />
+      ) : (
+        <div className={styles.digits_grid}>
+          <DigitButton digit={"1"} dispatch={dispatch} />
+          <DigitButton digit={"2"} dispatch={dispatch} />
+          <DigitButton digit={"3"} dispatch={dispatch} />
+          <DigitButton digit={"4"} dispatch={dispatch} />
+          <DigitButton digit={"5"} dispatch={dispatch} />
+          <DigitButton digit={"6"} dispatch={dispatch} />
+          <DigitButton digit={"7"} dispatch={dispatch} />
+          <DigitButton digit={"8"} dispatch={dispatch} />
+          <DigitButton digit={"9"} dispatch={dispatch} />
+          <DigitButton digit={"."} dispatch={dispatch} />
+          <DigitButton digit={"0"} dispatch={dispatch} />
+          <button onClick={() => dispatch({ type: ACTIONS.DELETE_DIGIT })}>
+            <Image src="/icons/backspace-icon.svg" width="32" height="32" />
+          </button>
+        </div>
+      )}
+
+      <div className={styles.pay_btn_container}>
+        <button
+          className={state.createInvoice ? styles.pay_new_btn : styles.pay_btn}
+          onClick={
+            state.createInvoice
+              ? () => dispatch({ type: ACTIONS.CREATE_NEW_INVOICE })
+              : () => dispatch({ type: ACTIONS.CREATE_INVOICE })
+          }
+        >
+          <Image
+            src={
+              state.createInvoice
+                ? "/icons/lightning-icon-dark.svg"
+                : "/icons/lightning-icon.svg"
+            }
+            width="20"
+            height="20"
+          />
+          {state.createInvoice ? "Create new invoice" : "Create invoice"}
+        </button>
+        {!state.createInvoice && (
+          <button
+            className={styles.clear_btn}
+            onClick={() => dispatch({ type: ACTIONS.CLEAR_INPUT })}
+          >
+            <Image src="/icons/clear-input-icon.svg" width="20" height="20" />
+            Clear
+          </button>
+        )}
+      </div>
+    </Container>
+  )
+}
+
+export default ParsePayment
+
+function parseQueryAmount(query: ParsedUrlQuery) {
+  const currency = query.currency as string | null
+
+  return {
+    amount: Number(query.amount) || 0,
+    currency: currency?.toUpperCase() || "USD",
+  }
+}

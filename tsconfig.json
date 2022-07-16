@@ -24,7 +24,9 @@
   "include": [
     "pages",
     "lib",
-    "components"
+    "components",
+    "utils",
+    "hooks",
   ],
   "exclude": [
     "node_modules"
