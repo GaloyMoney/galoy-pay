@@ -44,7 +44,6 @@ function RecievePayment() {
         </div>
       ) : (
         <>
-          {/* <PaymentOutcome state={state} /> */}
           {!state.createInvoice && (
             <ButtonGroup aria-label="Pin" className={styles.pin_btn_group}>
               <Image
