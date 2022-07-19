@@ -9,7 +9,7 @@ import useSatPrice from "../../lib/use-sat-price"
 import { formatOperand } from "../../utils/utils"
 import DigitButton from "./DigitButton"
 import styles from "./parsepayment.module.css"
-import RecieveInvoice from "./RecieveInvoice"
+import ReceiveInvoice from "./ReceiveInvoice"
 import { ACTIONS, ACTIONTYPE } from "./reducer"
 
 interface Props {
@@ -63,7 +63,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
       </div>
 
       {state.createInvoice ? (
-        <RecieveInvoice
+        <ReceiveInvoice
           minutes={minutes}
           seconds={seconds}
           state={state}

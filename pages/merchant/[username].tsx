@@ -12,7 +12,7 @@ import { RECIPIENT_WALLET_ID } from "../../lib/graphql/query"
 import styles from "./_user.module.css"
 import PaymentOutcome from "../../components/PaymentOutcome"
 
-function RecievePayment() {
+function ReceivePayment() {
   const router = useRouter()
   const { username } = router.query
 
@@ -76,4 +76,4 @@ function RecievePayment() {
   )
 }
 
-export default RecievePayment
+export default ReceivePayment
