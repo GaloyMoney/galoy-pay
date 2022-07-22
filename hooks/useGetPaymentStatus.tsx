@@ -2,9 +2,9 @@ import React from "react"
 
 import { useSubscription } from "@apollo/client"
 
-import { ACTIONS, ACTIONTYPE } from "../components/ParsePOSPayment/reducer"
 import { OperationError } from "../lib/graphql/index.types.d"
 import { LN_INVOICE_PAYMENT_STATUS } from "../lib/graphql/subscription"
+import { ACTIONS, ACTIONTYPE } from "../pages/merchant/_reducer"
 
 interface Props {
   paymentRequest: string

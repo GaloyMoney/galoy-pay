@@ -3,19 +3,19 @@ import Image from "react-bootstrap/Image"
 import { QRCode } from "react-qrcode-logo"
 
 import useCreateInvoice from "../../hooks/useCreateInvoice"
+import useSatPrice from "../../lib/use-sat-price"
+import { formatOperand } from "../../utils/utils"
 import styles from "./parsepayment.module.css"
-import { ACTIONTYPE } from "./reducer"
 
 interface Props {
   minutes: number
   seconds: number
   recipientWalletCurrency?: string
-  walletId?: string
+  walletId: string | undefined
   state: React.ComponentState
-  dispatch: React.Dispatch<ACTIONTYPE>
 }
 
-function RecieveInvoice({
+function ReceiveInvoice({
   minutes,
   seconds,
   state,
@@ -25,12 +25,18 @@ function RecieveInvoice({
   const { createInvoice, data, error, loading } = useCreateInvoice({
     recipientWalletCurrency,
   })
+  const { usdToSats } = useSatPrice()
+
+  const amount =
+    state.walletCurrency === "USD"
+      ? state.currentAmount
+      : formatOperand(usdToSats(Number(state.currentAmount)).toFixed().toString())
 
   const generateInvoice = React.useCallback(() => {
     createInvoice({
-      variables: { walletId: walletId, amount: state.currentAmount },
+      variables: { walletId: walletId, amount: amount },
     })
-  }, [state.currentAmount, walletId, createInvoice])
+  }, [amount, walletId, createInvoice])
 
   React.useEffect(() => {
     generateInvoice()
@@ -50,7 +56,7 @@ function RecieveInvoice({
 
   const loadingOrErrorMsg = loading ? (
     <p className={styles.loading}>Generating invoice</p>
-  ) : error ? (
+  ) : error || data?.mutationData.errors.length ? (
     <p className={styles.error}>{errorString}</p>
   ) : null
 
@@ -108,4 +114,4 @@ function RecieveInvoice({
   )
 }
 
-export default RecieveInvoice
+export default ReceiveInvoice

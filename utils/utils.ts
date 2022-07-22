@@ -1,3 +1,5 @@
+import { ParsedUrlQuery } from "querystring"
+
 export const usdFormatter = new Intl.NumberFormat("en-US", {
   // style: "currency",
   // currency: "USD",
@@ -15,4 +17,13 @@ export function formatOperand(operand: string) {
     return usdFormatter.format(Number(integer))
   }
   return `${usdFormatter.format(Number(integer))}.${decimal}`
+}
+
+export function parseQueryAmount(query: ParsedUrlQuery) {
+  const currency = query.currency as string | null
+
+  return {
+    amount: Number(query.amount) || 0,
+    currency: currency?.toUpperCase() || "USD",
+  }
 }

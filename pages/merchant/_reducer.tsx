@@ -41,13 +41,29 @@ function reducer(state: React.ComponentState, { type, payload }: ACTIONTYPE) {
     case ACTIONS.CREATE_INVOICE:
       if (state.createInvoice) return
       if (state.currentAmount == null || state.currentAmount === undefined) return
+      router.push(
+        {
+          pathname: state.username,
+          query: { amount: state.currentAmount, currency: state.walletCurrency },
+        },
+        undefined,
+        { shallow: true },
+      )
       return {
         ...state,
-        createInvoice: updateURL(state),
+        createInvoice: true,
       }
 
     case ACTIONS.CREATE_NEW_INVOICE:
       if (!state.createInvoice) return
+      router.push(
+        {
+          pathname: state.username,
+          query: { amount: "0", currency: state.walletCurrency },
+        },
+        undefined,
+        { shallow: true },
+      )
       return {
         ...state,
         createInvoice: false,
@@ -68,17 +84,6 @@ function reducer(state: React.ComponentState, { type, payload }: ACTIONTYPE) {
 
     default:
   }
-}
-
-function updateURL(state: React.ComponentState) {
-  state.createInvoice = true
-  return router.push(
-    `/merchant/${state.username}?amount=${state.currentAmount || 0}&currency=${
-      state.walletCurrency
-    }`,
-    undefined,
-    { shallow: true },
-  )
 }
 
 export default reducer

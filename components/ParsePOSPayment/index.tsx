@@ -1,16 +1,14 @@
-import { useRouter } from "next/router"
-import { ParsedUrlQuery } from "querystring"
 import React from "react"
 import Container from "react-bootstrap/Container"
 import Image from "react-bootstrap/Image"
 import { useTimer } from "react-timer-hook"
 
 import useSatPrice from "../../lib/use-sat-price"
+import { ACTIONS, ACTIONTYPE } from "../../pages/merchant/_reducer"
 import { formatOperand } from "../../utils/utils"
 import DigitButton from "./DigitButton"
 import styles from "./parsepayment.module.css"
 import RecieveInvoice from "./RecieveInvoice"
-import { ACTIONS, ACTIONTYPE } from "./reducer"
 
 interface Props {
   defaultWalletCurrency?: string
@@ -20,8 +18,7 @@ interface Props {
 }
 
 function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Props) {
-  const router = useRouter()
-  const { currency } = parseQueryAmount(router.query) // USD or SATs
+  const [usdDenomination, setUsdDenomination] = React.useState<boolean>(true)
   const { usdToSats } = useSatPrice()
 
   const time = new Date()
@@ -47,12 +44,12 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
               : styles.curr_denomination
           }
         >
-          {currency === "USD" ? valueInUSD : valueInSats.slice(1, -1)}
+          {usdDenomination ? valueInUSD : valueInSats.slice(1, -1)}
         </div>
         <div className={styles.other_denomination}>
-          {currency === "USD" ? valueInSats : valueInUSD}
+          {!usdDenomination ? valueInUSD : valueInSats}
         </div>
-        <button>
+        <button onClick={() => setUsdDenomination(!usdDenomination)}>
           <Image
             src="/icons/convert-icon.svg"
             alt="convert to SAT/USD icon"
@@ -67,7 +64,6 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           minutes={minutes}
           seconds={seconds}
           state={state}
-          dispatch={dispatch}
           recipientWalletCurrency={defaultWalletCurrency}
           walletId={walletId}
         />
@@ -125,12 +121,3 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
 }
 
 export default ParsePayment
-
-function parseQueryAmount(query: ParsedUrlQuery) {
-  const currency = query.currency as string | null
-
-  return {
-    amount: Number(query.amount) || 0,
-    currency: currency?.toUpperCase() || "USD",
-  }
-}
