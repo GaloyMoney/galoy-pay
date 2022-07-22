@@ -45,19 +45,27 @@ const CaptchaChallenge = ({ phoneNumber }) => {
     (captchaObj) => {
       const onSuccess = async () => {
         const result = captchaObj.getValidate()
-        const { errorsMessage } = await requestCaptchaAuthCode({
-          variables: {
-            input: {
-              phone: phoneNumber,
 
-              challengeCode: result.geetest_challenge,
-              validationCode: result.geetest_validate,
-              secCode: result.geetest_seccode,
+        try {
+          const { errorsMessage } = await requestCaptchaAuthCode({
+            variables: {
+              input: {
+                phone: phoneNumber,
+
+                challengeCode: result.geetest_challenge,
+                validationCode: result.geetest_validate,
+                secCode: result.geetest_seccode,
+              },
             },
-          },
-        })
+          })
 
-        setCaptchaState({ status: errorsMessage ? "error" : "success", errorsMessage })
+          setCaptchaState({ status: errorsMessage ? "error" : "success", errorsMessage })
+        } catch (error) {
+          setCaptchaState({
+            status: "error",
+            errorsMessage: "Invalid verification. Please try again",
+          })
+        }
       }
       captchaObj.appendTo("#captcha")
       captchaObj
@@ -79,24 +87,31 @@ const CaptchaChallenge = ({ phoneNumber }) => {
 
   React.useEffect(() => {
     const initCaptcha = async () => {
-      const { data, errorsMessage } = await createCaptchaChallenge()
+      try {
+        const { data, errorsMessage } = await createCaptchaChallenge()
 
-      const result = data?.captchaCreateChallenge?.result
-      if (!errorsMessage && result) {
-        const { id, challengeCode, newCaptcha, failbackMode } = result
-        window.initGeetest(
-          {
-            gt: id,
-            challenge: challengeCode,
-            offline: failbackMode,
-            // eslint-disable-next-line camelcase
-            new_captcha: newCaptcha,
+        const result = data?.captchaCreateChallenge?.result
+        if (!errorsMessage && result) {
+          const { id, challengeCode, newCaptcha, failbackMode } = result
+          window.initGeetest(
+            {
+              gt: id,
+              challenge: challengeCode,
+              offline: failbackMode,
+              // eslint-disable-next-line camelcase
+              new_captcha: newCaptcha,
 
-            lang: "en",
-            product: "bind",
-          },
-          captchaHandler,
-        )
+              lang: "en",
+              product: "bind",
+            },
+            captchaHandler,
+          )
+        }
+      } catch (error) {
+        setCaptchaState({
+          status: "error",
+          errorsMessage: "Invalid verification. Please try again",
+        })
       }
     }
     initCaptcha()

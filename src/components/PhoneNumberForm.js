@@ -1,8 +1,7 @@
 import * as React from "react"
 import { navigate } from "hookrouter"
-import { validPhone } from "../utils"
-import { isAuthenticated } from "../utils"
 import PropTypes from "prop-types"
+import { validPhone, isAuthenticated } from "../utils"
 
 export default function PhoneNumberForm({ onSuccess }) {
   if (isAuthenticated()) navigate("/dashboard")
