@@ -6,7 +6,6 @@ import Image from "react-bootstrap/Image"
 
 import { useQuery } from "@apollo/client"
 
-
 import { RECIPIENT_WALLET_ID } from "../../lib/graphql/query"
 import styles from "./_user.module.css"
 import reducer, { ACTIONS } from "./_reducer"
@@ -33,7 +32,8 @@ function RecievePayment() {
   React.useEffect(() => {
     if (state.walletCurrency === data?.accountDefaultWallet.walletCurrency) return
     state.walletCurrency = data?.accountDefaultWallet.walletCurrency
-  }, [data?.accountDefaultWallet.walletCurrency, state])
+    state.username = username
+  }, [data?.accountDefaultWallet.walletCurrency, state, username, data])
 
   return (
     <Container className={styles.payment_container}>

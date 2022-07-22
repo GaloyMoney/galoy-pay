@@ -7,7 +7,7 @@ import { ACTIONS, ACTIONTYPE } from "../../pages/merchant/_reducer"
 import { formatOperand } from "../../utils/utils"
 import DigitButton from "./DigitButton"
 import styles from "./parsepayment.module.css"
-import ReceiveInvoice from "./RecieveInvoice"
+import ReceiveInvoice from "./ReceiveInvoice"
 
 interface Props {
   defaultWalletCurrency?: string
