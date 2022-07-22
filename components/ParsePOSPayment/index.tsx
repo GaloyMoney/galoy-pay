@@ -1,14 +1,13 @@
 import React from "react"
 import Container from "react-bootstrap/Container"
 import Image from "react-bootstrap/Image"
-import { useTimer } from "react-timer-hook"
 
 import useSatPrice from "../../lib/use-sat-price"
 import { ACTIONS, ACTIONTYPE } from "../../pages/merchant/_reducer"
 import { formatOperand } from "../../utils/utils"
 import DigitButton from "./DigitButton"
 import styles from "./parsepayment.module.css"
-import RecieveInvoice from "./RecieveInvoice"
+import ReceiveInvoice from "./RecieveInvoice"
 
 interface Props {
   defaultWalletCurrency?: string
@@ -20,14 +19,6 @@ interface Props {
 function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Props) {
   const [usdDenomination, setUsdDenomination] = React.useState<boolean>(true)
   const { usdToSats } = useSatPrice()
-
-  const time = new Date()
-  time.setSeconds(time.getSeconds() + 60 * 5) // default to five mins for USD invoice
-  const expiryTimestamp = time
-  const { seconds, minutes } = useTimer({
-    expiryTimestamp,
-    onExpire: () => console.warn("onExpire called"),
-  })
 
   const valueInSats = `≈ ${formatOperand(
     usdToSats(Number(state.currentAmount)).toFixed().toString(),
@@ -60,9 +51,8 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
       </div>
 
       {state.createInvoice ? (
-        <RecieveInvoice
-          minutes={minutes}
-          seconds={seconds}
+        <ReceiveInvoice
+          dispatch={dispatch}
           state={state}
           recipientWalletCurrency={defaultWalletCurrency}
           walletId={walletId}

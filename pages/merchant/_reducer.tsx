@@ -33,6 +33,14 @@ function reducer(state: React.ComponentState, { type, payload }: ACTIONTYPE) {
 
     case ACTIONS.CLEAR_INPUT:
       if (state.currentAmount == null) return
+      router.push(
+        {
+          pathname: state.username,
+          query: { amount: 0, currency: state.walletCurrency },
+        },
+        undefined,
+        { shallow: true },
+      )
       return {
         ...state,
         currentAmount: "",

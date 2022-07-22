@@ -10,7 +10,7 @@ export const satsFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 })
 
-export function formatOperand(operand: string) {
+export function formatOperand(operand: string | undefined) {
   if (operand == null || isNaN(Number(operand))) return `0.00`
   const [integer, decimal] = operand.split(".")
   if (decimal == null) {

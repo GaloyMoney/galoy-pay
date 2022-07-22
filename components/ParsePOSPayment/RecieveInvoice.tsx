@@ -1,49 +1,52 @@
+import copy from "copy-to-clipboard"
+import { useRouter } from "next/router"
 import React from "react"
 import Image from "react-bootstrap/Image"
 import { QRCode } from "react-qrcode-logo"
+import { useTimer } from "react-timer-hook"
 
 import useCreateInvoice from "../../hooks/useCreateInvoice"
+import { LnInvoiceObject } from "../../lib/graphql/index.types.d"
 import useSatPrice from "../../lib/use-sat-price"
+import { ACTIONTYPE } from "../../pages/merchant/_reducer"
 import { formatOperand } from "../../utils/utils"
+import PaymentOutcome from "../PaymentOutcome"
 import styles from "./parsepayment.module.css"
 
 interface Props {
-  minutes: number
-  seconds: number
   recipientWalletCurrency?: string
   walletId: string | undefined
   state: React.ComponentState
+  dispatch: React.Dispatch<ACTIONTYPE>
 }
 
-function ReceiveInvoice({
-  minutes,
-  seconds,
-  state,
-  recipientWalletCurrency,
-  walletId,
-}: Props) {
+function ReceiveInvoice({ recipientWalletCurrency, walletId, dispatch }: Props) {
+  const { usdToSats } = useSatPrice()
+  const { amount, currency } = useRouter().query
+  const [copied, setCopied] = React.useState<boolean>(false)
+
   const { createInvoice, data, error, loading } = useCreateInvoice({
     recipientWalletCurrency,
   })
-  const { usdToSats } = useSatPrice()
-
-  const amount =
-    state.walletCurrency === "USD"
-      ? state.currentAmount
-      : formatOperand(usdToSats(Number(state.currentAmount)).toFixed().toString())
+  const paymentAmount = React.useMemo(() => {
+    if (currency === "USD") {
+      return amount
+    }
+    return formatOperand(usdToSats(Number(amount)).toFixed().toString())
+  }, [amount, currency, usdToSats])
 
   const generateInvoice = React.useCallback(() => {
     createInvoice({
-      variables: { walletId: walletId, amount: amount },
+      variables: { walletId: walletId, amount: paymentAmount },
     })
-  }, [amount, walletId, createInvoice])
+  }, [paymentAmount, walletId, createInvoice])
 
   React.useEffect(() => {
     generateInvoice()
   }, [generateInvoice])
 
   let errorString: string | null = error?.message || null
-  let invoice
+  let invoice: LnInvoiceObject | undefined
 
   if (data) {
     const invoiceData = data.mutationData
@@ -54,17 +57,45 @@ function ReceiveInvoice({
     }
   }
 
-  const loadingOrErrorMsg = loading ? (
-    <p className={styles.loading}>Generating invoice</p>
-  ) : error || data?.mutationData.errors.length ? (
-    <p className={styles.error}>{errorString}</p>
-  ) : null
+  const loadingOrErrorMsg =
+    loading || !invoice?.paymentRequest ? (
+      <p className={styles.loading}>Generating invoice</p>
+    ) : error || data?.mutationData.errors.length ? (
+      <p className={styles.error}>{errorString}</p>
+    ) : null
+
+  const GetTimer = () => {
+    const time = new Date()
+    time.setSeconds(time.getSeconds() + 60 * 5) // default to five mins for USD invoice
+    const expiryTimestamp = time
+    const { seconds, minutes } = useTimer({
+      expiryTimestamp,
+      onExpire: () => console.warn("onExpire called"),
+    })
+    return { seconds, minutes }
+  }
+
+  const copyInvoice = () => {
+    if (!invoice?.paymentRequest) {
+      console.log(invoice)
+      return
+    }
+    copy(invoice.paymentRequest)
+    setCopied(!copied)
+    console.log(copied)
+    setTimeout(() => {
+      setCopied(false)
+      console.log(copied)
+    }, 3000)
+  }
 
   return (
     <div className={styles.invoice_container}>
       {recipientWalletCurrency === "USD" && (
         <div className={styles.timer_container}>
-          <p>{`${minutes}:${seconds}`}</p>
+          <p>{`${currency === "USD" && GetTimer()?.minutes}:${
+            currency === "USD" && GetTimer()?.seconds
+          }`}</p>
           <div className={styles.timer}>
             <span></span>
           </div>
@@ -76,9 +107,11 @@ function ReceiveInvoice({
           loadingOrErrorMsg
         ) : (
           <>
+            {copied}
             <div
               className={styles.qr_code}
               aria-labelledby="QR code of lightning payment"
+              onClick={copyInvoice}
             >
               <QRCode
                 value={invoice?.paymentRequest}
@@ -88,7 +121,7 @@ function ReceiveInvoice({
               />
             </div>
             <div className={styles.qr_clipboard}>
-              <button>
+              <button onClick={copyInvoice}>
                 <Image
                   src="/icons/copy-icon.svg"
                   alt="copy icon"
@@ -110,6 +143,11 @@ function ReceiveInvoice({
           </>
         )}
       </div>
+      <PaymentOutcome
+        paymentRequest={invoice?.paymentRequest}
+        paymentAmount={paymentAmount}
+        dispatch={dispatch}
+      />
     </div>
   )
 }

@@ -9,7 +9,6 @@ import { useQuery } from "@apollo/client"
 
 import { RECIPIENT_WALLET_ID } from "../../lib/graphql/query"
 import styles from "./_user.module.css"
-import PaymentOutcome from "../../components/PaymentOutcome"
 import reducer, { ACTIONS } from "./_reducer"
 
 function RecievePayment() {
@@ -44,7 +43,7 @@ function RecievePayment() {
         </div>
       ) : (
         <>
-          <PaymentOutcome state={state} />
+          {/* <PaymentOutcome state={state} /> */}
           {!state.createInvoice && (
             <ButtonGroup aria-label="Pin" className={styles.pin_btn_group}>
               <Image
