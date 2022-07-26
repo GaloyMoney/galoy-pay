@@ -10,6 +10,7 @@ import { useQuery } from "@apollo/client"
 import { RECIPIENT_WALLET_ID } from "../../lib/graphql/query"
 import styles from "./_user.module.css"
 import reducer, { ACTIONS } from "./_reducer"
+import ParsePayment from "../../components/ParsePOSPayment"
 
 function RecievePayment() {
   const router = useRouter()

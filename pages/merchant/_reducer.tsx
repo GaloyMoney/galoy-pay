@@ -35,7 +35,7 @@ function reducer(state: React.ComponentState, { type, payload }: ACTIONTYPE) {
       if (state.currentAmount == null) return
       router.push(
         {
-          pathname: state.username,
+          pathname: `/merchant/${state.username}`,
           query: { amount: 0, currency: state.walletCurrency },
         },
         undefined,
@@ -51,7 +51,7 @@ function reducer(state: React.ComponentState, { type, payload }: ACTIONTYPE) {
       if (state.currentAmount == null || state.currentAmount === undefined) return
       router.push(
         {
-          pathname: state.username,
+          pathname: `/merchant/${state.username}`,
           query: { amount: state.currentAmount, currency: state.walletCurrency },
         },
         undefined,
@@ -66,7 +66,7 @@ function reducer(state: React.ComponentState, { type, payload }: ACTIONTYPE) {
       if (!state.createInvoice) return
       router.push(
         {
-          pathname: state.username,
+          pathname: `/merchant/${state.username}`,
           query: { amount: "0", currency: state.walletCurrency },
         },
         undefined,
