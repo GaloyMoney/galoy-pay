@@ -1,6 +1,6 @@
-export function reportError(errorMesssage) {
-  console.error(errorMesssage)
-  alert(errorMesssage)
+export function reportError(errorMessage) {
+  console.error(errorMessage)
+  alert(errorMessage)
 }
 
 export function validPhone(phone) {
