@@ -8,7 +8,7 @@ LEVEL=${LEVEL:-high}
 pushd ${REPO_ROOT}
 
 set +e
-yarn audit --level ${LEVEL}
+yarn audit --groups dependencies --level ${LEVEL}
 audit_return=$?
 set -e
 

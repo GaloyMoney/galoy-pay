@@ -2,8 +2,8 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: 'fix: do not exit early when audit fails'
-      sha: 799bfec8dccc06bb65f95da1f924a3f4a0e6f997
+      commitTitle: 'fix: only audit prod deps'
+      sha: d0c6c9af1185bb4faa1ef64e20185c342519dddf
     path: .
   path: vendor
 kind: LockConfig
