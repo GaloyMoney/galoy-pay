@@ -11,7 +11,7 @@ import styles from "./_user.module.css"
 import reducer, { ACTIONS } from "./_reducer"
 import ParsePayment from "../../components/ParsePOSPayment"
 
-function RecievePayment() {
+function ReceivePayment() {
   const router = useRouter()
   const { username } = router.query
 
@@ -80,4 +80,4 @@ function RecievePayment() {
   )
 }
 
-export default RecievePayment
+export default ReceivePayment
