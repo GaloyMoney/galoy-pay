@@ -41,8 +41,8 @@ function Home() {
                           {error
                             ? "Unavailable"
                             : loading
-                              ? "Loading..."
-                              : data.globals.nodesIds[0]}
+                            ? "Loading..."
+                            : data.globals.nodesIds[0]}
                         </p>
                       </ListGroup.Item>
                       <ListGroup.Item>
