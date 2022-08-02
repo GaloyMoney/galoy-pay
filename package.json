@@ -12,7 +12,7 @@
     "check-code": "yarn prettier-check && yarn eslint-check && yarn tsc-check"
   },
   "dependencies": {
-    "@apollo/client": "^3.4.16",
+    "@apollo/client": "^3.6.9",
     "bech32": "^2.0.0",
     "bootstrap": "^4.5.2",
     "copy-to-clipboard": "^3.3.1",
