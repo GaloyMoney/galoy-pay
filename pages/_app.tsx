@@ -19,7 +19,10 @@ export default function Layout({
       <Head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#000000" />
+        <meta name="theme-color" content="#536FF2" />
+        <meta name="apple-mobile-web-app-status-bar" content="#536FF2" />
+        <link rel="apple-touch-icon" href="/BBW-QRLOGO.png" />
+        <link rel="manifest" href="/manifest.json" />
         <meta
           name="description"
           content="Bitcoin Beach official lightning network node"
@@ -42,7 +45,9 @@ export default function Layout({
         />
         <title>BitcoinBeach Lightning Node</title>
       </Head>
+      {/* @ts-ignore */}
       <GraphQLProvider>
+        {/* @ts-ignore */}
         <Component {...pageProps} />
       </GraphQLProvider>
     </>

@@ -2,6 +2,8 @@ import copy from "copy-to-clipboard"
 import { useRouter } from "next/router"
 import React from "react"
 import Image from "react-bootstrap/Image"
+import OverlayTrigger from "react-bootstrap/OverlayTrigger"
+import Tooltip from "react-bootstrap/Tooltip"
 import { QRCode } from "react-qrcode-logo"
 import { useTimer } from "react-timer-hook"
 
@@ -121,15 +123,21 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, dispatch }: Props) 
               />
             </div>
             <div className={styles.qr_clipboard}>
-              <button onClick={copyInvoice}>
-                <Image
-                  src="/icons/copy-icon.svg"
-                  alt="copy icon"
-                  width="18px"
-                  height="18px"
-                />
-                Copy
-              </button>
+              <OverlayTrigger
+                show={copied}
+                placement="right"
+                overlay={<Tooltip id="copy">Copied!</Tooltip>}
+              >
+                <button onClick={copyInvoice}>
+                  <Image
+                    src="/icons/copy-icon.svg"
+                    alt="copy icon"
+                    width="18px"
+                    height="18px"
+                  />
+                  {copied ? "Copied" : "Copy"}
+                </button>
+              </OverlayTrigger>
               <button>
                 <Image
                   src="/icons/share-icon.svg"

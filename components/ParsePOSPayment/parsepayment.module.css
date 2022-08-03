@@ -211,6 +211,11 @@
   cursor: copy;
 }
 
+.qr_clipboard > button:first-child:hover {
+  color: green;
+  /* background-color: red; */
+}
+
 .loading,
 .error {
   font-size: 1.2rem;
