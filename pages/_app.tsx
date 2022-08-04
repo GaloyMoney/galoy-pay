@@ -45,9 +45,7 @@ export default function Layout({
         />
         <title>BitcoinBeach Lightning Node</title>
       </Head>
-      {/* @ts-ignore */}
       <GraphQLProvider>
-        {/* @ts-ignore */}
         <Component {...pageProps} />
       </GraphQLProvider>
     </>
