@@ -31,9 +31,12 @@ function ReceivePayment() {
 
   React.useEffect(() => {
     if (state.walletCurrency === data?.accountDefaultWallet.walletCurrency) return
-    state.walletCurrency = data?.accountDefaultWallet.walletCurrency
-    state.username = username
-  }, [data?.accountDefaultWallet.walletCurrency, state, username, data])
+    dispatch({
+      type: ACTIONS.UPDATE_WALLET_CURRENCY,
+      payload: data?.accountDefaultWallet.walletCurrency,
+    })
+    dispatch({ type: ACTIONS.UPDATE_USERNAME, payload: username })
+  }, [state, username, data])
 
   return (
     <Container className={styles.payment_container}>

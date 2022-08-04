@@ -2,29 +2,28 @@ import { useRouter } from "next/router"
 import React from "react"
 import Image from "react-bootstrap/Image"
 
-import useGetPaymentStatus from "../../hooks/useGetPaymentStatus"
+import useGetLNPaymentStatus from "../../hooks/use-Get-LN-Payment-Status"
 import useSatPrice from "../../lib/use-sat-price"
-import { ACTIONS, ACTIONTYPE } from "../../pages/merchant/_reducer"
+import { ACTIONS, ACTION_TYPE } from "../../pages/merchant/_reducer"
 import { formatOperand } from "../../utils/utils"
-import styles from "./paymentoutcome.module.css"
+import styles from "./payment-outcome.module.css"
 
 interface Props {
   paymentRequest: string | undefined
   paymentAmount: string | string[] | undefined
-  dispatch: React.Dispatch<ACTIONTYPE>
+  dispatch: React.Dispatch<ACTION_TYPE>
 }
 
 function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
   const router = useRouter()
   const { amount, currency } = router.query
   const { usdToSats } = useSatPrice()
-  const { data, loading, error } = useGetPaymentStatus({
+  const { data, loading, error } = useGetLNPaymentStatus({
     paymentRequest: paymentRequest,
   })
-  paymentRequest && console.log(paymentRequest)
 
-  if (error) {
-    console.error(error)
+  if (data !== undefined) {
+    if (error) console.error(error)
   }
 
   const backToCashRegisterButton = (
@@ -47,7 +46,7 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
     if (status === "PAID") {
       return (
         <div className={styles.container}>
-          <div aria-aria-labelledby="Payment successful">
+          <div aria-labelledby="Payment successful">
             <Image
               src="/icons/success-icon.svg"
               alt="success icon"
@@ -71,7 +70,7 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
     }
     if (errors.length > 0) {
       ;<div className={styles.container}>
-        <div aria-aria-labelledby="Payment successful">
+        <div aria-labelledby="Payment successful">
           <Image
             src="/icons/cancel-icon.svg"
             alt="success icon"

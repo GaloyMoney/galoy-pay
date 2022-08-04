@@ -10,7 +10,7 @@ interface Props {
   callbackFn?: () => void
 }
 
-const useGetPaymentStatus = ({ paymentRequest, callbackFn }: Props) => {
+const useGetLNPaymentStatus = ({ paymentRequest, callbackFn }: Props) => {
   const [paymentStatus, setPaymentStatus] = React.useState("not paid")
   const { loading, error, data } = useSubscription<{
     lnInvoicePaymentStatus: {
@@ -39,4 +39,4 @@ const useGetPaymentStatus = ({ paymentRequest, callbackFn }: Props) => {
   }
 }
 
-export default useGetPaymentStatus
+export default useGetLNPaymentStatus

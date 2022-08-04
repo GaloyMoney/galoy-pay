@@ -3,16 +3,16 @@ import Container from "react-bootstrap/Container"
 import Image from "react-bootstrap/Image"
 
 import useSatPrice from "../../lib/use-sat-price"
-import { ACTIONS, ACTIONTYPE } from "../../pages/merchant/_reducer"
+import { ACTIONS, ACTION_TYPE } from "../../pages/merchant/_reducer"
 import { formatOperand } from "../../utils/utils"
-import DigitButton from "./DigitButton"
-import styles from "./parsepayment.module.css"
-import ReceiveInvoice from "./ReceiveInvoice"
+import DigitButton from "./Digit-Button"
+import styles from "./parse-payment.module.css"
+import ReceiveInvoice from "./Receive-Invoice"
 
 interface Props {
   defaultWalletCurrency?: string
   walletId?: string
-  dispatch: React.Dispatch<ACTIONTYPE>
+  dispatch: React.Dispatch<ACTION_TYPE>
   state: React.ComponentState
 }
 

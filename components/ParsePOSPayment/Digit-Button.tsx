@@ -1,10 +1,10 @@
 import React from "react"
 
-import { ACTIONS, ACTIONTYPE } from "../../pages/merchant/_reducer"
+import { ACTIONS, ACTION_TYPE } from "../../pages/merchant/_reducer"
 
 interface Props {
   digit: string
-  dispatch: React.Dispatch<ACTIONTYPE>
+  dispatch: React.Dispatch<ACTION_TYPE>
 }
 
 function DigitButton({ digit, dispatch }: Props) {

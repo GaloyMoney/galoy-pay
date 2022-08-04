@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react"
 
-import useCreateInvoice from "../hooks/useCreateInvoice"
+import useCreateInvoice from "../hooks/use-Create-Invoice"
 import Invoice from "./invoice"
 
 const INVOICE_STALE_CHECK_INTERVAL = 2 * 60 * 1000

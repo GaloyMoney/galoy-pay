@@ -8,12 +8,17 @@ export const ACTIONS = {
   CREATE_INVOICE: "create-invoice",
   CREATE_NEW_INVOICE: "create-new-invoice",
   GET_PAYMENT_STATUS: "get-payment-status",
+  UPDATE_USERNAME: "update-username",
+  UPDATE_WALLET_CURRENCY: "update-wallet-currency",
   BACK: "back-by-one-history",
 }
 
-export type ACTIONTYPE = { type: string; payload?: string | (() => void) }
+export type ACTION_TYPE = {
+  type: string
+  payload?: string | string[] | (() => void) | undefined
+}
 
-function reducer(state: React.ComponentState, { type, payload }: ACTIONTYPE) {
+function reducer(state: React.ComponentState, { type, payload }: ACTION_TYPE) {
   switch (type) {
     case ACTIONS.ADD_DIGIT:
       if (payload == "0" && state.currentAmount == "0") return state
@@ -31,9 +36,21 @@ function reducer(state: React.ComponentState, { type, payload }: ACTIONTYPE) {
         currentAmount: state.currentAmount?.slice(0, -1),
       }
 
+    case ACTIONS.UPDATE_USERNAME:
+      return {
+        ...state,
+        username: payload,
+      }
+
+    case ACTIONS.UPDATE_WALLET_CURRENCY:
+      return {
+        ...state,
+        walletCurrency: payload,
+      }
+
     case ACTIONS.CLEAR_INPUT:
-      if (state.currentAmount == null) return
-      if (state.username == null) return
+      if (state.currentAmount == null) return state
+      if (state.username == null) return state
       router.push(
         {
           pathname: `/merchant/${state.username}`,
@@ -97,6 +114,7 @@ function reducer(state: React.ComponentState, { type, payload }: ACTIONTYPE) {
       }
 
     default:
+      return state
   }
 }
 
