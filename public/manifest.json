@@ -1,52 +1,80 @@
 {
-  "name": "GALOY MERCHANT APP",
-  "short_name": "POS",
-  "start_url": "/merchant/",
+  "name": "POS Cash register",
+  "short_name": "Cash register",
   "display": "standalone",
-  "background_color": "#536FF2",
+  "description": "Bitcoin beach POS cash register",
+  "background_color": "#fff",
   "theme_color": "#536FF2",
   "orientation": "portrait-primary",
   "id": "/merchant/",
+  "scope": "/merchant/[username]",
+  "start_url": "/merchant/[username]",
   "icons": [
     {
-      "src": "/manifest-logo/logo72x72.svg",
+      "src": "/manifest/logo72x72.svg",
       "type": "image/svg",
-      "sizes": "72x72"
+      "sizes": "72x72",
+      "purpose": "any"
     },
     {
-      "src": "/manifest-logo/logo96x96.svg",
+      "src": "/manifest/logo96x96.svg",
       "type": "image/svg",
-      "sizes": "96x96"
+      "sizes": "96x96",
+      "purpose": "any"
     },
     {
-      "src": "/manifest-logo/logo128x128.svg",
+      "src": "/manifest/logo128x128.svg",
       "type": "image/svg",
-      "sizes": "128x128"
+      "sizes": "128x128",
+      "purpose": "any"
     },
     {
-      "src": "/manifest-logo/logo144x144.svg",
+      "src": "/manifest/logo144x144.svg",
       "type": "image/svg",
-      "sizes": "144x144"
+      "sizes": "144x144",
+      "purpose": "any"
     },
     {
-      "src": "/manifest-logo/logo152x152.svg",
+      "src": "/manifest/logo144x144.svg",
       "type": "image/svg",
-      "sizes": "152x152"
+      "sizes": "144x144",
+      "purpose": "any"
     },
     {
-      "src": "/manifest-logo/logo192x192.svg",
+      "src": "/manifest/logo152x152.svg",
       "type": "image/svg",
-      "sizes": "192x192"
+      "sizes": "152x152",
+      "purpose": "any"
     },
     {
-      "src": "/manifest-logo/logo384x384.svg",
+      "src": "/manifest/logo192x192.svg",
       "type": "image/svg",
-      "sizes": "384x384"
+      "sizes": "192x192",
+      "purpose": "any"
     },
     {
-      "src": "/manifest-logo/logo512x512.svg",
+      "src": "/manifest/logo384x384.svg",
       "type": "image/svg",
-      "sizes": "512x512"
+      "sizes": "384x384",
+      "purpose": "any"
+    },
+    {
+      "src": "/manifest/logo384x384.svg",
+      "type": "image/svg",
+      "sizes": "384x384",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/manifest/logoPNG512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/manifest/logo512x512.svg",
+      "type": "image/svg",
+      "sizes": "512x512",
+      "purpose": "any"
     }
   ]
 }
