@@ -69,20 +69,22 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
       )
     }
     if (errors.length > 0) {
-      ;<div className={styles.container}>
-        <div aria-labelledby="Payment successful">
-          <Image
-            src="/icons/cancel-icon.svg"
-            alt="success icon"
-            width="104"
-            height="104"
-          />
-          <p className={styles.text}>
-            Please try again. Either the invoice has expired or it hasn’t been paid.
-          </p>
+      return (
+        <div className={styles.container}>
+          <div aria-labelledby="Payment unsuccessful">
+            <Image
+              src="/icons/cancel-icon.svg"
+              alt="success icon"
+              width="104"
+              height="104"
+            />
+            <p className={styles.text}>
+              Please try again. Either the invoice has expired or it hasn’t been paid.
+            </p>
+          </div>
+          {backToCashRegisterButton}
         </div>
-        {backToCashRegisterButton}
-      </div>
+      )
     }
   }
   return <>{loading && null}</>

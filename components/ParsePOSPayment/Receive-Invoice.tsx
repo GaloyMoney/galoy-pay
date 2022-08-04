@@ -66,13 +66,6 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, dispatch }: Props) 
     }
   }
 
-  const loadingOrErrorMsg =
-    loading || !invoice?.paymentRequest ? (
-      <p className={styles.loading}>Generating invoice</p>
-    ) : error || data?.mutationData.errors.length ? (
-      <p className={styles.error}>{errorString}</p>
-    ) : null
-
   const copyInvoice = () => {
     if (!invoice?.paymentRequest) {
       return
@@ -97,7 +90,9 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, dispatch }: Props) 
       )}
       <div className={styles.qr_code_container}>
         {loading || invoice?.paymentRequest === undefined ? (
-          loadingOrErrorMsg
+          <p className={styles.loading}>Generating invoice</p>
+        ) : error ? (
+          <p className={styles.error}>{errorString}</p>
         ) : (
           <>
             <div
