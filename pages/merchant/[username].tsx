@@ -4,33 +4,38 @@ import ButtonGroup from "react-bootstrap/ButtonGroup"
 import Container from "react-bootstrap/Container"
 import Image from "react-bootstrap/Image"
 
-import { useQuery } from "@apollo/client"
-
-import { RECIPIENT_WALLET_ID } from "../../lib/graphql/query"
 import styles from "./_user.module.css"
 import reducer, { ACTIONS } from "./_reducer"
 import ParsePayment from "../../components/ParsePOSPayment"
+import { useQuery } from "@galoymoney/client"
 
 function ReceivePayment() {
   const router = useRouter()
   const { username } = router.query
 
-  const { error: usernameError, data } = useQuery(RECIPIENT_WALLET_ID, {
-    variables: {
-      username,
-    },
+  let accountUsername: string
+  if (username == undefined) {
+    accountUsername = ""
+  } else {
+    accountUsername = username.toString()
+  }
+
+  const { data, error: usernameError } = useQuery.accountDefaultWallet({
+    variables: { username: accountUsername },
   })
 
   const [state, dispatch] = React.useReducer(reducer, {
     currentAmount: "",
-    createInvoice: false,
+    createdInvoice: false,
     walletCurrency: data?.accountDefaultWallet.walletCurrency || "USD",
-    username: username,
+    username: accountUsername,
     paymentStatus: "",
   })
 
   React.useEffect(() => {
-    if (state.walletCurrency === data?.accountDefaultWallet.walletCurrency) return
+    if (state.walletCurrency === data?.accountDefaultWallet.walletCurrency) {
+      return
+    }
     dispatch({
       type: ACTIONS.UPDATE_WALLET_CURRENCY,
       payload: data?.accountDefaultWallet.walletCurrency,
@@ -47,7 +52,7 @@ function ReceivePayment() {
         </div>
       ) : (
         <>
-          {!state.createInvoice && (
+          {!state.createdInvoice && (
             <ButtonGroup aria-label="Pin" className={styles.pin_btn_group}>
               <Image
                 src="/icons/pin-icon.svg"
@@ -58,7 +63,7 @@ function ReceivePayment() {
             </ButtonGroup>
           )}
           <div className={styles.username_container}>
-            {state.createInvoice && (
+            {state.createdInvoice && (
               <button onClick={() => dispatch({ type: ACTIONS.BACK })}>
                 <Image
                   src="/icons/chevron-left-icon.svg"

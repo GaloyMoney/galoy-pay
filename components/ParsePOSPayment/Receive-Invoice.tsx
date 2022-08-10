@@ -7,11 +7,11 @@ import Tooltip from "react-bootstrap/Tooltip"
 import { QRCode } from "react-qrcode-logo"
 import { useTimer } from "react-timer-hook"
 
+import { USD_INVOICE_EXPIRE_INTERVAL } from "../../config/config"
 import useCreateInvoice from "../../hooks/use-Create-Invoice"
 import { LnInvoiceObject } from "../../lib/graphql/index.types.d"
 import useSatPrice from "../../lib/use-sat-price"
 import { ACTION_TYPE } from "../../pages/merchant/_reducer"
-import { formatOperand } from "../../utils/utils"
 import PaymentOutcome from "../PaymentOutcome"
 import styles from "./parse-payment.module.css"
 
@@ -22,6 +22,8 @@ interface Props {
   dispatch: React.Dispatch<ACTION_TYPE>
 }
 
+const USD_MAX_INVOICE_TIME = "5.00"
+
 function ReceiveInvoice({ recipientWalletCurrency, walletId, dispatch }: Props) {
   const { usdToSats } = useSatPrice()
   const { amount, currency } = useRouter().query
@@ -30,7 +32,9 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, dispatch }: Props) 
 
   timerRef.current = new Date()
   if (currency === "USD") {
-    timerRef.current.setSeconds(timerRef.current.getSeconds() + 60 * 5) // default to five mins for USD invoice
+    timerRef.current.setSeconds(
+      timerRef.current.getSeconds() + USD_INVOICE_EXPIRE_INTERVAL,
+    ) // default to five mins for USD invoice
   }
   const expiryTimestamp = timerRef.current
   const { seconds, minutes } = useTimer({
@@ -38,32 +42,55 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, dispatch }: Props) 
     onExpire: () => console.warn("onExpire called on USD"),
   })
 
-  const { createInvoice, data, error, loading } = useCreateInvoice({
+  const { createInvoice, data, errorsMessage, error, loading } = useCreateInvoice({
     recipientWalletCurrency,
   })
+
   const paymentAmount = React.useMemo(() => {
     if (currency === "USD") {
       return amount
     }
-    return formatOperand(usdToSats(Number(amount)).toFixed().toString())
+
+    return usdToSats(Number(amount)).toFixed()
   }, [amount, currency, usdToSats])
 
   React.useEffect(() => {
+    if (
+      paymentAmount === "0.00" ||
+      paymentAmount == undefined ||
+      isNaN(Number(paymentAmount)) ||
+      walletId == undefined
+    ) {
+      return
+    }
+    const amount = Number(paymentAmount)
     createInvoice({
-      variables: { walletId: walletId, amount: paymentAmount },
+      variables: {
+        input: { recipientWalletId: walletId, amount },
+      },
     })
   }, [paymentAmount, walletId, createInvoice])
 
-  let errorString: string | null = error?.message || null
+  const errorString: string | null = errorsMessage || null
   let invoice: LnInvoiceObject | undefined
 
   if (data) {
-    const invoiceData = data.mutationData
-    if (invoiceData.errors?.length > 0) {
-      errorString = invoiceData.errors.map((e) => e.message).join(", ")
-    } else {
-      invoice = invoiceData.invoice
+    if ("lnInvoiceCreateOnBehalfOfRecipient" in data) {
+      const { lnInvoiceCreateOnBehalfOfRecipient: invoiceData } = data
+      if (invoiceData.invoice) {
+        invoice = invoiceData.invoice
+      }
     }
+    if ("lnUsdInvoiceCreateOnBehalfOfRecipient" in data) {
+      const { lnUsdInvoiceCreateOnBehalfOfRecipient: invoiceData } = data
+      if (invoiceData.invoice) {
+        invoice = invoiceData.invoice
+      }
+    }
+  }
+
+  if (!invoice?.paymentRequest) {
+    return null
   }
 
   const copyInvoice = () => {
@@ -81,25 +108,24 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, dispatch }: Props) 
     <div className={styles.invoice_container}>
       {recipientWalletCurrency === "USD" && (
         <div className={styles.timer_container}>
-          <p>{`${currency === "USD" && minutes}:${currency === "USD" && seconds}`}</p>
+          <p>{`${minutes}:${seconds}`}</p>
           <div className={styles.timer}>
             <span></span>
           </div>
-          <p>5:00</p>
+          <p>{USD_MAX_INVOICE_TIME}</p>
         </div>
       )}
-      <div className={styles.qr_code_container}>
-        {loading || invoice?.paymentRequest === undefined ? (
-          <p className={styles.loading}>Generating invoice</p>
-        ) : error ? (
-          <p className={styles.error}>{errorString}</p>
-        ) : (
+      <div>
+        {loading ||
+          (invoice?.paymentRequest == undefined && (
+            <p className={styles.loading}>Generating invoice</p>
+          ))}
+
+        {error && <p className={styles.error}>{errorString}</p>}
+
+        {data && (
           <>
-            <div
-              className={styles.qr_code}
-              aria-labelledby="QR code of lightning payment"
-              onClick={copyInvoice}
-            >
+            <div aria-labelledby="QR code of lightning payment" onClick={copyInvoice}>
               <QRCode
                 value={invoice?.paymentRequest}
                 size={320}

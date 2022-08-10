@@ -1,3 +1,4 @@
+import { useRouter } from "next/router"
 import React from "react"
 import Container from "react-bootstrap/Container"
 import Image from "react-bootstrap/Image"
@@ -19,10 +20,20 @@ interface Props {
 function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Props) {
   const [usdDenomination, setUsdDenomination] = React.useState<boolean>(true)
   const { usdToSats } = useSatPrice()
+  const { amount } = useRouter().query
 
-  const valueInSats = `≈ ${formatOperand(
-    usdToSats(Number(state.currentAmount)).toFixed().toString(),
-  )} sats `
+  React.useEffect(() => {
+    if (Number(amount) > 0) {
+      if (amount?.toString().match(/(\.[0-9]{3,}$|\..*\.)/)) return
+      dispatch({
+        type: ACTIONS.SET_AMOUNT_FROM_PARAMS,
+        payload: formatOperand(amount?.toString()),
+      })
+    }
+  }, [amount, dispatch])
+
+  const value = usdToSats(Number(state.currentAmount)).toFixed()
+  const valueInSats = `≈ ${formatOperand(value.toString())} sats `
   const valueInUSD = `$ ${formatOperand(state.currentAmount)}`
 
   return (
@@ -50,7 +61,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
         </button>
       </div>
 
-      {state.createInvoice ? (
+      {state.createdInvoice ? (
         <ReceiveInvoice
           dispatch={dispatch}
           state={state}
@@ -78,30 +89,36 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
 
       <div className={styles.pay_btn_container}>
         <button
-          className={state.createInvoice ? styles.pay_new_btn : styles.pay_btn}
+          className={state.createdInvoice ? styles.pay_new_btn : styles.pay_btn}
           onClick={
-            state.createInvoice
+            state.createdInvoice
               ? () => dispatch({ type: ACTIONS.CREATE_NEW_INVOICE })
               : () => dispatch({ type: ACTIONS.CREATE_INVOICE })
           }
         >
           <Image
             src={
-              state.createInvoice
+              state.createdInvoice
                 ? "/icons/lightning-icon-dark.svg"
                 : "/icons/lightning-icon.svg"
             }
+            alt="lightning icon"
             width="20"
             height="20"
           />
-          {state.createInvoice ? "Create new invoice" : "Create invoice"}
+          {state.createdInvoice ? "Create new invoice" : "Create invoice"}
         </button>
-        {!state.createInvoice && (
+        {!state.createdInvoice && (
           <button
             className={styles.clear_btn}
             onClick={() => dispatch({ type: ACTIONS.CLEAR_INPUT })}
           >
-            <Image src="/icons/clear-input-icon.svg" width="20" height="20" />
+            <Image
+              src="/icons/clear-input-icon.svg"
+              alt="clear input icon"
+              width="20"
+              height="20"
+            />
             Clear
           </button>
         )}

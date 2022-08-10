@@ -22,11 +22,7 @@
     "strict": true
   },
   "include": [
-    "pages",
-    "lib",
-    "components",
-    "utils",
-    "hooks",
+    "**/*",
   ],
   "exclude": [
     "node_modules"

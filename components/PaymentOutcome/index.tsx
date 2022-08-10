@@ -1,15 +1,15 @@
+import { useSubscription } from "@galoymoney/client"
 import { useRouter } from "next/router"
 import React from "react"
 import Image from "react-bootstrap/Image"
 
-import useGetLNPaymentStatus from "../../hooks/use-Get-LN-Payment-Status"
 import useSatPrice from "../../lib/use-sat-price"
 import { ACTIONS, ACTION_TYPE } from "../../pages/merchant/_reducer"
 import { formatOperand } from "../../utils/utils"
 import styles from "./payment-outcome.module.css"
 
 interface Props {
-  paymentRequest: string | undefined
+  paymentRequest: string
   paymentAmount: string | string[] | undefined
   dispatch: React.Dispatch<ACTION_TYPE>
 }
@@ -18,8 +18,15 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
   const router = useRouter()
   const { amount, currency } = router.query
   const { usdToSats } = useSatPrice()
-  const { data, loading, error } = useGetLNPaymentStatus({
-    paymentRequest: paymentRequest,
+
+  if (!paymentRequest) {
+    return null
+  }
+
+  const { loading, data, error, errorsMessage } = useSubscription.lnInvoicePaymentStatus({
+    variables: {
+      input: { paymentRequest },
+    },
   })
 
   if (data !== undefined) {
@@ -54,12 +61,12 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
               height="104"
             />
             <p className={styles.text}>
-              The invoice of{"$"}
+              The invoice of {"$"}
               {`${formatOperand(amount?.toString())} (~${
                 currency === "USD"
                   ? formatOperand(usdToSats(Number(amount)).toFixed().toString())
                   : paymentAmount
-              } sats)`}
+              } sats)`}{" "}
               has been paid
             </p>
           </div>
@@ -68,7 +75,7 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
         </div>
       )
     }
-    if (errors.length > 0) {
+    if (errors.length > 0 || errorsMessage) {
       return (
         <div className={styles.container}>
           <div aria-labelledby="Payment unsuccessful">

@@ -1,12 +1,6 @@
 import { useState } from "react"
 
-import { useMutation } from "@apollo/client"
-
-import { LnInvoiceObject, OperationError } from "../lib/graphql/index.types.d"
-import {
-  LN_INVOICE_CREATE_ON_BEHALF_OF_RECIPIENT,
-  LN_USD_INVOICE_CREATE_ON_BEHALF_OF_RECIPIENT,
-} from "../lib/graphql/mutations"
+import { useMutation } from "@galoymoney/client"
 
 interface Props {
   recipientWalletCurrency: string | undefined
@@ -17,25 +11,22 @@ const useCreateInvoice = ({ recipientWalletCurrency }: Props) => {
     "loading" | "new" | "need-update" | "expired"
   >("loading")
 
-  const INVOICE_CREATION_MUTATION =
+  const mutation =
     recipientWalletCurrency === "USD"
-      ? LN_USD_INVOICE_CREATE_ON_BEHALF_OF_RECIPIENT
-      : LN_INVOICE_CREATE_ON_BEHALF_OF_RECIPIENT
+      ? useMutation.lnUsdInvoiceCreateOnBehalfOfRecipient
+      : useMutation.lnInvoiceCreateOnBehalfOfRecipient
 
-  const [createInvoice, { loading, error, data }] = useMutation<{
-    mutationData: {
-      errors: OperationError[]
-      invoice?: LnInvoiceObject
-    }
-  }>(INVOICE_CREATION_MUTATION, {
+  const [createInvoice, { loading, errorsMessage, error, data }] = mutation({
     onError: console.error,
     onCompleted: () => setInvoiceStatus("new"),
   })
+
   return {
     createInvoice,
     setInvoiceStatus,
     invoiceStatus,
     loading,
+    errorsMessage,
     error,
     data,
   }

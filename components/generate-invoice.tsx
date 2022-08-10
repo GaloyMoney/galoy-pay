@@ -19,7 +19,7 @@ function GenerateInvoice({
   regenerate: () => void
   currency: string
 }) {
-  const { createInvoice, data, loading, error, invoiceStatus, setInvoiceStatus } =
+  const { createInvoice, data, loading, errorsMessage, invoiceStatus, setInvoiceStatus } =
     useCreateInvoice({ recipientWalletCurrency })
   const timerIds = useRef<number[]>([])
 
@@ -28,7 +28,9 @@ function GenerateInvoice({
   }
   useEffect(() => {
     createInvoice({
-      variables: { walletId: recipientWalletId, amount: amountInBase },
+      variables: {
+        input: { recipientWalletId, amount: amountInBase },
+      },
     })
     if (currency !== "SATS" || recipientWalletCurrency === "USD") {
       timerIds.current.push(
@@ -44,15 +46,21 @@ function GenerateInvoice({
     return clearAllTimers
   }, [recipientWalletId, amountInBase, currency, createInvoice])
 
-  let errorString: string | null = error?.message || null
+  const errorString: string | null = errorsMessage || null
   let invoice
 
   if (data) {
-    const invoiceData = data.mutationData
-    if (invoiceData.errors?.length > 0) {
-      errorString = invoiceData.errors.map((e) => e.message).join(", ")
-    } else {
-      invoice = invoiceData.invoice
+    if ("lnInvoiceCreateOnBehalfOfRecipient" in data) {
+      const { lnInvoiceCreateOnBehalfOfRecipient: invoiceData } = data
+      if (invoiceData.invoice) {
+        invoice = invoiceData.invoice
+      }
+    }
+    if ("lnUsdInvoiceCreateOnBehalfOfRecipient" in data) {
+      const { lnUsdInvoiceCreateOnBehalfOfRecipient: invoiceData } = data
+      if (invoiceData.invoice) {
+        invoice = invoiceData.invoice
+      }
     }
   }
 
