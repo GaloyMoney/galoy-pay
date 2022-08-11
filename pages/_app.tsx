@@ -4,6 +4,7 @@ import "./index.css"
 import Head from "next/head"
 import dynamic from "next/dynamic"
 import { NextPage } from "next"
+import { APP_DESCRIPTION } from "../config/config"
 
 const GraphQLProvider = dynamic(() => import("../lib/graphql"), { ssr: false })
 
@@ -23,10 +24,7 @@ export default function Layout({
         <meta name="apple-mobile-web-app-status-bar" content="#536FF2" />
         <link rel="apple-touch-icon" href="/BBW-QRLOGO.png" />
         <link rel="manifest" href="/manifest.json" />
-        <meta
-          name="description"
-          content="Bitcoin Beach official lightning network node"
-        />
+        <meta name="description" content={APP_DESCRIPTION} />
 
         <script
           async
