@@ -8,7 +8,7 @@ import styles from "./_user.module.css"
 import reducer, { ACTIONS } from "./_reducer"
 import ParsePayment from "../../components/ParsePOSPayment"
 import { useQuery } from "@galoymoney/client"
-import PinToHomscreen from "../../components/PinToHomescreen"
+import PinToHomescreen from "../../components/PinToHomescreen"
 
 function ReceivePayment() {
   const router = useRouter()
@@ -73,7 +73,7 @@ function ReceivePayment() {
               </button>
             </ButtonGroup>
           )}
-          <PinToHomscreen
+          <PinToHomescreen
             pinnedToHomeScreen={state.pinnedToHomeScreen}
             dispatch={dispatch}
           />
