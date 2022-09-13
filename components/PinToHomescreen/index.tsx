@@ -2,12 +2,18 @@ import React from "react"
 import { Image } from "react-bootstrap"
 
 import { getOS } from "../../lib/download"
-import { ACTION_TYPE } from "../../pages/merchant/_reducer"
+import { ACTIONS, ACTION_TYPE } from "../../pages/merchant/_reducer"
 import Modal from "../CustomModal/modal"
+import {
+  chromeModalContent,
+  desktopIosModalContent,
+  iosModalContent,
+  mobileChromeModalContent,
+} from "./browser-modal-content"
 import styles from "./pinToHomescreen.module.css"
 
 interface Props {
-  pinnedToHomeScreen: boolean
+  pinnedToHomeScreenModalVisible: boolean
   dispatch: React.Dispatch<ACTION_TYPE>
 }
 
@@ -21,55 +27,39 @@ const browser = (function () {
   }
   switch (true) {
     case test(/edg/i):
-      return "Microsoft Edge"
+      return "Microsoft-Edge"
     case test(/trident/i):
-      return "Microsoft Internet Explorer"
+      return "Microsoft-Internet-Explorer"
     case test(/firefox|fxios/i):
-      return "Mozilla Firefox"
+      return "Mozilla-Firefox"
     case test(/opr\//i):
       return "Opera"
     case test(/ucbrowser/i):
-      return "UC Browser"
+      return "UC-Browser"
     case test(/samsungbrowser/i):
-      return "Samsung Browser"
+      return "Samsung-Browser"
     case test(/chrome|chromium|crios/i):
-      return "Google Chrome"
+      return "Google-Chrome"
     case test(/safari/i):
-      return "Apple Safari"
+      return "Apple-Safari"
     default:
       return "Other"
   }
 })()
-console.log(browser)
 
-const iosModalContent = [
-  {
-    index: 1,
-    text: "At the bottom of the screen or at the top right, click the “Share” icon.",
-    image: "/tab-bar.png",
-  },
-  {
-    index: 2,
-    text: "The share sheet will show. Scroll down or swipe right to reveal the “Add to Homescreen” button. Click on it.",
-    image: "/share-scroll.png",
-  },
-  {
-    index: 3,
-    text: "You can change the name of the page if you would like.",
-    image: "/rename-register.png",
-  },
-  {
-    index: 4,
-    text: "Click “Add”. An icon will be added to your Home Screen so you can quickly access the page.",
-    image: "/safari-explanation.png",
-  },
-]
-
-const PinToHomscreen = ({ pinnedToHomeScreen, dispatch }: Props) => {
+const PinToHomescreen = ({ pinnedToHomeScreenModalVisible, dispatch }: Props) => {
   const os = getOS()
+  const [, setIsOpen] = React.useState<boolean>(pinnedToHomeScreenModalVisible)
   const pinToHomeRef = React.useRef(null)
-  if (!pinnedToHomeScreen) return null
+  if (!pinnedToHomeScreenModalVisible) return null
   let modalWidth: string
+
+  const handleClose = () => {
+    dispatch({
+      type: ACTIONS.PINNED_TO_HOMESCREEN_MODAL_VISIBLE,
+      payload: false,
+    })
+  }
 
   if (os === "ios") {
     modalWidth = "340px"
@@ -77,8 +67,9 @@ const PinToHomscreen = ({ pinnedToHomeScreen, dispatch }: Props) => {
       <>
         <Modal
           ref={pinToHomeRef}
-          isOpened={pinnedToHomeScreen}
-          dispatch={dispatch}
+          isOpened={pinnedToHomeScreenModalVisible}
+          setIsOpened={setIsOpen}
+          handleClose={handleClose}
           modalWidth={modalWidth}
           modalTitle="How to pin the Cash Register to your home screen"
         >
@@ -91,7 +82,7 @@ const PinToHomscreen = ({ pinnedToHomeScreen, dispatch }: Props) => {
                   <picture>
                     <Image
                       src={content.image}
-                      alt={content.text}
+                      alt="ios modal tutorial"
                       width="100%"
                       height="100%"
                     />
@@ -105,16 +96,89 @@ const PinToHomscreen = ({ pinnedToHomeScreen, dispatch }: Props) => {
     )
   }
 
-  if (os === "android") {
+  if (os === "android" || browser === "Samsung-Browser") {
+    modalWidth = "340px"
     return (
       <>
         <Modal
           ref={pinToHomeRef}
-          isOpened={pinnedToHomeScreen}
-          dispatch={dispatch}
+          isOpened={pinnedToHomeScreenModalVisible}
+          setIsOpened={setIsOpen}
+          handleClose={handleClose}
+          modalWidth={modalWidth}
           modalTitle="Add to home screen"
         >
-          <div>android</div>
+          <div className={styles.wrapper}>
+            {mobileChromeModalContent.map((content, idx) => {
+              return (
+                <div key={idx}>
+                  <li className={styles.index}>{content.index}</li>
+                  <p className={styles.text}>{content.text}</p>
+                  <picture>
+                    <Image src={content.image} width="100%" height="100%" />
+                  </picture>
+                </div>
+              )
+            })}
+          </div>
+        </Modal>
+      </>
+    )
+  }
+
+  if (browser === "Google-Chrome") {
+    modalWidth = "100%"
+    return (
+      <>
+        <Modal
+          ref={pinToHomeRef}
+          isOpened={pinnedToHomeScreenModalVisible}
+          setIsOpened={setIsOpen}
+          handleClose={handleClose}
+          modalWidth={modalWidth}
+          modalTitle="How to pin the Cash Register to your home screen"
+        >
+          <div className={`${styles.wrapper} ${styles.desktop}`}>
+            {chromeModalContent.map((content, idx) => {
+              return (
+                <div key={idx}>
+                  <li className={styles.index}>{content.index}</li>
+                  <p className={styles.text}>{content.text}</p>
+                  <picture>
+                    <Image src={content.image} alt="chrome modal tutorial image" />
+                  </picture>
+                </div>
+              )
+            })}
+          </div>
+        </Modal>
+      </>
+    )
+  }
+
+  if (browser === "Apple-Safari") {
+    return (
+      <>
+        <Modal
+          ref={pinToHomeRef}
+          isOpened={pinnedToHomeScreenModalVisible}
+          setIsOpened={setIsOpen}
+          handleClose={handleClose}
+          modalTitle="How to pin the Cash Register to your home screen"
+        >
+          <div className={`${styles.wrapper} ${styles.desktop}`}>
+            {desktopIosModalContent.map((content, idx) => {
+              return (
+                <div key={idx}>
+                  <li className={styles.index}>{content.index}</li>
+                  <p className={styles.text}>{content.text}</p>
+                  <picture>
+                    <Image src={content.image} alt="chrome modal tutorial image" />
+                  </picture>
+                </div>
+              )
+            })}
+          </div>
         </Modal>
       </>
     )
@@ -124,14 +188,17 @@ const PinToHomscreen = ({ pinnedToHomeScreen, dispatch }: Props) => {
     <>
       <Modal
         ref={pinToHomeRef}
-        isOpened={pinnedToHomeScreen}
-        dispatch={dispatch}
+        isOpened={pinnedToHomeScreenModalVisible}
+        setIsOpened={setIsOpen}
+        handleClose={handleClose}
         modalTitle="How to pin the Cash Register to your home screen"
       >
-        <div>desktop</div>
+        <div className={`${styles.wrapper} ${styles.desktop}`}>
+          Check the menu options of your browser for options to add to homescreen.
+        </div>
       </Modal>
     </>
   )
 }
 
-export default PinToHomscreen
+export default PinToHomescreen

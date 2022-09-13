@@ -30,7 +30,7 @@ function ReceivePayment() {
     createdInvoice: false,
     walletCurrency: data?.accountDefaultWallet.walletCurrency || "USD",
     username: accountUsername,
-    pinnedToHomeScreen: false,
+    pinnedToHomeScreenModalVisible: false,
   })
 
   React.useEffect(() => {
@@ -63,8 +63,8 @@ function ReceivePayment() {
               <button
                 onClick={() =>
                   dispatch({
-                    type: ACTIONS.PINNED_TO_HOMESCREEN,
-                    payload: !state.pinnedToHomeScreen,
+                    type: ACTIONS.PINNED_TO_HOMESCREEN_MODAL_VISIBLE,
+                    payload: !state.pinnedToHomeScreenModalVisible,
                   })
                 }
                 className={styles.pin_btn}
@@ -74,7 +74,7 @@ function ReceivePayment() {
             </ButtonGroup>
           )}
           <PinToHomescreen
-            pinnedToHomeScreen={state.pinnedToHomeScreen}
+            pinnedToHomeScreenModalVisible={state.pinnedToHomeScreenModalVisible}
             dispatch={dispatch}
           />
           <div className={styles.username_container}>
