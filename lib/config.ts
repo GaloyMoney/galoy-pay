@@ -20,7 +20,7 @@ if (!GRAPHQL_HOSTNAME) {
   }
 }
 
-const GRAPHQL_URI_INTERNAL = `http://${GRAPHQL_HOSTNAME_INTERNAL}/graphql`
+const GRAPHQL_URI_INTERNAL = `https://${GRAPHQL_HOSTNAME_INTERNAL}/graphql`
 const GRAPHQL_URI = `https://${GRAPHQL_HOSTNAME}/graphql`
 const GRAPHQL_SUBSCRIPTION_URI = `wss://${GRAPHQL_HOSTNAME}/graphql`
 
