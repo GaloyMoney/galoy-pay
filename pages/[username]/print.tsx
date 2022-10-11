@@ -17,21 +17,21 @@ export async function getServerSideProps({
   params: { username: string }
 }) {
   const url = originalUrl(req)
-
+  const lnurlp = bech32.encode(
+    "lnurl",
+    bech32.toWords(
+      Buffer.from(
+        `${url.protocol}//${url.hostname}/.well-known/lnurlp/${username}`,
+        "utf8",
+      ),
+    ),
+    1500,
+  )
   return {
     props: {
       lightningAddress: `${username}@${url.hostname}`,
-      lnurl: bech32.encode(
-        "lnurl",
-        bech32.toWords(
-          Buffer.from(
-            `${url.protocol}//${url.hostname}/.well-known/lnurlp/${username}`,
-            "utf8",
-          ),
-        ),
-        1500,
-      ),
-      webURL: `${url.protocol}//${url.hostname}/${username}`,
+      lnurl: lnurlp,
+      webURL: `${url.protocol}//${url.hostname}/${username}?lightning=${lnurlp}`,
     },
   }
 }
@@ -46,7 +46,8 @@ export default function ({
   webURL: string
 }) {
   const componentRef = useRef<HTMLDivElement | null>(null)
-  const [qrType, setQR] = useState("lnurl")
+  const [qrType, setQR] = useState("web")
+  const qrCodeData = (qrType === "lnurl" ? lnurl : webURL).toUpperCase()
 
   return (
     <>
@@ -61,7 +62,7 @@ export default function ({
                     <h1>Pay {lightningAddress}</h1>
                     <QRCode
                       ecLevel="H"
-                      value={qrType === "lnurl" ? lnurl : webURL}
+                      value={qrCodeData}
                       size={800}
                       logoImage="/BBQRLogo.png"
                       logoWidth={250}
@@ -85,7 +86,7 @@ export default function ({
                   <h3>Pay {lightningAddress}</h3>
                   <QRCode
                     ecLevel="H"
-                    value={qrType === "lnurl" ? lnurl : webURL}
+                    value={qrCodeData}
                     size={300}
                     logoImage="/BBQRLogo.png"
                     logoWidth={100}
