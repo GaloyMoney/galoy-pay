@@ -88,7 +88,7 @@ function ReceivePayment() {
                 />
               </button>
             )}
-            <p className={styles.username}>{`${username} cash register`}</p>
+            <p className={styles.username}>{`Pay ${username}`}</p>
           </div>
 
           <ParsePayment
