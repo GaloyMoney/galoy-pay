@@ -61,12 +61,13 @@ function ReceivePayment() {
                 className={styles.pin_icon}
               />
               <button
-                onClick={() =>
+                onClick={() => {
+                  localStorage.setItem("username", accountUsername)
                   dispatch({
                     type: ACTIONS.PINNED_TO_HOMESCREEN_MODAL_VISIBLE,
                     payload: !state.pinnedToHomeScreenModalVisible,
                   })
-                }
+                }}
                 className={styles.pin_btn}
               >
                 Pin to homescreen
