@@ -14,11 +14,15 @@ function ReceivePayment() {
   const router = useRouter()
   const { username } = router.query
 
+  const username_from_local = localStorage.getItem("username")
   let accountUsername: string
   if (username == undefined) {
     accountUsername = ""
   } else {
     accountUsername = username.toString()
+    if (!username_from_local) {
+      localStorage.setItem("username", accountUsername)
+    }
   }
 
   const { data, error: usernameError } = useQuery.accountDefaultWallet({
@@ -62,7 +66,12 @@ function ReceivePayment() {
               />
               <button
                 onClick={() => {
-                  localStorage.setItem("username", accountUsername)
+                  if (username_from_local) {
+                    // clear prev username
+                    localStorage.removeItem("username")
+                    // cache new user
+                    localStorage.setItem("username", accountUsername)
+                  }
                   dispatch({
                     type: ACTIONS.PINNED_TO_HOMESCREEN_MODAL_VISIBLE,
                     payload: !state.pinnedToHomeScreenModalVisible,

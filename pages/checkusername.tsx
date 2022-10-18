@@ -4,7 +4,7 @@ const CheckUsername = () => {
   const router = useRouter()
   // get the username from local storage
   const username_from_local = localStorage.getItem("username")
-  if (!username_from_local) {
+  if (!username_from_local || username_from_local === null) {
     router.push({
       pathname: `/`,
       query: undefined,
@@ -17,6 +17,7 @@ const CheckUsername = () => {
     pathname: `/merchant/${username_from_local}`,
     query: undefined,
   })
+
   return null
 }
 
