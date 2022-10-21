@@ -5,13 +5,12 @@ const SetupPwa = () => {
   const router = useRouter()
   const [username, setUsername] = React.useState<string>("")
 
-  let accountUsername: string
   const username_from_local = localStorage.getItem("username")
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (accountUsername === "" || !accountUsername) {
+    if (!username_from_local) {
       localStorage.setItem("username", username)
     }
 
@@ -24,19 +23,20 @@ const SetupPwa = () => {
     )
   }
 
-  if (username_from_local != null || username_from_local) {
-    accountUsername = username_from_local
-    router.push(
-      {
-        pathname: `/merchant/${accountUsername}`,
-      },
-      undefined,
-      { shallow: true },
-    )
-  }
+  React.useEffect(() => {
+    if (username_from_local) {
+      router.push(
+        {
+          pathname: `/merchant/${username_from_local}`,
+        },
+        undefined,
+        { shallow: true },
+      )
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [username_from_local])
 
-  if (username_from_local == null || !username_from_local) {
-    accountUsername = ""
+  if (!username_from_local) {
     return (
       <div className="setup-pwa">
         <form
