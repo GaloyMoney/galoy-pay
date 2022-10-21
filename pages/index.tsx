@@ -10,7 +10,6 @@ import { gql, useQuery } from "@apollo/client"
 
 import { GRAPHQL_URI } from "../lib/config"
 import { useRouter } from "next/router"
-import { getOS } from "../lib/download"
 
 const GET_NODE_STATS = gql`
   query nodeIds {
@@ -26,18 +25,13 @@ function Home() {
       ? `https://1ml.com/testnet/node/`
       : `https://1ml.com/node/`
   const { loading, error, data } = useQuery(GET_NODE_STATS)
-  const os = getOS()
+
   const router = useRouter()
   const [username, setUsername] = React.useState<string>("")
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (os === "ios") {
-      const username_from_local = localStorage.getItem("username")
-      if (!username_from_local || username_from_local == null) {
-        localStorage.setItem("username", username)
-      }
-    }
+
     router.push(
       {
         pathname: `/merchant/${username}`,
