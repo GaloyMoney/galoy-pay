@@ -11,7 +11,7 @@ import { USD_INVOICE_EXPIRE_INTERVAL } from "../../config/config"
 import useCreateInvoice from "../../hooks/use-Create-Invoice"
 import { LnInvoiceObject } from "../../lib/graphql/index.types.d"
 import useSatPrice from "../../lib/use-sat-price"
-import { ACTION_TYPE } from "../../pages/merchant/_reducer"
+import { ACTION_TYPE } from "../../pages/_reducer"
 import PaymentOutcome from "../PaymentOutcome"
 import styles from "./parse-payment.module.css"
 

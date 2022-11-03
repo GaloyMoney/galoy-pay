@@ -1,6 +1,6 @@
 import router from "next/router"
 import React from "react"
-import { MAX_INPUT_VALUE_LENGTH } from "../../config/config"
+import { MAX_INPUT_VALUE_LENGTH } from "../config/config"
 
 export const ACTIONS = {
   ADD_DIGIT: "add-digit",
@@ -69,7 +69,7 @@ function reducer(state: React.ComponentState, { type, payload }: ACTION_TYPE) {
       if (state.username == null) return state
       router.push(
         {
-          pathname: `/merchant/${state.username}`,
+          pathname: `${state.username}`,
           query: { amount: 0, currency: state.walletCurrency },
         },
         undefined,
@@ -92,7 +92,7 @@ function reducer(state: React.ComponentState, { type, payload }: ACTION_TYPE) {
         return state
       router.push(
         {
-          pathname: `/merchant/${state.username}`,
+          pathname: `${state.username}`,
           query: {
             amount: payload && Number(payload) > 0 ? payload : state.currentAmount,
             currency: state.walletCurrency,
@@ -110,7 +110,7 @@ function reducer(state: React.ComponentState, { type, payload }: ACTION_TYPE) {
       if (!state.createdInvoice) return state
       router.push(
         {
-          pathname: `/merchant/${state.username}`,
+          pathname: `${state.username}`,
           query: { amount: "0", currency: state.walletCurrency },
         },
         undefined,

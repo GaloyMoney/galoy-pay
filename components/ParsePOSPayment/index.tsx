@@ -4,7 +4,7 @@ import Container from "react-bootstrap/Container"
 import Image from "react-bootstrap/Image"
 
 import useSatPrice from "../../lib/use-sat-price"
-import { ACTION_TYPE, ACTIONS } from "../../pages/merchant/_reducer"
+import { ACTION_TYPE, ACTIONS } from "../../pages/_reducer"
 import { formatOperand } from "../../utils/utils"
 import DigitButton from "./Digit-Button"
 import styles from "./parse-payment.module.css"
