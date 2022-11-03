@@ -41,7 +41,12 @@ function reducer(state: React.ComponentState, { type, payload }: ACTION_TYPE) {
 
     case ACTIONS.SET_AMOUNT_FROM_PARAMS:
       if (state.currentAmount == null) return state
-      if (payload?.toString().match(/(\.[0-9]{3,}$|\..*\.)/)) return state
+      if (payload?.toString().match(/(\.[0-9]{2,}$|\..*\.)/)) {
+        return {
+          ...state,
+          currentAmount: Number(payload).toFixed(2),
+        }
+      }
       return {
         ...state,
         currentAmount: payload,
@@ -88,7 +93,10 @@ function reducer(state: React.ComponentState, { type, payload }: ACTION_TYPE) {
       router.push(
         {
           pathname: `/merchant/${state.username}`,
-          query: { amount: state.currentAmount, currency: state.walletCurrency },
+          query: {
+            amount: payload && Number(payload) > 0 ? payload : state.currentAmount,
+            currency: state.walletCurrency,
+          },
         },
         undefined,
         { shallow: true },
@@ -110,6 +118,7 @@ function reducer(state: React.ComponentState, { type, payload }: ACTION_TYPE) {
       )
       return {
         ...state,
+        payload,
         createdInvoice: false,
         currentAmount: "",
       }
