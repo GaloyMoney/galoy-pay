@@ -1,4 +1,3 @@
-import router from "next/router"
 import React from "react"
 import { MAX_INPUT_VALUE_LENGTH } from "../config/config"
 
@@ -67,17 +66,10 @@ function reducer(state: React.ComponentState, { type, payload }: ACTION_TYPE) {
     case ACTIONS.CLEAR_INPUT:
       if (state.currentAmount == null) return state
       if (state.username == null) return state
-      router.push(
-        {
-          pathname: `${state.username}`,
-          query: { amount: 0, currency: state.walletCurrency },
-        },
-        undefined,
-        { shallow: true },
-      )
+
       return {
         ...state,
-        currentAmount: "",
+        currentAmount: "0",
       }
 
     case ACTIONS.CREATE_INVOICE:
@@ -88,19 +80,10 @@ function reducer(state: React.ComponentState, { type, payload }: ACTION_TYPE) {
         state.currentAmount === "" ||
         state.currentAmount === "0.00" ||
         state.currentAmount === "0.0"
-      )
+      ) {
         return state
-      router.push(
-        {
-          pathname: `${state.username}`,
-          query: {
-            amount: payload && Number(payload) > 0 ? payload : state.currentAmount,
-            currency: state.walletCurrency,
-          },
-        },
-        undefined,
-        { shallow: true },
-      )
+      }
+
       return {
         ...state,
         createdInvoice: true,
@@ -108,19 +91,11 @@ function reducer(state: React.ComponentState, { type, payload }: ACTION_TYPE) {
 
     case ACTIONS.CREATE_NEW_INVOICE:
       if (!state.createdInvoice) return state
-      router.push(
-        {
-          pathname: `${state.username}`,
-          query: { amount: "0", currency: state.walletCurrency },
-        },
-        undefined,
-        { shallow: true },
-      )
+
       return {
         ...state,
-        payload,
         createdInvoice: false,
-        currentAmount: "",
+        currentAmount: "0",
       }
 
     case ACTIONS.BACK:
