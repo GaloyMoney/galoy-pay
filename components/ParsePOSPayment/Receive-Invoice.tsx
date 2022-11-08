@@ -159,7 +159,7 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
       </div>
       <PaymentOutcome
         paymentRequest={invoice?.paymentRequest}
-        paymentAmount={amount}
+        paymentAmount={paymentAmount}
         dispatch={dispatch}
       />
     </div>
