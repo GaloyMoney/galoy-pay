@@ -10,7 +10,6 @@ interface Props {
   onError?: (error?: unknown) => void
   onInteraction?: () => void
   files: [string]
-  image: string
   getImage?: () => void
   shareState: string | undefined
   disabled?: boolean
@@ -21,7 +20,6 @@ const Share: FC<Props> = ({
   shareData,
   onInteraction,
   files,
-  image,
   getImage,
   shareState,
   onSuccess,
@@ -53,7 +51,7 @@ const Share: FC<Props> = ({
         <SharePopup
           shareData={shareData}
           getImage={getImage}
-          image={image}
+          files={files}
           shareState={shareState}
           onClose={() => setOpenPopup(false)}
         />

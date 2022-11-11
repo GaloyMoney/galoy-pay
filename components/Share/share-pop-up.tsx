@@ -6,7 +6,7 @@ type ShareState = "pending" | "success" | "error"
 
 interface Props {
   shareData: ShareData
-  image?: string
+  files?: [string]
   getImage?: () => void
   shareState: string | undefined
   onClose: () => void
@@ -16,7 +16,7 @@ interface Props {
 const SharePopup: FC<Props> = ({
   shareData,
   shareState,
-  image,
+  files,
   getImage,
   onClose,
   onError,
@@ -25,10 +25,10 @@ const SharePopup: FC<Props> = ({
 
   const copyImageToClipboard = async () => {
     try {
-      if (image) {
+      if (files) {
         getImage && getImage()
 
-        const data = await fetch(image)
+        const data = await fetch(files[0])
         const blob = await data.blob()
 
         await navigator.clipboard.write([
