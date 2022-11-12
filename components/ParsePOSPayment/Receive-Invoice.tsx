@@ -9,7 +9,7 @@ import { useTimer } from "react-timer-hook"
 import { useScreenshot } from "use-react-screenshot"
 import { AmountUnit } from "."
 
-import { BBW_DOMAIN, USD_INVOICE_EXPIRE_INTERVAL } from "../../config/config"
+import { URL_HOST_DOMAIN, USD_INVOICE_EXPIRE_INTERVAL } from "../../config/config"
 import useCreateInvoice from "../../hooks/use-Create-Invoice"
 import { LnInvoiceObject } from "../../lib/graphql/index.types.d"
 import useSatPrice from "../../lib/use-sat-price"
@@ -40,7 +40,9 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
 
   const shareUrl =
     !amount && !unit
-      ? `${BBW_DOMAIN}${username}?amount=${state.currentAmount}&sats=${usdToSats(
+      ? `https://${URL_HOST_DOMAIN}/${username}?amount=${
+          state.currentAmount
+        }&sats=${usdToSats(
           state.currentAmount,
         ).toFixed()}&currency=${recipientWalletCurrency}&unit=SAT`
       : window.location.href

@@ -75,7 +75,6 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
             </p>
           </div>
           {backToCashRegisterButton}
-          <p className={styles.receipt}>Send receipt</p>
         </div>
       )
     }
