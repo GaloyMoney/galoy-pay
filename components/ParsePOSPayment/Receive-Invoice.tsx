@@ -187,7 +187,7 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
               <Share
                 shareData={shareData}
                 getImage={getImage}
-                files={[image]}
+                image={image}
                 shareState={shareState}
               >
                 <span
