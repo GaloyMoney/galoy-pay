@@ -181,6 +181,12 @@
   margin-right: 5px;
 }
 
+@media (max-width: 375px) {
+  .footer {
+    bottom: 0;
+  }
+}
+
 @media (min-width: 768px) {
   .divider {
     margin-top: 1rem;

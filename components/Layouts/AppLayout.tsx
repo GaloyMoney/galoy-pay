@@ -105,7 +105,7 @@ const AppLayout = ({ children, username }: Props) => {
             </Link>
           </li>
           <li onClick={closeSideBar}>
-            <Link href={`/${username}/print`}>
+            <Link href={memo ? `/${username}/print?memo=${memo}` : `/${username}/print`}>
               <a>
                 <Image src="/paycode-black&white.svg" width={"15"} height={"15"} />
                 Printable Paycode
