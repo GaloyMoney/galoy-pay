@@ -32,9 +32,58 @@ const AppLayout = ({ children, username }: Props) => {
   return (
     <div className={`${openSideBar && styles.container_bg} ${styles.container}`}>
       <nav className={styles.nav_bar}>
-        <div style={{ cursor: "pointer" }}>
-          <Image src="/BrandLogo.png" />
-        </div>
+        <a href={`/${username}`} style={{ cursor: "pointer" }}>
+          <svg
+            width="14"
+            height="28"
+            viewBox="0 0 14 28"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M0 2.7168V27.9499H6.66049C6.66049 27.9499 13.6185 27.9499 13.6185 21.0529C13.6185 11.6254 1.23342 11.1931 0.854496 5.52188C0.71208 3.39836 0 2.7168 0 2.7168Z"
+              fill="url(#paint0_linear_1247_17156)"
+            />
+            <path
+              d="M0 2.71713C0 2.71713 0 -0.0498047 4.83706 -0.0498047C8.95949 -0.0498047 10.4142 3.48771 10.4142 5.28317C10.4142 8.869 6.43161 11.9742 4.08937 15.3337C1.10118 19.6189 0 25.5317 0 27.9502V2.71713Z"
+              fill="url(#paint1_linear_1247_17156)"
+            />
+            <defs>
+              <linearGradient
+                id="paint0_linear_1247_17156"
+                x1="11.0449"
+                y1="34.5213"
+                x2="-3.0416"
+                y2="-1.73879"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop offset="0.12" stopColor="#3DE8F4" />
+                <stop offset="0.16" stopColor="#38CFF1" />
+                <stop offset="0.24" stopColor="#2C8FEB" />
+                <stop offset="0.36" stopColor="#1A2DE2" />
+                <stop offset="0.39" stopColor="#3331C9" />
+                <stop offset="0.47" stopColor="#673B96" />
+                <stop offset="0.55" stopColor="#94436A" />
+                <stop offset="0.62" stopColor="#B94A46" />
+                <stop offset="0.7" stopColor="#D64F2A" />
+                <stop offset="0.77" stopColor="#EA5316" />
+                <stop offset="0.85" stopColor="#F6550A" />
+                <stop offset="0.92" stopColor="#FB5607" />
+              </linearGradient>
+              <linearGradient
+                id="paint1_linear_1247_17156"
+                x1="-1.43942"
+                y1="25.697"
+                x2="5.28465"
+                y2="4.03957"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stopColor="#FFBE0B" />
+                <stop offset="1" stopColor="#FB5607" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </a>
         <div onClick={() => setOpenSideBar(!openSideBar)} className={styles.hamburger}>
           <span className={`${openSideBar && styles.toggle}`}></span>
           <span className={`${openSideBar && styles.toggle}`}></span>
@@ -122,10 +171,10 @@ const AppLayout = ({ children, username }: Props) => {
         {children}
       </main>
       <footer className={styles.footer}>
-        <div>
+        <a href="https://galoy.io" target="_blank" rel="noreferrer">
           <span>Powered by</span>
           <img src="/galoy-brand.png" alt="galoy brand" />
-        </div>
+        </a>
       </footer>
     </div>
   )
