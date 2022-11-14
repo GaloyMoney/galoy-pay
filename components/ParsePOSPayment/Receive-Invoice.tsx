@@ -39,12 +39,12 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
   const getImage = () => takeScreenShot(qrImageRef.current)
 
   const shareUrl =
-    !amount && !unit
+    !amount && !unit && !memo
       ? `https://${URL_HOST_DOMAIN}/${username}?amount=${
           state.currentAmount
         }&sats=${usdToSats(
           state.currentAmount,
-        ).toFixed()}&currency=${recipientWalletCurrency}&unit=SAT`
+        ).toFixed()}&currency=${recipientWalletCurrency}&unit=SAT&memo=""`
       : window.location.href
 
   const shareData = {

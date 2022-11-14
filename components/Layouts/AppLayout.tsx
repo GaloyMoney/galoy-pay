@@ -1,10 +1,11 @@
 import copy from "copy-to-clipboard"
-import { Image } from "react-bootstrap"
 import Link from "next/link"
+import { useRouter } from "next/router"
 import React from "react"
+import { Image } from "react-bootstrap"
 
-import styles from "./app-layout.module.css"
 import { URL_HOST_DOMAIN } from "../../config/config"
+import styles from "./app-layout.module.css"
 
 type Props = {
   children: React.ReactPortal | React.ReactNode
@@ -12,8 +13,13 @@ type Props = {
 }
 
 const AppLayout = ({ children, username }: Props) => {
+  const { memo } = useRouter().query
   const [openSideBar, setOpenSideBar] = React.useState<boolean>(false)
   const lightningAddr = `${username?.toString().toLowerCase()}@${URL_HOST_DOMAIN}`
+
+  const cashRegisterLink = memo
+    ? `/${username}?amount=0&sats=0&currency=BTC&unit=CENT&memo=${memo.toString()}`
+    : `/${username}`
 
   const copyToClipboard = () => {
     copy(lightningAddr)
@@ -37,7 +43,7 @@ const AppLayout = ({ children, username }: Props) => {
         <ul className={`${openSideBar && styles.nav_menu_bg} ${styles.nav_menu}`}>
           <li>{`Ways to pay ${username ?? "user"} `}</li>
           <li onClick={closeSideBar}>
-            <Link href={`/${username}`}>
+            <Link href={cashRegisterLink}>
               <a>
                 <Image src="/register-black&white.svg" width={"15"} height={"15"} />
                 Cash Register App
