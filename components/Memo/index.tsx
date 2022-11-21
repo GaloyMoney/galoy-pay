@@ -8,9 +8,7 @@ const Memo = ({ createdInvoice }: React.ComponentState) => {
   const router = useRouter()
   const { username, amount, unit, sats, memo } = router.query
   const [openModal, setOpenModal] = React.useState<boolean>(false)
-  const [note, setNote] = React.useState<string>("")
-
-  console.log(createdInvoice)
+  const [note, setNote] = React.useState<string>(memo?.toString() || "")
 
   const handleSetMemo = () => {
     router.push({
@@ -26,15 +24,18 @@ const Memo = ({ createdInvoice }: React.ComponentState) => {
   return (
     <div className={styles.container}>
       <div>
-        <div className={styles.note_wrapper}>
-          <p>Note:</p>
-          <input readOnly value={memo ?? ""} />
-        </div>
+        {memo ? (
+          <div className={styles.note_wrapper}>
+            <p>Note:</p>
+            <input readOnly value={memo} />
+          </div>
+        ) : null}
         <button
           onClick={handleShow}
           className={`${createdInvoice ? styles.disable_btn : styles.add_btn}`}
           disabled={createdInvoice}
         >
+          {!createdInvoice && !memo ? "Add note" : null}
           <svg
             width="19"
             height="19"

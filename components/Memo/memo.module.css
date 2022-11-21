@@ -38,6 +38,8 @@
   border-radius: 8px;
   font-weight: 600;
   padding: 0.5rem;
+  color: rgba(83, 111, 242, 1);
+  column-gap: 0.5rem;
 }
 
 .disable_btn {
