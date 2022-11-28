@@ -11,7 +11,7 @@ const Memo = ({ createdInvoice }: React.ComponentState) => {
   const [note, setNote] = React.useState<string>(memo?.toString() || "")
 
   const handleSetMemo = () => {
-    if (unit === "SAT") {
+    if (unit === "SAT" || unit === "CENT") {
       router.push(
         {
           pathname: `${username}`,
