@@ -21,10 +21,7 @@ export async function getServerSideProps({
   const lnurl = bech32.encode(
     "lnurl",
     bech32.toWords(
-      Buffer.from(
-        `${url.protocol}//${url.hostname}/.well-known/lnurlp/${username}`,
-        "utf8",
-      ),
+      Buffer.from(`${url.protocol}//${url.hostname}/.well-known/u/${username}`, "utf8"),
     ),
     1500,
   )
