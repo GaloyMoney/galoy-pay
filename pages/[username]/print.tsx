@@ -7,7 +7,7 @@ import originalUrl from "original-url"
 import ReactToPrint from "react-to-print"
 import { bech32 } from "bech32"
 import { QRCode } from "react-qrcode-logo"
-import { useRef, useState } from "react"
+import { useRef } from "react"
 
 export async function getServerSideProps({
   req,
@@ -30,7 +30,7 @@ export async function getServerSideProps({
         ),
         1500,
       ),
-      webURL: `${url.protocol}//${url.hostname}/${username}`,
+      webURL: `${url.protocol}//${url.hostname}:${url.port}/${username}`,
       username,
       userHeader: `${username}'s paycode`,
     },
@@ -50,7 +50,7 @@ export default function ({
   userHeader: string
 }) {
   const componentRef = useRef<HTMLDivElement | null>(null)
-  const [qrType, setQR] = useState("lnurl")
+  const qrCodeValue = (webURL + "?lightning=" + lnurl).toUpperCase()
 
   return (
     <>
@@ -69,7 +69,7 @@ export default function ({
                     </p>
                     <QRCode
                       ecLevel="H"
-                      value={qrType === "lnurl" ? lnurl : webURL}
+                      value={qrCodeValue}
                       size={800}
                       logoImage="/BBW-QRLOGO.png"
                       logoWidth={250}
@@ -96,7 +96,7 @@ export default function ({
                   </p>
                   <QRCode
                     ecLevel="H"
-                    value={qrType === "lnurl" ? lnurl : webURL}
+                    value={qrCodeValue}
                     size={300}
                     logoImage="/BBW-QRLOGO.png"
                     logoWidth={100}
@@ -109,14 +109,6 @@ export default function ({
         <br />
       </Container>
       <Row className="justify-content-center">
-        <Button
-          style={{ marginRight: 10 }}
-          onClick={() => {
-            setQR(qrType === "web" ? "lnurl" : "web")
-          }}
-        >
-          Use {qrType === "web" ? "lnurl" : "web URL"}
-        </Button>
         <ReactToPrint
           trigger={() => <Button>Print QR Code</Button>}
           content={() => componentRef.current}
