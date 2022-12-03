@@ -28,11 +28,11 @@ export async function getServerSideProps({
     ),
     1500,
   )
-  const webURL = `${url.protocol}//${url.hostname}:${url.port}/${username}`
+
+  // Note: add the port to the webURL for local development
+  const webURL = `${url.protocol}//${url.hostname}/${username}`
 
   const qrCodeURL = (webURL + "?lightning=" + lnurl).toUpperCase()
-
-  console.log(qrCodeURL.length)
 
   return {
     props: {
