@@ -18,19 +18,25 @@ export async function getServerSideProps({
 }) {
   const url = originalUrl(req)
 
+  const lnurl = bech32.encode(
+    "lnurl",
+    bech32.toWords(
+      Buffer.from(
+        `${url.protocol}//${url.hostname}/.well-known/lnurlp/${username}`,
+        "utf8",
+      ),
+    ),
+    1500,
+  )
+  const webURL = `${url.protocol}//${url.hostname}:${url.port}/${username}`
+
+  const qrCodeURL = (webURL + "?lightning=" + lnurl).toUpperCase()
+
+  console.log(qrCodeURL.length)
+
   return {
     props: {
-      lnurl: bech32.encode(
-        "lnurl",
-        bech32.toWords(
-          Buffer.from(
-            `${url.protocol}//${url.hostname}/.well-known/lnurlp/${username}`,
-            "utf8",
-          ),
-        ),
-        1500,
-      ),
-      webURL: `${url.protocol}//${url.hostname}:${url.port}/${username}`,
+      qrCodeURL,
       username,
       userHeader: `${username}'s paycode`,
     },
@@ -38,19 +44,16 @@ export async function getServerSideProps({
 }
 
 export default function ({
-  lnurl,
-  webURL,
+  qrCodeURL,
   username,
   userHeader,
 }: {
   lightningAddress: string
-  lnurl: string
-  webURL: string
+  qrCodeURL: string
   username: string
   userHeader: string
 }) {
   const componentRef = useRef<HTMLDivElement | null>(null)
-  const qrCodeValue = (webURL + "?lightning=" + lnurl).toUpperCase()
 
   return (
     <>
@@ -69,7 +72,7 @@ export default function ({
                     </p>
                     <QRCode
                       ecLevel="H"
-                      value={qrCodeValue}
+                      value={qrCodeURL}
                       size={800}
                       logoImage="/BBW-QRLOGO.png"
                       logoWidth={250}
@@ -96,7 +99,7 @@ export default function ({
                   </p>
                   <QRCode
                     ecLevel="H"
-                    value={qrCodeValue}
+                    value={qrCodeURL}
                     size={300}
                     logoImage="/BBW-QRLOGO.png"
                     logoWidth={100}
