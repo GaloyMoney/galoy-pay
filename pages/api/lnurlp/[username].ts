@@ -99,8 +99,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   } else {
     accountUsername = username.toString()
   }
+  let walletId
+  let walletCurrency
 
-  const { data, error: accountDefaultWalletError } = await client.query({
+  try{
+  const { data } = await client.query({
     query: ACCOUNT_DEFAULT_WALLET,
     variables: { username: accountUsername },
     context: {
@@ -108,18 +111,18 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       "x-forwarded-for": req.headers["x-forwarded-for"],
     },
   })
-
-  const walletId = data?.accountDefaultWallet.id ? data?.accountDefaultWallet.id : ""
-  const walletCurrency = data?.accountDefaultWallet.walletCurrency
-  console.log({ headers: req.headers }, "request to NextApiRequest")
-
-  if (accountDefaultWalletError) {
-    console.log(accountDefaultWalletError.message)
+  walletId = data?.accountDefaultWallet?.id ? data?.accountDefaultWallet?.id : ""
+  walletCurrency = data?.accountDefaultWallet?.walletCurrency
+} catch(error){
     return res.json({
       status: "ERROR",
       reason: `Couldn't find user '${username}'.`,
     })
   }
+
+
+  
+  console.log({ headers: req.headers }, "request to NextApiRequest")
 
   const metadata = JSON.stringify([
     ["text/plain", `Payment to ${username}`],
