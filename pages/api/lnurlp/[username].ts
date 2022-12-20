@@ -70,7 +70,7 @@ const LNURL_INVOICE = gql`
 const LNURL_USD_INVOICE = gql`
   mutation lnUsdInvoiceCreateOnBehalfOfRecipient(
     $walletId: WalletId!
-    $amount: SatAmount!
+    $amount: CentAmount!
     $descriptionHash: Hex32Bytes!
   ) {
     mutationData: lnUsdInvoiceCreateOnBehalfOfRecipient(
