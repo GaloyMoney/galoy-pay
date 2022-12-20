@@ -63,6 +63,29 @@ const LNURL_INVOICE = gql`
   }
 `
 
+const LNURL_USD_INVOICE = gql`
+  mutation lnUsdInvoiceCreateOnBehalfOfRecipient(
+    $walletId: WalletId!
+    $amount: CentAmount!
+    $descriptionHash: Hex32Bytes!
+  ) {
+    mutationData: lnUsdInvoiceCreateOnBehalfOfRecipient(
+      input: {
+        recipientWalletId: $walletId
+        amount: $amount
+        descriptionHash: $descriptionHash
+      }
+    ) {
+      errors {
+        message
+      }
+      invoice {
+        paymentRequest
+      }
+    }
+  }
+`
+
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   const { username, amount } = req.query
   const url = originalUrl(req)
