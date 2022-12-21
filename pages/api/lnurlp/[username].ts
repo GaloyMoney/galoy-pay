@@ -161,22 +161,22 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
     try {
       const descriptionHash = crypto.createHash("sha256").update(metadata).digest("hex")
-
-      const {
-        data: {
-          mutationData: { errors, invoice },
-        },
-      } = await client.mutate({
-        mutation: LNURL_INVOICE,
-        variables: {
-          walletId,
-          amount: amountSats,
-          descriptionHash,
-        },
-      })
-
-      if (errors && errors.length) {
-        console.log("error getting invoice", errors)
+      if (walletCurrency === walletUnitCurrency.BTC) {
+        const {
+          data: {
+            mutationData: { errors, invoice },
+          },
+        } = await client.mutate({
+          mutation: LNURL_INVOICE,
+          variables: {
+            walletId,
+            amount: amountSats,
+            descriptionHash,
+          },
+        })
+        if (errors && errors.length) {
+          console.log("error getting invoice", errors)
+        }
         return res.json({
           pr: invoice.paymentRequest,
           routes: [],
