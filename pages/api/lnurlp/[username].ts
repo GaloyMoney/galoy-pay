@@ -34,13 +34,9 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 })
 
-const ACCOUNT_DEFAULT_WALLET = gql`
-  query accountDefaultWallet($username: Username!) {
-    accountDefaultWallet(username: $username) {
-      __typename
-      id
-      walletCurrency
-    }
+const USER_WALLET_ID = gql`
+  query userDefaultWalletId($username: Username!) {
+    userDefaultWalletId(username: $username)
   }
 `
 
@@ -109,12 +105,9 @@ const walletUnitCurrency = {
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   const { username, amount } = req.query
   const url = originalUrl(req)
-  let accountUsername: string
-  if (username == undefined) {
-    accountUsername = ""
-  } else {
-    accountUsername = username.toString()
-  }
+
+  console.log({ headers: req.headers }, "request to NextApiRequest")
+
   let walletId
   let walletCurrency
 
@@ -228,6 +221,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           throw new Error(priceDataErrors.message)
         }
       }
+
+      res.json({
+        pr: invoice.paymentRequest,
+        routes: [],
+      })
     } catch (err: unknown) {
       console.log("unexpected error getting invoice", err)
       res.json({
