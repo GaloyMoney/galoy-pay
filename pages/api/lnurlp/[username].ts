@@ -90,6 +90,22 @@ const LNURL_USD_INVOICE = gql`
   }
 `
 
+const BTC_PRICE = gql`
+  query btcPrice {
+    btcPrice {
+      base
+      offset
+      currencyUnit
+      formattedAmount
+    }
+  }
+`
+
+const walletUnitCurrency = {
+  BTC: "BTC",
+  USD: "USD",
+} as const
+
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   const { username, amount } = req.query
   const url = originalUrl(req)
@@ -102,26 +118,24 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   let walletId
   let walletCurrency
 
-  try{
-  const { data } = await client.query({
-    query: ACCOUNT_DEFAULT_WALLET,
-    variables: { username: accountUsername },
-    context: {
-      "x-real-ip": req.headers["x-real-ip"],
-      "x-forwarded-for": req.headers["x-forwarded-for"],
-    },
-  })
-  walletId = data?.accountDefaultWallet?.id ? data?.accountDefaultWallet?.id : ""
-  walletCurrency = data?.accountDefaultWallet?.walletCurrency
-} catch(error){
+  try {
+    const { data } = await client.query({
+      query: ACCOUNT_DEFAULT_WALLET,
+      variables: { username: accountUsername },
+      context: {
+        "x-real-ip": req.headers["x-real-ip"],
+        "x-forwarded-for": req.headers["x-forwarded-for"],
+      },
+    })
+    walletId = data?.accountDefaultWallet?.id ? data?.accountDefaultWallet?.id : ""
+    walletCurrency = data?.accountDefaultWallet?.walletCurrency
+  } catch (error) {
     return res.json({
       status: "ERROR",
       reason: `Couldn't find user '${username}'.`,
     })
   }
 
-
-  
   console.log({ headers: req.headers }, "request to NextApiRequest")
 
   const metadata = JSON.stringify([
@@ -170,28 +184,49 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         })
       } else {
         const {
-          data: {
-            mutationData: { errors, invoice },
-          },
-        } = await client.mutate({
-          mutation: LNURL_USD_INVOICE,
-          variables: {
-            walletId,
-            amount: amountSats,
-            descriptionHash,
+          data: { btcPrice },
+          error: priceDataErrors,
+          loading: loadingPriceData,
+        } = await client.query({
+          query: BTC_PRICE,
+          context: {
+            "x-real-ip": req.headers["x-real-ip"],
+            "x-forwarded-for": req.headers["x-forwarded-for"],
           },
         })
-        if (errors && errors.length) {
-          console.log("error getting invoice", errors)
+        const { base, offset } = btcPrice
+        const price = base / 10 ** offset
+        const centAmount = Math.round(amountSats * price)
+
+        if (!loadingPriceData && centAmount) {
+          const {
+            data: {
+              mutationData: { errors, invoice },
+            },
+          } = await client.mutate({
+            mutation: LNURL_USD_INVOICE,
+            variables: {
+              walletId,
+              amount: centAmount,
+              descriptionHash,
+            },
+          })
+          if (errors && errors.length) {
+            console.log("error getting invoice", errors)
+            return res.json({
+              status: "ERROR",
+              reason: `Failed to get invoice: ${errors[0].message}`,
+            })
+          }
           return res.json({
-            status: "ERROR",
-            reason: `Failed to get invoice: ${errors[0].message}`,
+            pr: invoice.paymentRequest,
+            routes: [],
           })
         }
-        return res.json({
-          pr: invoice.paymentRequest,
-          routes: [],
-        })
+        if (priceDataErrors) {
+          console.log({ priceDataErrors })
+          throw new Error(priceDataErrors.message)
+        }
       }
     } catch (err: unknown) {
       console.log("unexpected error getting invoice", err)
@@ -200,8 +235,17 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         reason: err instanceof Error ? err.message : "unexpected error",
       })
     }
+  } else if (walletCurrency === walletUnitCurrency.USD) {
+    // first call if USD
+    res.json({
+      callback: url.full,
+      minSendable: 100000,
+      maxSendable: 500000000,
+      metadata: metadata,
+      tag: "payRequest",
+    })
   } else {
-    // first call
+    // first call if BTC
     res.json({
       callback: url.full,
       minSendable: 1000,
