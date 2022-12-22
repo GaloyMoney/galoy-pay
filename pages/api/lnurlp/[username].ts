@@ -72,54 +72,29 @@ type CreateInvoiceOutput = {
   error?: Error
 }
 
-const walletUnitCurrency = {
-  BTC: "BTC",
-  USD: "USD",
-} as const
-
 async function createInvoice(
   walletId: string,
-  walletCurrency: string,
   amount: number,
   metadata: string,
 ): Promise<CreateInvoiceOutput> {
   const descriptionHash = crypto.createHash("sha256").update(metadata).digest("hex")
 
-  if (walletCurrency === walletUnitCurrency.BTC) {
-    const {
-      data: {
-        mutationData: { errors, invoice },
-      },
-    } = await client.mutate({
-      mutation: LNURL_INVOICE,
-      variables: {
-        walletId,
-        amount,
-        descriptionHash,
-      },
-    })
-    if (errors && errors.length) {
-      throw new Error(`Failed to get invoice: ${errors[0].message}`)
-    }
-    return invoice
-  } else {
-    const {
-      data: {
-        mutationData: { errors, invoice },
-      },
-    } = await client.mutate({
-      mutation: LNURL_INVOICE,
-      variables: {
-        walletId,
-        amount,
-        descriptionHash,
-      },
-    })
-    if (errors && errors.length) {
-      throw new Error(`Failed to get invoice: ${errors[0].message}`)
-    }
-    return invoice
+  const {
+    data: {
+      mutationData: { errors, invoice },
+    },
+  } = await client.mutate({
+    mutation: LNURL_INVOICE,
+    variables: {
+      walletId,
+      amount,
+      descriptionHash,
+    },
+  })
+  if (errors && errors.length) {
+    throw new Error(`Failed to get invoice: ${errors[0].message}`)
   }
+  return invoice
 }
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
@@ -134,19 +109,17 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     ["text/identifier", `${username}@${url.hostname}`],
   ])
   let walletId: string
-  let walletCurrency: string
 
   try {
     const { data } = await client.query({
       query: ACCOUNT_DEFAULT_WALLET,
-      variables: { username: accountUsername, walletCurrency: walletUnitCurrency.BTC },
+      variables: { username: accountUsername, walletCurrency: "BTC" },
       context: {
         "x-real-ip": req.headers["x-real-ip"],
         "x-forwarded-for": req.headers["x-forwarded-for"],
       },
     })
     walletId = data?.accountDefaultWallet?.id ? data?.accountDefaultWallet?.id : ""
-    walletCurrency = data?.accountDefaultWallet?.walletCurrency
   } catch (err) {
     return res.json({
       status: "ERROR",
@@ -165,12 +138,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         reason: "Millisatoshi amount is not supported, please send a value in full sats.",
       })
     }
-    const { paymentRequest, error } = await createInvoice(
-      walletId,
-      walletCurrency,
-      amountSats,
-      metadata,
-    )
+    const { paymentRequest, error } = await createInvoice(walletId, amountSats, metadata)
     if (error instanceof Error) {
       return res.json({
         status: "ERROR",
