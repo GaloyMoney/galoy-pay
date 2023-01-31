@@ -8,30 +8,30 @@ import config from "../config"
 
 import "../styles/main.css"
 
-const { GRAPHQL_URL } = config()
-
-const cache = new InMemoryCache()
-const httpLink = new HttpLink({ uri: GRAPHQL_URL, fetch })
-
-const authLink = setContext((_, { headers }) => {
-  if (typeof window === "undefined") {
-    return headers
-  }
-  const token = window.sessionStorage.getItem("token")
-  return {
-    headers: {
-      ...headers,
-      Authorization: token ? `Bearer ${token}` : "",
-    },
-  }
-})
-
-const client = new ApolloClient({
-  link: authLink.concat(httpLink),
-  cache,
-})
-
 function MyApp({ Component, pageProps }: AppProps) {
+  const { GRAPHQL_URL } = config()
+
+  const cache = new InMemoryCache()
+  const httpLink = new HttpLink({ uri: GRAPHQL_URL, fetch })
+
+  const authLink = setContext((_, { headers }) => {
+    if (typeof window === "undefined") {
+      return headers
+    }
+    const token = window.sessionStorage.getItem("token")
+    return {
+      headers: {
+        ...headers,
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    }
+  })
+
+  const client = new ApolloClient({
+    link: authLink.concat(httpLink),
+    cache,
+  })
+
   return (
     <>
       <Head>
