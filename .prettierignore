@@ -1,9 +1,8 @@
-coverage
-lib
-tmp
-charts
+graphql/__generated__
+ci/
+
+.next
 .vscode
 
-**/*.yaml
-**/*.yml
-**/*.md
+.github
+ci/vendor

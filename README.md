@@ -10,12 +10,17 @@ With a default installation, Admin Panel can be accessed with `admin.domain.com`
 
 ## How to run this repo locally?
 
-In the project directory, you can run:
+This project uses Next.js, to run it locally, you need to set the following environment variable (in a `.env.local` file):
+
+```
+NEXT_PUBLIC_GRAPHQL_URL=https://admin-api.staging.galoy.io/graphql
+```
+
+Then, nn the project directory, you can run:
 
 ```
 yarn install
-export GRAPHQL_URI="https://graphql-admin.domain.com"
-yarn start
+yarn dev
 ```
 
 Runs the app in the development mode.\
@@ -31,7 +36,5 @@ It correctly bundles React in production mode and optimizes the build for the be
 
 The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
-
-
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
