@@ -7,6 +7,7 @@ import Tooltip from "react-bootstrap/Tooltip"
 import { QRCode } from "react-qrcode-logo"
 import { useTimer } from "react-timer-hook"
 import { useScreenshot } from "use-react-screenshot"
+import { requestPayment } from "lnurl-withdraw"
 import { AmountUnit } from "."
 
 import { URL_HOST_DOMAIN, USD_INVOICE_EXPIRE_INTERVAL } from "../../config/config"
@@ -33,6 +34,7 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
 
   const [expiredInvoiceError, setExpiredInvoiceError] = React.useState<string>("")
   const [copied, setCopied] = React.useState<boolean>(false)
+  const [readingNfc, setReadingNfc] = React.useState<boolean>(false)
   const [shareState, setShareState] = React.useState<"not-set">()
   const [image, takeScreenShot] = useScreenshot()
 
@@ -155,6 +157,58 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
     }, 3000)
   }
 
+  const readNfc = async () => {
+    if (typeof NDEFReader === 'undefined') {
+      setReadingNfc(false)
+      console.error("NFC Reader is not available")
+      return
+    }
+
+    try {
+      const reader = new NDEFReader();
+      await reader.scan();
+      console.log('Scanning for NFC tags');
+
+      reader.onreadingerror = () => {
+        console.log(
+          "Error! Cannot read data from the NFC tag. Try a different one?"
+        );
+      };
+      reader.onreading = (event) => {
+        console.log('NFC tag detected');
+        const textDecoder = new TextDecoder('utf-8')
+
+        const record = event.message.records.find(el => {
+          const payload = textDecoder.decode(el.data)
+          return payload.toUpperCase().indexOf('LNURL') !== -1
+        })
+
+        const lnurl = textDecoder.decode(record?.data)
+        console.log(lnurl)
+        console.log("end reading, starting payment")
+
+        requestPayment({
+          lnUrl: lnurl,
+          invoice: invoice?.paymentRequest || "",
+          validateInvoice: false,
+        })
+          .then((r) => {
+            console.log(r)
+          })
+          .catch((e) => {
+            console.error(e)
+          })
+          .finally(() => {
+            setReadingNfc(false)
+          })
+
+      };
+    } catch (error) {
+      console.error(error)
+      setReadingNfc(false)
+    }
+  }
+
   if ((errorString && !loading) || expiredInvoiceError) {
     const invalidInvoiceError =
       recipientWalletCurrency === "USD" && Number(amount?.toString()) <= 0
@@ -216,6 +270,22 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
                     height="18px"
                   />
                   {copied ? "Copied" : "Copy"}
+                </button>
+              </OverlayTrigger>
+
+              <OverlayTrigger
+                show={readingNfc}
+                placement="auto"
+                overlay={<Tooltip id="readingNfc">Reading!</Tooltip>}
+              >
+                <button title="Read NFC card" onClick={readNfc}>
+                  <Image
+                    src="/icons/nfc.svg"
+                    alt="nfc icon"
+                    width="18px"
+                    height="18px"
+                  />
+                  {readingNfc ? "Reading" : "Read card"}
                 </button>
               </OverlayTrigger>
 
