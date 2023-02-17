@@ -202,7 +202,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     }
 
     if (nostrEnabled && nostr && redis) {
-      redis.set(`nostrInvoice:${invoice.paymentHash}`, nostr, "EX", 600)
+      redis.set(`nostrInvoice:${invoice.paymentHash}`, nostr, "EX", 1440)
     }
 
     return res.json({
