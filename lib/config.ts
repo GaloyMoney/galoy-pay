@@ -24,6 +24,6 @@ const GRAPHQL_URI_INTERNAL = `http://${GRAPHQL_HOSTNAME_INTERNAL}/graphql`
 const GRAPHQL_URI = `https://${GRAPHQL_HOSTNAME}/graphql`
 const GRAPHQL_SUBSCRIPTION_URI = `wss://${GRAPHQL_HOSTNAME}/graphql`
 
-const NOSTR_PUBKEY = process.env.NOSTR_PUBKEY as string
+const NOSTR_PUBKEY = (process.env.NOSTR_PUBKEY as string || "").toLowerCase()
 
 export { GRAPHQL_URI, GRAPHQL_SUBSCRIPTION_URI, GRAPHQL_URI_INTERNAL, NOSTR_PUBKEY }
