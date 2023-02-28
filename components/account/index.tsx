@@ -154,22 +154,19 @@ function AccountDetails() {
     },
   )
 
-  const [deleteBusiness] = useMutation(
-    BUSINESS_DELETE_MAP,
-    {
-      onCompleted({ businessDeleteMapInfo }) {
-        if (businessDeleteMapInfo.accountDetails) {
-          updateData(businessDeleteMapInfo.accountDetails)
-          const usernameOrPhone =
-            businessDeleteMapInfo.accountDetails.username ??
-            businessDeleteMapInfo.accountDetails.owner.phone
-          alert(`${usernameOrPhone}'s business has been deleted successfully from map`)
-        }
-      },
-      onError: reportError,
-      fetchPolicy: "no-cache",
+  const [deleteBusiness] = useMutation(BUSINESS_DELETE_MAP, {
+    onCompleted({ businessDeleteMapInfo }) {
+      if (businessDeleteMapInfo.accountDetails) {
+        updateData(businessDeleteMapInfo.accountDetails)
+        const usernameOrPhone =
+          businessDeleteMapInfo.accountDetails.username ??
+          businessDeleteMapInfo.accountDetails.owner.phone
+        alert(`${usernameOrPhone}'s business has been deleted successfully from map`)
+      }
     },
-  )
+    onError: reportError,
+    fetchPolicy: "no-cache",
+  })
 
   const loading = loadingAccountByPhone || loadingAccountByUsername
 

@@ -41,7 +41,7 @@ function TransactionDetails() {
 
   const handleTxnsData = (txns: TransactionListType) => {
     setData(txns)
-    const txn = txns.find(
+    const txn = txns?.find(
       (txn) =>
         txn?.initiationVia.__typename !== "InitiationViaIntraLedger" &&
         txn?.settlementVia.__typename !== "SettlementViaIntraLedger",
