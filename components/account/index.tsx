@@ -22,6 +22,7 @@ import {
   ACCOUNTS_ADD_USD_WALLET,
   ACCOUNT_UPDATE_LEVEL,
   BUSINESS_UPDATE_MAP_INFO,
+  BUSINESS_DELETE_MAP,
 } from "../../graphql/mutations"
 import { AccountLevel, AccountStatus, WalletCurrency } from "../../graphql/types"
 
@@ -153,6 +154,23 @@ function AccountDetails() {
     },
   )
 
+  const [deleteBusiness] = useMutation(
+    BUSINESS_DELETE_MAP,
+    {
+      onCompleted({ businessDeleteMapInfo }) {
+        if (businessDeleteMapInfo.accountDetails) {
+          updateData(businessDeleteMapInfo.accountDetails)
+          const usernameOrPhone =
+            businessDeleteMapInfo.accountDetails.username ??
+            businessDeleteMapInfo.accountDetails.owner.phone
+          alert(`${usernameOrPhone}'s business has been deleted successfully from map`)
+        }
+      },
+      onError: reportError,
+      fetchPolicy: "no-cache",
+    },
+  )
+
   const loading = loadingAccountByPhone || loadingAccountByUsername
 
   const usernameOrPhone = data?.username ?? data?.owner.phone
@@ -218,6 +236,14 @@ function AccountDetails() {
     alert("Username is required")
   }
 
+  const deleteBusinessDetails = (username: string) => {
+    if (!username) {
+      return
+    }
+    const input = { username }
+    return deleteBusiness({ variables: { input } })
+  }
+
   return (
     <>
       <SearchHeader
@@ -254,6 +280,7 @@ function AccountDetails() {
               <BusinessMapUpdate
                 accountDetails={data}
                 update={changeBusinessMapDetails}
+                deleteBusiness={deleteBusinessDetails}
                 updating={loadingBusinessMap}
                 loading={loading}
               />

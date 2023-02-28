@@ -16,9 +16,10 @@ const isValidBusinessInfo = ({ title, coordinates }: AccountBusinessInfo) =>
 const BusinessMapUpdate: React.FC<{
   accountDetails: AccountData
   update: (info: AccountBusinessInfo) => void
+  deleteBusiness: (username: string) => void
   updating: boolean
   loading: boolean
-}> = ({ accountDetails, update, updating = false, loading = false }) => {
+}> = ({ accountDetails, update, deleteBusiness, updating = false, loading = false }) => {
   const data = accountDetails
 
   const [title, setTitle] = useState(data?.title || "")
@@ -26,6 +27,7 @@ const BusinessMapUpdate: React.FC<{
   const [longitude, setLongitude] = useState<number | "">(
     data?.coordinates?.longitude || "",
   )
+  const [username] = useState<string>(data?.username || "")
 
   const emptyClass = loading ? "filter blur-sm animate-pulse" : ""
 
@@ -52,6 +54,17 @@ const BusinessMapUpdate: React.FC<{
     }
 
     alert("Invalid business info")
+  }
+
+  const submitDelete: React.FormEventHandler<HTMLFormElement> = async (event) => {
+    event.preventDefault()
+
+    if (deleteBusiness) {
+      deleteBusiness(username)
+      return
+    }
+
+    alert("Invalid username")
   }
 
   return (
@@ -119,6 +132,16 @@ const BusinessMapUpdate: React.FC<{
             className="mb-0 w-full bg-blue-400 hover:bg-blue-500 text-white font-bold p-2 my-4 border border-blue-500 rounded disabled:opacity-50"
           >
             {updating ? "Updating..." : "Update"}
+          </button>
+        </div>
+      </form>
+      <form className="grid grid-cols-2 gap-4" onSubmit={submitDelete}>
+        <div className={`${emptyClass} flex items-end justify-end`}>
+          <button
+            type="submit"
+            className="mb-0 w-full bg-blue-400 hover:bg-red-500 text-white font-bold p-2 my-4 border border-blue-500 rounded disabled:opacity-50"
+          >
+            {"Delete"}
           </button>
         </div>
       </form>
