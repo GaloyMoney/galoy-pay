@@ -10,13 +10,14 @@ With a default installation, Admin Panel can be accessed with `admin.domain.com`
 
 ## How to run this repo locally?
 
-This project uses Next.js, to run it locally, you need to set the following environment variable (in a `.env.local` file):
+This project uses Next.js, to run it locally, you need to set the following environment variables (in a `.env.local` file):
 
 ```
-export NEXT_PUBLIC_GRAPHQL_URL=https://admin-api.staging.galoy.io/graphql
+NEXT_PUBLIC_GRAPHQL_URL=https://admin-api.staging.galoy.io/graphql
+NEXT_PUBLIC_GALOY_AUTH_ENDPOINT=https://admin-api.staging.galoy.io/auth
 ```
 
-Then, nn the project directory, you can run:
+Then, in the project directory, you can run:
 
 ```
 yarn install

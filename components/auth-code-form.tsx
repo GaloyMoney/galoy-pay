@@ -1,41 +1,42 @@
 "use client"
 
 import { useState } from "react"
-import { useMutation } from "@apollo/client"
 
 import { validAuthCode, reportError } from "../utils"
 import { useRouter } from "next/navigation"
-import { LOGIN } from "../graphql/mutations"
+import config from "../config"
 
 const AuthCodeForm: React.FC<{ phoneNumber: string }> = ({ phoneNumber }) => {
   const router = useRouter()
   const [otp, setOtp] = useState("")
-  const [login, { loading: userLoginLoading }] = useMutation(LOGIN)
+  const [userLoginLoading, setUserLoginLoading] = useState(false)
 
   const submitOtp: React.FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault()
-
-    const { errors: loginErrors, data } = await login({
-      variables: { input: { phone: phoneNumber, code: otp } },
+    const raw = JSON.stringify({
+      phoneNumber,
+      authCode: otp,
     })
-
-    if (loginErrors) {
-      return reportError(loginErrors[0])
-    }
-
-    if (data?.userLogin) {
-      const { errors, authToken } = data.userLogin
-
-      if (errors.length > 0) {
-        return reportError(errors[0])
-      }
-
-      if (authToken) {
-        window.sessionStorage.setItem("token", authToken)
-        router.push("/account")
-      } else {
-        alert("Could not execute operation")
-      }
+    setUserLoginLoading(true)
+    try {
+      const loginResp = await fetch(`${config().GALOY_AUTH_ENDPOINT}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: raw,
+        redirect: "follow",
+        credentials: "include",
+      })
+      if (loginResp instanceof Error) return reportError(loginResp)
+      window.sessionStorage.setItem("token", "loggedInWithCookie")
+      router.push("/account")
+    } catch (e) {
+      return reportError({
+        message: "Error logging in",
+      })
+    } finally {
+      setUserLoginLoading(false)
     }
   }
 
