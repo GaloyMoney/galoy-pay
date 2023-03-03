@@ -33,9 +33,11 @@ function MyApp({ Component, pageProps }: AppProps) {
         method: "GET",
         redirect: "follow",
         credentials: "include",
+      }).then(() => {
+        localStorage.clear()
+        sessionStorage.clear()
+        window.location.replace("/")
       })
-      localStorage.clear()
-      sessionStorage.clear()
     }
   })
 
