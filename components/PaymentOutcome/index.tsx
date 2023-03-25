@@ -2,11 +2,12 @@ import { useSubscription } from "@galoymoney/client"
 import { useRouter } from "next/router"
 import React from "react"
 import Image from "react-bootstrap/Image"
-
 import useSatPrice from "../../lib/use-sat-price"
 import { ACTIONS, ACTION_TYPE } from "../../pages/_reducer"
 import { formatOperand } from "../../utils/utils"
 import styles from "./payment-outcome.module.css"
+import Receipt from "./receipt"
+import Modal from 'react-bootstrap/Modal';
 
 interface Props {
   paymentRequest: string
@@ -16,11 +17,24 @@ interface Props {
 
 function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
   const router = useRouter()
-  const { amount, unit, sats } = router.query
+  const { amount, unit, sats, username, memo } = router.query
   const { satsToUsd } = useSatPrice()
+  const [isPrint, setPrint] = React.useState(false)
+  const [show, setShow] = React.useState(false);
+
 
   if (!paymentRequest) {
     return null
+  }
+
+
+
+  const printReceipt = () => {
+    setPrint(true)
+    setShow(true)
+    setTimeout(()=>{
+      window.print()
+    },500)
   }
 
   const { loading, data, error, errorsMessage } = useSubscription.lnInvoicePaymentStatus({
@@ -47,6 +61,38 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
       Back to cash register
     </button>
   )
+
+  const downloadReceipt = (
+    <button className={styles.pay_new_btn} onClick={() => printReceipt()}>
+      <Image
+        src="/icons/print-icon.svg"
+        alt="print icon"
+        width="18"
+        height="18"
+        className="mr-2"
+      />
+      Print Receipt
+    </button>
+  )
+
+    if (isPrint) {
+      return (
+        <Modal show={show} fullscreen={true} onHide={() => setShow(false)} backdropClassName={styles.backdrop}>
+        <Modal.Header closeButton>
+          Transaction Receipt
+        </Modal.Header>
+        <Modal.Body>  
+          <Receipt
+          amount={amount}
+          sats={sats}
+          username={username}
+          paymentRequest={paymentRequest}
+          memo={memo}
+        /></Modal.Body>
+      </Modal>
+      
+      )
+    }
 
   if (data) {
     const { status, errors } = data.lnInvoicePaymentStatus
@@ -77,6 +123,7 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
                   )} sats)`}{" "}
               has been paid
             </p>
+            {downloadReceipt}
           </div>
           {backToCashRegisterButton}
         </div>
@@ -100,6 +147,8 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
         </div>
       )
     }
+
+  
   }
   return <>{loading && null}</>
 }
