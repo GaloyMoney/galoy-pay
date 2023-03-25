@@ -37,6 +37,11 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
     },500)
   }
 
+  const closePayment = () =>{
+    setShow(false)
+    dispatch({ type: ACTIONS.CREATE_NEW_INVOICE })
+  }
+
   const { loading, data, error, errorsMessage } = useSubscription.lnInvoicePaymentStatus({
     variables: {
       input: { paymentRequest },
@@ -77,7 +82,7 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
 
     if (isPrint) {
       return (
-        <Modal show={show} fullscreen={true} onHide={() => setShow(false)} backdropClassName={styles.backdrop}>
+        <Modal show={show} fullscreen={true} onHide={() => closePayment()} backdropClassName={styles.backdrop}>
         <Modal.Header closeButton>
           Transaction Receipt
         </Modal.Header>

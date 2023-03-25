@@ -2,7 +2,7 @@ import React from "react"
 import Image from "react-bootstrap/Image"
 import GaloyIcon from "./Galoy"
 import styles from "./payment-outcome.module.css"
-
+import { formatOperand } from "../../utils/utils"
 
 interface Props {
   amount: string | string[] | undefined
@@ -42,7 +42,9 @@ function receipt(props: Props) {
       <div className="text-center">
         <span>Transaction Amount</span>
         <h1>{props.sats} sats</h1>
-        <span> ${props.amount?props.amount:"~ less than a 1 cent"} </span>
+        <span> ${props.amount?formatOperand(
+                    props.amount?.toString(),
+                  ):"~ less than a 1 cent"} </span>
        
         <div className="d-flex justify-content-center">
         <table className="my-3 w-100">
