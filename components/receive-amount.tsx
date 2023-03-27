@@ -35,7 +35,9 @@ export default function ReceiveAmount({
     const newAmount =
       newCurrency === "SATS" ? Math.round(usdToSats(amount)) : satsToUsd(amount)
 
-    router.push(getUpdatedURL(router.query, { currency: newCurrency, amount: newAmount, display }))
+    router.push(
+      getUpdatedURL(router.query, { currency: newCurrency, amount: newAmount, display }),
+    )
   }
 
   const handleAmountUpdate = useDebouncedCallback(({ numberValue }) => {

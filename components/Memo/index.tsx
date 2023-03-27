@@ -20,7 +20,7 @@ const Memo = ({ createdInvoice }: React.ComponentState) => {
             sats: sats,
             unit: unit,
             memo: note,
-            display
+            display,
           },
         },
         undefined,

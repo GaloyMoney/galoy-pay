@@ -91,7 +91,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           currency: defaultWalletCurrency,
           unit: newUnit,
           memo,
-          display
+          display,
         },
       },
       undefined,
@@ -120,7 +120,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           currency: defaultWalletCurrency,
           unit,
           memo,
-          display
+          display,
         },
       },
       undefined,

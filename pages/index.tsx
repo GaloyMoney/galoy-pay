@@ -99,9 +99,7 @@ function Home() {
                               placeholder="username"
                               required
                             />
-                            <label htmlFor="display">
-                              Enter your currency
-                            </label>
+                            <label htmlFor="display">Enter your currency</label>
                             <input
                               type="text"
                               name="display"
