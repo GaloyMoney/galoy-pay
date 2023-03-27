@@ -2,8 +2,8 @@ import { useRouter } from "next/router"
 import React from "react"
 import Container from "react-bootstrap/Container"
 import Image from "react-bootstrap/Image"
-
 import useSatPrice from "../../lib/use-sat-price"
+import useRealtimePrice from "../../lib/use-realtime-price"
 import { ACTION_TYPE, ACTIONS } from "../../pages/_reducer"
 import { formatOperand } from "../../utils/utils"
 import Memo from "../Memo"
@@ -34,6 +34,9 @@ export enum AmountUnit {
 
 function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Props) {
   const { usdToSats, satsToUsd } = useSatPrice()
+  const searchParams = new URLSearchParams(window.location.search)
+  const displayCurrency = searchParams.get("display") ?? "USD"
+  const { satsToCurrency } = useRealtimePrice(displayCurrency)
   const router = useRouter()
   const { username, amount, sats, unit, memo } = router.query
 
@@ -88,6 +91,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           currency: defaultWalletCurrency,
           unit: newUnit,
           memo,
+          display: displayCurrency,
         },
       },
       undefined,
@@ -154,6 +158,12 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount, sats, unit, dispatch])
+
+  const calcDisplayCurrencyAmount =
+    satsToCurrency(Number(sats)) < 0.01 || isNaN(satsToCurrency(Number(sats)))
+      ? "(less than 1 cent)"
+      : satsToCurrency(Number(sats)).toFixed(2)
+  console.log(`Price for  ${sats} in ${displayCurrency} is: `, calcDisplayCurrencyAmount)
 
   return (
     <Container className={styles.digits_container}>

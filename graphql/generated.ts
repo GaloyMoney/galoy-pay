@@ -1418,6 +1418,36 @@ export type PriceSubscription = {
   }
 }
 
+export type RealtimePriceSubscriptionVariables = Exact<{
+  currency: Scalars["DisplayCurrency"]
+}>
+
+export type RealtimePriceSubscription = {
+  readonly __typename: "Subscription"
+  readonly realtimePrice: {
+    readonly __typename: "RealtimePricePayload"
+    readonly errors: ReadonlyArray<{
+      readonly __typename: "GraphQLApplicationError"
+      readonly message: string
+    }>
+    readonly realtimePrice?: {
+      readonly __typename: "RealtimePrice"
+      readonly timestamp: number
+      readonly denominatorCurrency: string
+      readonly btcSatPrice: {
+        readonly __typename: "PriceOfOneSatInMinorUnit"
+        readonly base: number
+        readonly offset: number
+      }
+      readonly usdCentPrice: {
+        readonly __typename: "PriceOfOneUsdCentInMinorUnit"
+        readonly base: number
+        readonly offset: number
+      }
+    } | null
+  }
+}
+
 export type AccountDefaultWalletQueryVariables = Exact<{
   username: Scalars["Username"]
   walletCurrency: WalletCurrency
@@ -1594,6 +1624,61 @@ export function usePriceSubscription(
 }
 export type PriceSubscriptionHookResult = ReturnType<typeof usePriceSubscription>
 export type PriceSubscriptionResult = Apollo.SubscriptionResult<PriceSubscription>
+export const RealtimePriceDocument = gql`
+  subscription realtimePrice($currency: DisplayCurrency!) {
+    realtimePrice(input: { currency: $currency }) {
+      errors {
+        message
+      }
+      realtimePrice {
+        timestamp
+        btcSatPrice {
+          base
+          offset
+        }
+        usdCentPrice {
+          base
+          offset
+        }
+        denominatorCurrency
+      }
+    }
+  }
+`
+
+/**
+ * __useRealtimePriceSubscription__
+ *
+ * To run a query within a React component, call `useRealtimePriceSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useRealtimePriceSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRealtimePriceSubscription({
+ *   variables: {
+ *      currency: // value for 'currency'
+ *   },
+ * });
+ */
+export function useRealtimePriceSubscription(
+  baseOptions: Apollo.SubscriptionHookOptions<
+    RealtimePriceSubscription,
+    RealtimePriceSubscriptionVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useSubscription<
+    RealtimePriceSubscription,
+    RealtimePriceSubscriptionVariables
+  >(RealtimePriceDocument, options)
+}
+export type RealtimePriceSubscriptionHookResult = ReturnType<
+  typeof useRealtimePriceSubscription
+>
+export type RealtimePriceSubscriptionResult =
+  Apollo.SubscriptionResult<RealtimePriceSubscription>
 export const AccountDefaultWalletDocument = gql`
   query accountDefaultWallet($username: Username!, $walletCurrency: WalletCurrency!) {
     accountDefaultWallet(username: $username, walletCurrency: $walletCurrency) {
