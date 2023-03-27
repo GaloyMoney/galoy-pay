@@ -27,6 +27,7 @@ function Home() {
 
   const router = useRouter()
   const [username, setUsername] = React.useState<string>("")
+  const [display, setDisplay] = React.useState<string>("")
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -34,6 +35,7 @@ function Home() {
     router.push(
       {
         pathname: username,
+        query: { display },
       },
       undefined,
       { shallow: true },
@@ -95,6 +97,19 @@ function Home() {
                                 setUsername(event.target.value)
                               }
                               placeholder="username"
+                              required
+                            />
+                            <label htmlFor="display">
+                              Enter your currency
+                            </label>
+                            <input
+                              type="text"
+                              name="display"
+                              value={display}
+                              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                                setDisplay(event.target.value)
+                              }
+                              placeholder="USD"
                               required
                             />
                             <button>Submit</button>

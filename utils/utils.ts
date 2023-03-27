@@ -27,3 +27,11 @@ export function parseQueryAmount(query: ParsedUrlQuery) {
     currency: currency?.toUpperCase() || "USD",
   }
 }
+
+export function parseDisplayCurrency(query: ParsedUrlQuery) {
+  const display = query.display as string | null
+
+  return {
+    display: display || "USD",
+  }
+}

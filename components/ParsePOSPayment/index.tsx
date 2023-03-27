@@ -5,7 +5,7 @@ import Image from "react-bootstrap/Image"
 import useSatPrice from "../../lib/use-sat-price"
 import useRealtimePrice from "../../lib/use-realtime-price"
 import { ACTION_TYPE, ACTIONS } from "../../pages/_reducer"
-import { formatOperand } from "../../utils/utils"
+import { formatOperand, parseDisplayCurrency } from "../../utils/utils"
 import Memo from "../Memo"
 import DigitButton from "./Digit-Button"
 import styles from "./parse-payment.module.css"
@@ -33,11 +33,11 @@ export enum AmountUnit {
 }
 
 function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Props) {
-  const { usdToSats, satsToUsd } = useSatPrice()
-  const searchParams = new URLSearchParams(window.location.search)
-  const displayCurrency = searchParams.get("display") ?? "USD"
-  const { satsToCurrency } = useRealtimePrice(displayCurrency)
   const router = useRouter()
+  const { usdToSats, satsToUsd } = useSatPrice()
+  const { display } = parseDisplayCurrency(router.query)
+  const { satsToCurrency } = useRealtimePrice(display)
+
   const { username, amount, sats, unit, memo } = router.query
 
   const value = usdToSats(Number(state.currentAmount)).toFixed()
@@ -91,7 +91,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           currency: defaultWalletCurrency,
           unit: newUnit,
           memo,
-          display: displayCurrency,
+          display
         },
       },
       undefined,
@@ -120,6 +120,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           currency: defaultWalletCurrency,
           unit,
           memo,
+          display
         },
       },
       undefined,
@@ -163,7 +164,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     satsToCurrency(Number(sats)) < 0.01 || isNaN(satsToCurrency(Number(sats)))
       ? "(less than 1 cent)"
       : satsToCurrency(Number(sats)).toFixed(2)
-  console.log(`Price for  ${sats} in ${displayCurrency} is: `, calcDisplayCurrencyAmount)
+  console.log(`Price for  ${sats} in ${display} is: `, calcDisplayCurrencyAmount)
 
   return (
     <Container className={styles.digits_container}>
