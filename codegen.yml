@@ -8,8 +8,8 @@ documents:
   - "pages/**/*.ts"
   - "pages/**/*.tsx"
 generates:
-  graphql/generated.ts:
-    schema: "graphql/local-schema.gql"
+  lib/graphql/generated.ts:
+    schema: "lib/graphql/local-schema.gql"
     plugins:
       - typescript
       - typescript-operations

@@ -1,4 +1,4 @@
-import { WalletCurrency } from "../../graphql/generated"
+import { WalletCurrency } from "./../../lib/graphql/generated"
 
 export const DisplayCurrency = "DisplayCurrency" as const
 export type DisplayCurrency = typeof DisplayCurrency

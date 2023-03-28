@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client"
 import * as React from "react"
-import { useRealtimePriceSubscription } from "../graphql/generated"
+import { useRealtimePriceSubscription } from "../lib/graphql/generated"
 
 gql`
   subscription realtimePrice($currency: DisplayCurrency!) {

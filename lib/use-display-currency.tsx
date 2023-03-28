@@ -1,6 +1,10 @@
 import { gql } from "@apollo/client"
 import * as React from "react"
-import { Currency, CurrencyListQuery, useCurrencyListQuery } from "../graphql/generated"
+import {
+  Currency,
+  CurrencyListQuery,
+  useCurrencyListQuery,
+} from "../lib/graphql/generated"
 
 gql`
   query currencyList {
