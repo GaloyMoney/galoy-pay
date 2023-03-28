@@ -7,7 +7,7 @@ import { ACTIONS, ACTION_TYPE } from "../../pages/_reducer"
 import { formatOperand } from "../../utils/utils"
 import styles from "./payment-outcome.module.css"
 import Receipt from "./receipt"
-import Modal from 'react-bootstrap/Modal';
+import Modal from "react-bootstrap/Modal"
 
 interface Props {
   paymentRequest: string
@@ -19,25 +19,24 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
   const router = useRouter()
   const { amount, unit, sats, username, memo } = router.query
   const { satsToUsd } = useSatPrice()
-  const [isPrint, setPrint] = React.useState(false)
-  const [show, setShow] = React.useState(false);
-
+  const [isPrint, setIsPrint] = React.useState(false)
+  const [show, setShow] = React.useState(false)
 
   if (!paymentRequest) {
     return null
   }
 
-
-
   const printReceipt = () => {
-    setPrint(true)
+    setIsPrint(true)
     setShow(true)
-    setTimeout(()=>{
-      window.print()
-    },500)
+    setTimeout(() => {
+      if (typeof window !== "undefined") {
+        window.print()
+      }
+    }, 500)
   }
 
-  const closePayment = () =>{
+  const closePayment = () => {
     setShow(false)
     dispatch({ type: ACTIONS.CREATE_NEW_INVOICE })
   }
@@ -68,7 +67,7 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
   )
 
   const downloadReceipt = (
-    <button className={styles.pay_new_btn} onClick={() => printReceipt()}>
+    <button className={styles.pay_new_btn} onClick={printReceipt}>
       <Image
         src="/icons/print-icon.svg"
         alt="print icon"
@@ -80,24 +79,28 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
     </button>
   )
 
-    if (isPrint) {
-      return (
-        <Modal show={show} fullscreen={true} onHide={() => closePayment()} backdropClassName={styles.backdrop}>
-        <Modal.Header closeButton>
-          Transaction Receipt
-        </Modal.Header>
-        <Modal.Body>  
+  if (isPrint) {
+    return (
+      <Modal
+        show={show}
+        fullscreen={true}
+        onHide={() => closePayment()}
+        backdropClassName={styles.backdrop}
+      >
+        <Modal.Header closeButton>Transaction Receipt</Modal.Header>
+        <Modal.Body>
           <Receipt
-          amount={amount}
-          sats={sats}
-          username={username}
-          paymentRequest={paymentRequest}
-          memo={memo}
-        /></Modal.Body>
+            amount={amount}
+            sats={sats}
+            username={username}
+            paymentRequest={paymentRequest}
+            memo={memo}
+            paymentAmount={paymentAmount}
+          />
+        </Modal.Body>
       </Modal>
-      
-      )
-    }
+    )
+  }
 
   if (data) {
     const { status, errors } = data.lnInvoicePaymentStatus
@@ -152,8 +155,6 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
         </div>
       )
     }
-
-  
   }
   return <>{loading && null}</>
 }
