@@ -10,6 +10,7 @@ import { gql, useQuery } from "@apollo/client"
 
 import { GRAPHQL_URI } from "../lib/config"
 import { useRouter } from "next/router"
+import useDisplayCurrency from "../lib/use-display-currency"
 
 const GET_NODE_STATS = gql`
   query nodeIds {
@@ -24,10 +25,14 @@ function Home() {
     ? `https://mempool.space/signet/lightning/node/`
     : `https://mempool.space/lightning/node/`
   const { loading, error, data } = useQuery(GET_NODE_STATS)
+  const {
+    displayCurrencyList,
+    selectedDisplayCurrency,
+    setSelectedDisplayCurrency,
+  } = useDisplayCurrency()
 
   const router = useRouter()
   const [username, setUsername] = React.useState<string>("")
-  const [display, setDisplay] = React.useState<string>("")
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -35,7 +40,7 @@ function Home() {
     router.push(
       {
         pathname: username,
-        query: { display },
+        query: { display: selectedDisplayCurrency?.id?.toString() ?? "USD" },
       },
       undefined,
       { shallow: true },
@@ -100,16 +105,24 @@ function Home() {
                               required
                             />
                             <label htmlFor="display">Enter your currency</label>
-                            <input
-                              type="text"
+                            <select
+                              style={{height: "42px"}}
                               name="display"
-                              value={display}
-                              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                                setDisplay(event.target.value)
-                              }
                               placeholder="USD"
                               required
-                            />
+                              onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
+                                const currencyId = event.target.value
+                                const newDisplayCurrency = displayCurrencyList?.find(item => item.id === currencyId)
+                                if (newDisplayCurrency){
+                                  setSelectedDisplayCurrency(newDisplayCurrency)
+                                }
+                              }}>
+                              {displayCurrencyList?.map((option) => (
+                                <option key={option.id} value={option.id}>
+                                  {option.id}
+                                </option>
+                              ))}
+                            </select>
                             <button>Submit</button>
                           </form>
                         </ListGroup.Item>
