@@ -66,7 +66,6 @@
   padding: 0.5rem;
 }
 
-
 .pay_new_btn {
   background-color: transparent;
   color: rgb(83, 111, 242);
@@ -77,19 +76,17 @@
   margin-bottom: 1rem;
 }
 
-
-
-.reference{
+.reference {
   word-break: break-all;
-  width:270px;
-  margin:auto
+  width: 270px;
+  margin: auto;
 }
 
-.backdrop{
+.backdrop {
   opacity: 1 !important;
   background-color: rgba(255, 255, 255, 1);
 }
 
-.link:hover{
-  text-decoration: none
+.link:hover {
+  text-decoration: none;
 }

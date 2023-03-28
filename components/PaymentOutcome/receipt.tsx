@@ -28,8 +28,7 @@ function receipt(props: Props) {
         </h1>
         <span>
           {" "}
-          $
-          {props.amount
+          ${props.amount
             ? formatOperand(props.amount?.toString())
             : "~ less than 1 cent"}{" "}
         </span>
