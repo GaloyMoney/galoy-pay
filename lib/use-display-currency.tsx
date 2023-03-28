@@ -16,23 +16,24 @@ gql`
 `
 
 const useDisplayCurrency = () => {
-  const [displayCurrencyList, setDisplayCurrencyList] = React.useState<CurrencyListQuery["currencyList"]>()
+  const [displayCurrencyList, setDisplayCurrencyList] =
+    React.useState<CurrencyListQuery["currencyList"]>()
   const [selectedDisplayCurrency, setSelectedDisplayCurrency] = React.useState<Currency>({
-    "id": "USD",
-    "name": "US Dollar",
-    "flag": "🇺🇸",
-    "__typename": "Currency",
-    "fractionDigits": 2,
-    "symbol": "$"
+    id: "USD",
+    name: "US Dollar",
+    flag: "🇺🇸",
+    __typename: "Currency",
+    fractionDigits: 2,
+    symbol: "$",
   })
   const [displayCurrencyFormatted, setDisplayCurrencyFormatted] = React.useState<string>(
-    `${selectedDisplayCurrency.symbol} 1.00`
+    `${selectedDisplayCurrency.symbol} 1.00`,
   )
 
   useCurrencyListQuery({
     onCompleted(data) {
       console.log("get currenecy list completed")
-      if (data.currencyList){
+      if (data.currencyList) {
         setDisplayCurrencyList(data.currencyList)
       }
     },
@@ -48,6 +49,6 @@ const useDisplayCurrency = () => {
     setSelectedDisplayCurrency,
     displayCurrencyFormatted,
     setDisplayCurrencyFormatted,
-  };
+  }
 }
 export default useDisplayCurrency

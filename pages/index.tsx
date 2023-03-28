@@ -25,11 +25,8 @@ function Home() {
     ? `https://mempool.space/signet/lightning/node/`
     : `https://mempool.space/lightning/node/`
   const { loading, error, data } = useQuery(GET_NODE_STATS)
-  const {
-    displayCurrencyList,
-    selectedDisplayCurrency,
-    setSelectedDisplayCurrency,
-  } = useDisplayCurrency()
+  const { displayCurrencyList, selectedDisplayCurrency, setSelectedDisplayCurrency } =
+    useDisplayCurrency()
 
   const router = useRouter()
   const [username, setUsername] = React.useState<string>("")
@@ -106,17 +103,20 @@ function Home() {
                             />
                             <label htmlFor="display">Enter your currency</label>
                             <select
-                              style={{height: "42px"}}
+                              style={{ height: "42px" }}
                               name="display"
                               placeholder="USD"
                               required
                               onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
                                 const currencyId = event.target.value
-                                const newDisplayCurrency = displayCurrencyList?.find(item => item.id === currencyId)
-                                if (newDisplayCurrency){
+                                const newDisplayCurrency = displayCurrencyList?.find(
+                                  (item) => item.id === currencyId,
+                                )
+                                if (newDisplayCurrency) {
                                   setSelectedDisplayCurrency(newDisplayCurrency)
                                 }
-                              }}>
+                              }}
+                            >
                               {displayCurrencyList?.map((option) => (
                                 <option key={option.id} value={option.id}>
                                   {option.id}
