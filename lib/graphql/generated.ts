@@ -1050,6 +1050,16 @@ export type SatAmountPayload = {
   readonly errors: ReadonlyArray<Error>
 }
 
+export type SelectedDisplayCurrency = {
+  readonly __typename: "SelectedDisplayCurrency"
+  readonly currency?: Maybe<Scalars["String"]>
+  readonly flag?: Maybe<Scalars["String"]>
+  readonly fractionDigits?: Maybe<Scalars["Int"]>
+  readonly id?: Maybe<Scalars["ID"]>
+  readonly name?: Maybe<Scalars["String"]>
+  readonly symbol?: Maybe<Scalars["String"]>
+}
+
 export type SettlementVia =
   | SettlementViaIntraLedger
   | SettlementViaLn
@@ -1401,18 +1411,48 @@ export type CurrencyListQuery = {
   readonly currencyList: ReadonlyArray<{
     readonly __typename: "Currency"
     readonly id: string
-    readonly name: string
     readonly flag: string
-    readonly fractionDigits: number
+    readonly name: string
     readonly symbol: string
+    readonly fractionDigits: number
   }>
 }
 
-export type RealtimePriceSubscriptionVariables = Exact<{
+export type RealtimePriceQueryVariables = Exact<{ [key: string]: never }>
+
+export type RealtimePriceQuery = {
+  readonly __typename: "Query"
+  readonly me?: {
+    readonly __typename: "User"
+    readonly id: string
+    readonly defaultAccount: {
+      readonly __typename: "ConsumerAccount"
+      readonly id: string
+      readonly realtimePrice: {
+        readonly __typename: "RealtimePrice"
+        readonly denominatorCurrency: string
+        readonly id: string
+        readonly timestamp: number
+        readonly btcSatPrice: {
+          readonly __typename: "PriceOfOneSatInMinorUnit"
+          readonly base: number
+          readonly offset: number
+        }
+        readonly usdCentPrice: {
+          readonly __typename: "PriceOfOneUsdCentInMinorUnit"
+          readonly base: number
+          readonly offset: number
+        }
+      }
+    }
+  } | null
+}
+
+export type RealtimePriceWsSubscriptionVariables = Exact<{
   currency: Scalars["DisplayCurrency"]
 }>
 
-export type RealtimePriceSubscription = {
+export type RealtimePriceWsSubscription = {
   readonly __typename: "Subscription"
   readonly realtimePrice: {
     readonly __typename: "RealtimePricePayload"
@@ -1583,12 +1623,12 @@ export type LnNoAmountInvoiceCreateOnBehalfOfRecipientMutationOptions =
 export const CurrencyListDocument = gql`
   query currencyList {
     currencyList {
-      id
-      name
-      flag
-      fractionDigits
-      symbol
       __typename
+      id
+      flag
+      name
+      symbol
+      fractionDigits
     }
   }
 `
@@ -1636,7 +1676,75 @@ export type CurrencyListQueryResult = Apollo.QueryResult<
   CurrencyListQueryVariables
 >
 export const RealtimePriceDocument = gql`
-  subscription realtimePrice($currency: DisplayCurrency!) {
+  query realtimePrice {
+    me {
+      id
+      defaultAccount {
+        id
+        realtimePrice {
+          btcSatPrice {
+            base
+            offset
+          }
+          denominatorCurrency
+          id
+          timestamp
+          usdCentPrice {
+            base
+            offset
+          }
+        }
+      }
+    }
+  }
+`
+
+/**
+ * __useRealtimePriceQuery__
+ *
+ * To run a query within a React component, call `useRealtimePriceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useRealtimePriceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRealtimePriceQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRealtimePriceQuery(
+  baseOptions?: Apollo.QueryHookOptions<RealtimePriceQuery, RealtimePriceQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<RealtimePriceQuery, RealtimePriceQueryVariables>(
+    RealtimePriceDocument,
+    options,
+  )
+}
+export function useRealtimePriceLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    RealtimePriceQuery,
+    RealtimePriceQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<RealtimePriceQuery, RealtimePriceQueryVariables>(
+    RealtimePriceDocument,
+    options,
+  )
+}
+export type RealtimePriceQueryHookResult = ReturnType<typeof useRealtimePriceQuery>
+export type RealtimePriceLazyQueryHookResult = ReturnType<
+  typeof useRealtimePriceLazyQuery
+>
+export type RealtimePriceQueryResult = Apollo.QueryResult<
+  RealtimePriceQuery,
+  RealtimePriceQueryVariables
+>
+export const RealtimePriceWsDocument = gql`
+  subscription realtimePriceWs($currency: DisplayCurrency!) {
     realtimePrice(input: { currency: $currency }) {
       errors {
         message
@@ -1658,38 +1766,38 @@ export const RealtimePriceDocument = gql`
 `
 
 /**
- * __useRealtimePriceSubscription__
+ * __useRealtimePriceWsSubscription__
  *
- * To run a query within a React component, call `useRealtimePriceSubscription` and pass it any options that fit your needs.
- * When your component renders, `useRealtimePriceSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useRealtimePriceWsSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useRealtimePriceWsSubscription` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useRealtimePriceSubscription({
+ * const { data, loading, error } = useRealtimePriceWsSubscription({
  *   variables: {
  *      currency: // value for 'currency'
  *   },
  * });
  */
-export function useRealtimePriceSubscription(
+export function useRealtimePriceWsSubscription(
   baseOptions: Apollo.SubscriptionHookOptions<
-    RealtimePriceSubscription,
-    RealtimePriceSubscriptionVariables
+    RealtimePriceWsSubscription,
+    RealtimePriceWsSubscriptionVariables
   >,
 ) {
   const options = { ...defaultOptions, ...baseOptions }
   return Apollo.useSubscription<
-    RealtimePriceSubscription,
-    RealtimePriceSubscriptionVariables
-  >(RealtimePriceDocument, options)
+    RealtimePriceWsSubscription,
+    RealtimePriceWsSubscriptionVariables
+  >(RealtimePriceWsDocument, options)
 }
-export type RealtimePriceSubscriptionHookResult = ReturnType<
-  typeof useRealtimePriceSubscription
+export type RealtimePriceWsSubscriptionHookResult = ReturnType<
+  typeof useRealtimePriceWsSubscription
 >
-export type RealtimePriceSubscriptionResult =
-  Apollo.SubscriptionResult<RealtimePriceSubscription>
+export type RealtimePriceWsSubscriptionResult =
+  Apollo.SubscriptionResult<RealtimePriceWsSubscription>
 export const PriceDocument = gql`
   subscription price(
     $amount: SatAmount!

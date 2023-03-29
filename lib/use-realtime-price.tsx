@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client"
 import * as React from "react"
-import { useRealtimePriceSubscription } from "../lib/graphql/generated"
+import { useRealtimePriceWsSubscription } from "../lib/graphql/generated"
 
 gql`
-  subscription realtimePrice($currency: DisplayCurrency!) {
+  subscription realtimePriceWs($currency: DisplayCurrency!) {
     realtimePrice(input: { currency: $currency }) {
       errors {
         message
@@ -27,13 +27,18 @@ gql`
 const useRealtimePrice = (currency: string) => {
   const priceRef = React.useRef<number>(0)
 
-  const { data } = useRealtimePriceSubscription({
+  const { data } = useRealtimePriceWsSubscription({
     variables: { currency },
   })
 
   const conversions = React.useMemo(
     () => ({
-      satsToCurrency: (sats: number) => (sats * priceRef.current) / 100,
+      satsToCurrency: (sats: number, fractionDigits: number) => {
+        if (fractionDigits === 2) {
+          return (sats * priceRef.current) / 100
+        }
+        return sats * priceRef.current
+      },
     }),
     [priceRef],
   )

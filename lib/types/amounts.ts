@@ -125,3 +125,8 @@ export const isNonZeroMoneyAmount = (
 ): moneyAmount is MoneyAmount<WalletOrDisplayCurrency> => {
   return moneyAmount !== undefined && moneyAmount.amount !== 0
 }
+
+export type ConvertMoneyAmount = <W extends WalletOrDisplayCurrency>(
+  moneyAmount: MoneyAmount<WalletOrDisplayCurrency>,
+  toCurrency: W,
+) => MoneyAmount<W>

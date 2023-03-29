@@ -1,16 +1,18 @@
-import React from "react"
+import React, { useEffect } from "react"
 import Card from "react-bootstrap/Card"
 import Col from "react-bootstrap/Col"
 import Container from "react-bootstrap/Container"
 import Jumbotron from "react-bootstrap/Jumbotron"
 import ListGroup from "react-bootstrap/ListGroup"
 import Row from "react-bootstrap/Row"
-
 import { gql, useQuery } from "@apollo/client"
 
 import { GRAPHQL_URI } from "../lib/config"
 import { useRouter } from "next/router"
-import useDisplayCurrency from "../lib/use-display-currency"
+import { useDisplayCurrency } from "../lib/use-display-currency"
+import { usePriceConversion } from "../lib/use-price-conversion"
+import { useCurrencyListQuery } from "../lib/graphql/generated"
+import { DisplayCurrency } from "../lib/types/amounts"
 
 const GET_NODE_STATS = gql`
   query nodeIds {
@@ -25,8 +27,10 @@ function Home() {
     ? `https://mempool.space/signet/lightning/node/`
     : `https://mempool.space/lightning/node/`
   const { loading, error, data } = useQuery(GET_NODE_STATS)
-  const { displayCurrencyList, selectedDisplayCurrency, setSelectedDisplayCurrency } =
-    useDisplayCurrency()
+  const { formatCurrency } = useDisplayCurrency()
+  const result = usePriceConversion()
+  const { data: currencyData } = useCurrencyListQuery()
+  const [selectedDisplayCurrency, setSelectedDisplayCurrency] = React.useState("EUR")
 
   const router = useRouter()
   const [username, setUsername] = React.useState<string>("")
@@ -37,7 +41,7 @@ function Home() {
     router.push(
       {
         pathname: username,
-        query: { display: selectedDisplayCurrency?.id?.toString() ?? "USD" },
+        query: { display: selectedDisplayCurrency ?? "USD" },
       },
       undefined,
       { shallow: true },
@@ -109,15 +113,22 @@ function Home() {
                               required
                               onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
                                 const currencyId = event.target.value
-                                const newDisplayCurrency = displayCurrencyList?.find(
-                                  (item) => item.id === currencyId,
-                                )
+                                const newDisplayCurrency =
+                                  currencyData?.currencyList?.find(
+                                    (item) => item.id === currencyId,
+                                  )
                                 if (newDisplayCurrency) {
-                                  setSelectedDisplayCurrency(newDisplayCurrency)
+                                  setSelectedDisplayCurrency(newDisplayCurrency.id)
+                                  const formatted = formatCurrency({
+                                    amountInMajorUnits: 1,
+                                    currency: newDisplayCurrency.id,
+                                    withSign: true,
+                                  })
+                                  console.log("fomatted", formatted)
                                 }
                               }}
                             >
-                              {displayCurrencyList?.map((option) => (
+                              {currencyData?.currencyList?.map((option) => (
                                 <option key={option.id} value={option.id}>
                                   {option.id}
                                 </option>

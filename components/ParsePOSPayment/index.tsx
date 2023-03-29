@@ -1,5 +1,5 @@
 import { useRouter } from "next/router"
-import React from "react"
+import React, { useEffect } from "react"
 import Container from "react-bootstrap/Container"
 import Image from "react-bootstrap/Image"
 import useSatPrice from "../../lib/use-sat-price"
@@ -10,6 +10,7 @@ import Memo from "../Memo"
 import DigitButton from "./Digit-Button"
 import styles from "./parse-payment.module.css"
 import ReceiveInvoice from "./Receive-Invoice"
+import { useDisplayCurrency } from "../../lib/use-display-currency"
 
 function isRunningStandalone() {
   return window.matchMedia("(display-mode: standalone)").matches
@@ -37,6 +38,8 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   const { usdToSats, satsToUsd } = useSatPrice()
   const { display } = parseDisplayCurrency(router.query)
   const { satsToCurrency } = useRealtimePrice(display)
+  const { formatCurrency, currencyList } = useDisplayCurrency()
+  const [formattedCurrencyAmount, setFormattedCurrencyAmount] = React.useState("$0.00")
 
   const { username, amount, sats, unit, memo } = router.query
 
@@ -160,11 +163,24 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount, sats, unit, dispatch])
 
-  const calcDisplayCurrencyAmount =
-    satsToCurrency(Number(sats)) < 0.01 || isNaN(satsToCurrency(Number(sats)))
-      ? "(less than 1 cent)"
-      : satsToCurrency(Number(sats)).toFixed(2)
-  console.log(`Price for  ${sats} in ${display} is: `, calcDisplayCurrencyAmount)
+  useEffect(() => {
+    const fractionDigits =
+      currencyList?.find((c) => c.id === display)?.fractionDigits ?? 2
+    // state.currentAmount
+    const convertedCurrencyAmount = satsToCurrency(Number(sats), fractionDigits)
+    let formattedCurrency = formatCurrency({
+      amountInMajorUnits: convertedCurrencyAmount,
+      currency: display,
+      withSign: true,
+    })
+    if ((display === "USD" || display === "EUR") && convertedCurrencyAmount < 0.01) {
+      formattedCurrency = "(less than 1 cent)"
+    }
+    setFormattedCurrencyAmount(formattedCurrency)
+    console.log(
+      `Price for ${sats} sats in ${display} is: ${convertedCurrencyAmount} formatted as ${formattedCurrency}`,
+    )
+  }, [sats, formatCurrency, display, satsToCurrency, currencyList])
 
   return (
     <Container className={styles.digits_container}>
@@ -187,7 +203,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
             !unit || unit === AmountUnit.Cent ? styles.zero_order : styles.first_order
           }`}
         >
-          {valueInUSD}
+          {formattedCurrencyAmount}
         </div>
         <div
           className={`${unit === AmountUnit.Sat ? styles.zero_order : styles.first_order}
