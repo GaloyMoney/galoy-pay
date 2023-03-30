@@ -2,10 +2,9 @@ import { useRouter } from "next/router"
 import React, { useEffect } from "react"
 import Container from "react-bootstrap/Container"
 import Image from "react-bootstrap/Image"
-import useSatPrice from "../../lib/use-sat-price"
 import useRealtimePrice from "../../lib/use-realtime-price"
 import { ACTION_TYPE, ACTIONS } from "../../pages/_reducer"
-import { formatOperand, parseDisplayCurrency } from "../../utils/utils"
+import { parseDisplayCurrency } from "../../utils/utils"
 import Memo from "../Memo"
 import DigitButton from "./Digit-Button"
 import styles from "./parse-payment.module.css"
@@ -35,31 +34,32 @@ export enum AmountUnit {
 
 function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Props) {
   const router = useRouter()
-  const { usdToSats, satsToUsd } = useSatPrice()
   const { display } = parseDisplayCurrency(router.query)
-  const { satsToCurrency } = useRealtimePrice(display)
+  const { currencyToSats, satsToCurrency } = useRealtimePrice(display)
   const { formatCurrency, currencyList } = useDisplayCurrency()
-  const [formattedCurrencyAmount, setFormattedCurrencyAmount] = React.useState("$0.00")
-
+  const [valueInFiat, setValueInFiat] = React.useState("$0.00")
+  const [valueInSats, setValueInSats] = React.useState(0)
+  const [fractionDigits, setFractionDigits] = React.useState(2)
   const { username, amount, sats, unit, memo } = router.query
-
-  const value = usdToSats(Number(state.currentAmount)).toFixed()
-
-  const calcUsdOrCentAmount =
-    satsToUsd(Number(sats)) < 0.01 || isNaN(satsToUsd(Number(sats)))
-      ? "(less than 1 cent)"
-      : satsToUsd(Number(sats)).toFixed(2)
-
-  const valueInUSD = `$ ${
-    unit === AmountUnit.Sat ? calcUsdOrCentAmount : formatOperand(state.currentAmount)
-  }`
-  const valueInSats = `≈ ${
-    unit === AmountUnit.Sat
-      ? formatOperand(state.currentAmount)
-      : formatOperand(value.toString())
-  } sats `
-
   const prevUnit = React.useRef(AmountUnit.Cent)
+
+  // load up all query params on first load, even if they are not passed
+  useEffect(() => {
+    router.push(
+      {
+        pathname: `${username}`,
+        query: {
+          amount: amount ?? 0,
+          sats: sats ?? 0,
+          unit: unit ?? "SAT",
+          memo: memo ?? "",
+          display: display ?? "USD",
+        },
+      },
+      undefined,
+      { shallow: true },
+    )
+  }, [])
 
   const updateCurrentAmountWithParams = React.useCallback((): UpdateAmount => {
     if (unit === AmountUnit.Sat) {
@@ -105,14 +105,23 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   // Update Params From Current Amount
   React.useEffect(() => {
     if (!unit) return
-    const amount =
-      unit === AmountUnit.Sat
-        ? satsToUsd(state.currentAmount).toFixed(2)
-        : state.currentAmount
+
+    const { convertedCurrencyAmount, formattedCurrency } = satsToCurrency(
+      state.currentAmount,
+      display,
+      fractionDigits,
+    )
+    const amount = unit === AmountUnit.Sat ? convertedCurrencyAmount : state.currentAmount
+    setValueInFiat(formattedCurrency)
+    console.log("amountConversion", amount)
+
     const sats =
       unit === AmountUnit.Sat
         ? state.currentAmount
-        : usdToSats(Number(state.currentAmount)).toFixed()
+        : currencyToSats(Number(state.currentAmount), display, fractionDigits)
+            .convertedCurrencyAmount
+    setValueInSats(sats)
+    console.log("satsConversion", sats)
 
     router.push(
       {
@@ -136,22 +145,40 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   React.useEffect(() => {
     if (!unit || unit === prevUnit.current) return
     if (unit === AmountUnit.Cent) {
+      const { convertedCurrencyAmount } = currencyToSats(
+        Number(amount),
+        display,
+        fractionDigits,
+      )
       dispatch({
         type: ACTIONS.SET_AMOUNT_FROM_PARAMS,
-        payload: satsToUsd(state.currentAmount).toFixed(2).toString(),
+        payload: convertedCurrencyAmount.toString(),
       })
     }
     if (unit === AmountUnit.Sat) {
+      const { convertedCurrencyAmount } = satsToCurrency(
+        Number(sats),
+        display,
+        fractionDigits,
+      )
       dispatch({
         type: ACTIONS.SET_AMOUNT_FROM_PARAMS,
-        payload: value?.toString(),
+        payload: convertedCurrencyAmount?.toString(),
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unit])
 
+  // Update Fraction Digits
+  React.useEffect(() => {
+    const numDigits = currencyList?.find((c) => c.id === display)?.fractionDigits ?? 2
+    setFractionDigits(numDigits)
+    console.log("update fraction digits", numDigits)
+  }, [fractionDigits, display, currencyList])
+
   // Update Current Amount From Params
   React.useEffect(() => {
+    console.log("dispatch changed locally", amount, sats, unit)
     if (!unit || !sats || !amount) return
     const { shouldUpdate, value } = updateCurrentAmountWithParams()
     if (shouldUpdate && value) {
@@ -163,24 +190,14 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount, sats, unit, dispatch])
 
-  useEffect(() => {
-    const fractionDigits =
-      currencyList?.find((c) => c.id === display)?.fractionDigits ?? 2
-    // state.currentAmount
-    const convertedCurrencyAmount = satsToCurrency(Number(sats), fractionDigits)
-    let formattedCurrency = formatCurrency({
-      amountInMajorUnits: convertedCurrencyAmount,
-      currency: display,
-      withSign: true,
-    })
-    if ((display === "USD" || display === "EUR") && convertedCurrencyAmount < 0.01) {
-      formattedCurrency = "(less than 1 cent)"
-    }
-    setFormattedCurrencyAmount(formattedCurrency)
-    console.log(
-      `Price for ${sats} sats in ${display} is: ${convertedCurrencyAmount} formatted as ${formattedCurrency}`,
-    )
-  }, [sats, formatCurrency, display, satsToCurrency, currencyList])
+  // useEffect(() => {
+  //   const { convertedCurrencyAmount, formattedCurrency } = satsToCurrency(Number(sats), display, fractionDigits)
+  //   console.log("convertedCurrencyAmount", convertedCurrencyAmount)
+  //   setValueInFiat(formattedCurrency)
+  //   console.log(
+  //     `SATS Convertsion Price for ${sats} sats in ${display} is: ${convertedCurrencyAmount} formatted as ${formattedCurrency}`,
+  //   )
+  // }, [sats, formatCurrency, display, satsToCurrency, currencyList, fractionDigits])
 
   return (
     <Container className={styles.digits_container}>
@@ -203,13 +220,17 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
             !unit || unit === AmountUnit.Cent ? styles.zero_order : styles.first_order
           }`}
         >
-          {formattedCurrencyAmount}
+          {formatCurrency({
+            amountInMajorUnits: Number(amount),
+            currency: display,
+            withSign: true,
+          }) ?? "$0.00"}
         </div>
         <div
           className={`${unit === AmountUnit.Sat ? styles.zero_order : styles.first_order}
           }`}
         >
-          {unit === AmountUnit.Cent ? valueInSats : valueInSats.slice(1, -1)}
+          {valueInSats} sats
         </div>
         {state.createdInvoice ? null : (
           <button title="toggle currency" onClick={() => toggleCurrency()}>

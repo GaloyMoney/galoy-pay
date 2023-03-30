@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client"
 import * as React from "react"
 import { useRealtimePriceWsSubscription } from "../lib/graphql/generated"
+import { useDisplayCurrency } from "../lib/use-display-currency"
 
 gql`
   subscription realtimePriceWs($currency: DisplayCurrency!) {
@@ -26,6 +27,7 @@ gql`
 
 const useRealtimePrice = (currency: string) => {
   const priceRef = React.useRef<number>(0)
+  const { formatCurrency } = useDisplayCurrency()
 
   const { data } = useRealtimePriceWsSubscription({
     variables: { currency },
@@ -33,14 +35,42 @@ const useRealtimePrice = (currency: string) => {
 
   const conversions = React.useMemo(
     () => ({
-      satsToCurrency: (sats: number, fractionDigits: number) => {
-        if (fractionDigits === 2) {
-          return (sats * priceRef.current) / 100
+      satsToCurrency: (sats: number, display: string, fractionDigits: number) => {
+        const convertedCurrencyAmount =
+          fractionDigits === 2 ? (sats * priceRef.current) / 100 : sats * priceRef.current
+        const formattedCurrency = formatCurrency({
+          amountInMajorUnits: convertedCurrencyAmount,
+          currency: display,
+          withSign: true,
+        })
+        // if ((display === "USD" || display === "EUR") && convertedCurrencyAmount < 0.01) {
+        //   formattedCurrency = "0"
+        // }
+        return {
+          convertedCurrencyAmount,
+          formattedCurrency,
         }
-        return sats * priceRef.current
+      },
+      currencyToSats: (currency: number, display: string, fractionDigits: number) => {
+        const convertedCurrencyAmount =
+          fractionDigits === 2
+            ? (100 * currency) / priceRef.current
+            : currency / priceRef.current
+        const formattedCurrency = formatCurrency({
+          amountInMajorUnits: convertedCurrencyAmount,
+          currency: display,
+          withSign: true,
+        })
+        // if ((display === "USD" || display === "EUR") && convertedCurrencyAmount < 0.01) {
+        //   formattedCurrency = "0"
+        // }
+        return {
+          convertedCurrencyAmount,
+          formattedCurrency,
+        }
       },
     }),
-    [priceRef],
+    [priceRef, formatCurrency],
   )
 
   if (data?.realtimePrice?.realtimePrice?.btcSatPrice) {
@@ -50,7 +80,18 @@ const useRealtimePrice = (currency: string) => {
 
   if (priceRef.current === 0) {
     return {
-      satsToCurrency: () => NaN,
+      satsToCurrency: () => {
+        return {
+          convertedCurrencyAmount: NaN,
+          formattedCurrency: "0",
+        }
+      },
+      currencyToSats: () => {
+        return {
+          convertedCurrencyAmount: NaN,
+          formattedCurrency: "0",
+        }
+      },
     }
   }
 
