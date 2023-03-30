@@ -124,7 +124,7 @@ function Home() {
                                     currency: newDisplayCurrency.id,
                                     withSign: true,
                                   })
-                                  console.log("fomatted", formatted)
+                                  console.log("formatted", formatted)
                                 }
                               }}
                             >
