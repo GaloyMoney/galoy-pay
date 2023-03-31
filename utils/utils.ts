@@ -35,3 +35,24 @@ export function parseDisplayCurrency(query: ParsedUrlQuery) {
     display: display || "USD",
   }
 }
+
+export function safeAmount(amount: any, hasLeadingZeros?: boolean) {
+  try {
+    if (isNaN(amount)) return 0
+    const theSafeAmount = (
+      amount !== "NaN" &&
+      amount !== undefined &&
+      amount !== "" &&
+      typeof amount === "string"
+        ? !amount?.includes("NaN")
+        : true
+    )
+      ? amount
+      : 0
+    console.log("safeAmount", Number(theSafeAmount))
+    return Number(theSafeAmount)
+  } catch (e) {
+    console.log("safeAmountError", e)
+    return 0
+  }
+}

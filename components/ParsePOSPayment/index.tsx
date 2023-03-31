@@ -4,13 +4,15 @@ import Container from "react-bootstrap/Container"
 import Image from "react-bootstrap/Image"
 import useRealtimePrice from "../../lib/use-realtime-price"
 import { ACTION_TYPE, ACTIONS } from "../../pages/_reducer"
-import { parseDisplayCurrency } from "../../utils/utils"
+import { parseDisplayCurrency, safeAmount } from "../../utils/utils"
 import Memo from "../Memo"
 import DigitButton from "./Digit-Button"
 import styles from "./parse-payment.module.css"
 import ReceiveInvoice from "./Receive-Invoice"
 import { useDisplayCurrency } from "../../lib/use-display-currency"
-import { Currency } from "../../lib/graphql/generated"
+import { Currency, RealtimePriceWsSubscription } from "../../lib/graphql/generated"
+import { ParsedUrlQuery } from "querystring"
+import { SubscriptionResult } from "@apollo/client"
 
 function isRunningStandalone() {
   return window.matchMedia("(display-mode: standalone)").matches
@@ -33,64 +35,68 @@ export enum AmountUnit {
   Cent = "CENT",
 }
 
+const defaultCurrencyMetadata: Currency = {
+  id: "USD",
+  flag: "🇺🇸",
+  name: "US Dollar",
+  symbol: "$",
+  fractionDigits: 2,
+  __typename: "Currency",
+}
+
 function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Props) {
   const router = useRouter()
   const { username, amount, sats, unit, memo } = router.query
   const { display } = parseDisplayCurrency(router.query)
   const [hasLoaded, setHasLoaded] = React.useState(false)
-  const { currencyToSats, satsToCurrency } = useRealtimePrice(display, (data) => {
-    console.log("hasLoaded", hasLoaded)
-    // on first load, compute the conversion rate
-    if (!hasLoaded){
-      if (unit === AmountUnit.Sat) {
-        state.currentAmount = sats
-      } else {
-        state.currentAmount = amount
-      }
-    }
-    setHasLoaded(true)
-    console.log("got sub data", data)
-  })
+  const { currencyToSats, satsToCurrency } = useRealtimePrice(display, handleRealtimePriceSubscriptionData)
   const { currencyList } = useDisplayCurrency()
   const [valueInFiat, setValueInFiat] = React.useState("0.00")
   const [valueInSats, setValueInSats] = React.useState(0)
-  const [currencyMetadata, setCurrencyMetadata] = React.useState<Currency>({
-    id: "USD",
-    flag: "🇺🇸",
-    name: "US Dollar",
-    symbol: "$",
-    fractionDigits: 2,
-    __typename: "Currency",
-  })
+  const [currentAmount, setCurrentAmount] = React.useState(state.currentAmount)
+  const [currencyMetadata, setCurrencyMetadata] = React.useState<Currency>(defaultCurrencyMetadata)
 
   const prevUnit = React.useRef(AmountUnit.Cent)
 
+  // onload
   // load up all query params on first load, even if they are not passed
   useEffect(() => {
-    console.log("initialAmount", amount)
-    const initialAmount = safeAmount(amount)
-    const initialSats = safeAmount(sats)
+    const initialAmount = safeAmount(amount).toString()
+    const initialSats = safeAmount(sats).toString()
     const initialDisplay = display ?? "USD"
     const initialUnit = unit ?? "SAT"
-    router.push(
-      {
-        pathname: `${username}`,
-        query: {
-          amount: initialAmount,
-          sats: initialSats,
-          unit: initialUnit,
-          memo: memo ?? "",
-          display: initialDisplay,
+    const inititalQuery = router.query
+    console.log('Initial query:', inititalQuery)
+    const newQuery: ParsedUrlQuery = {
+      amount: initialAmount,
+      sats: initialSats,
+      unit: initialUnit,
+      memo: memo ?? "",
+      display: initialDisplay,
+    }
+    console.log('New query:', newQuery)
+    if (inititalQuery !== newQuery) {
+      router.push(
+        {
+          pathname: `${username}`,
+          query: {
+            amount: initialAmount,
+            sats: initialSats,
+            unit: initialUnit,
+            memo: memo ?? "",
+            display: initialDisplay,
+          },
         },
-      },
-      undefined,
-      { shallow: true },
-    )
+        undefined,
+        { shallow: true },
+      )
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const updateCurrentAmountWithParams = React.useCallback((): UpdateAmount => {
     if (unit === AmountUnit.Sat) {
-      if (sats === state.currentAmount) {
+      if (sats === currentAmount) {
         return {
           shouldUpdate: false,
           value: null,
@@ -102,14 +108,14 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
         }
       }
     } else {
-      if (Number(amount) === Number(state.currentAmount)) {
+      if (Number(amount) === Number(currentAmount)) {
         return { shouldUpdate: false, value: null }
       } else if (amount) {
         return { shouldUpdate: true, value: amount.toString() }
       }
     }
     return { shouldUpdate: false, value: null }
-  }, [amount, sats, unit, state.currentAmount])
+  }, [amount, sats, unit, currentAmount])
 
   const toggleCurrency = () => {
     const newUnit = unit === AmountUnit.Sat ? AmountUnit.Cent : AmountUnit.Sat
@@ -132,55 +138,67 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   }
 
   // Update Params From Current Amount
-  React.useEffect(() => {
+  const handleAmountChange = (skipRouterPush?: boolean) => {
     if (!unit) return
-
     const { convertedCurrencyAmount } = satsToCurrency(
-      state.currentAmount,
+      currentAmount,
       display,
       currencyMetadata.fractionDigits,
     )
-    let amount = unit === AmountUnit.Sat ? convertedCurrencyAmount : state.currentAmount
+    let amt = unit === AmountUnit.Sat ? convertedCurrencyAmount : currentAmount
     if (unit === AmountUnit.Sat || currencyMetadata.fractionDigits === 0) {
-       // format the fiat
-        amount = safeAmount(amount)
-        amount =
+      // format the fiat
+      amt = safeAmount(amt)
+      amt =
           currencyMetadata.fractionDigits === 0
-            ? amount.toFixed()
-            : amount.toFixed(currencyMetadata.fractionDigits)
+            ? amt.toFixed()
+            : amt.toFixed(currencyMetadata.fractionDigits)
     }
 
-    setValueInFiat(amount)
-    console.log("amountConversion", amount)
-
+    setValueInFiat(amt)
+    console.log("amountConversion", amt)
     let sats =
       unit === AmountUnit.Sat
-        ? state.currentAmount
+        ? currentAmount
         : currencyToSats(
-            Number(state.currentAmount),
+            Number(currentAmount),
             display,
             currencyMetadata.fractionDigits,
           ).convertedCurrencyAmount
     sats = safeAmount(sats).toFixed()
     setValueInSats(sats)
     console.log("satsConversion", sats)
-
-    router.push(
-      {
-        pathname: `${username}`,
-        query: {
-          amount,
-          sats,
-          currency: defaultWalletCurrency,
-          unit,
-          memo,
-          display,
+    const newQuery = {
+      amount: amt,
+      sats,
+      currency: defaultWalletCurrency,
+      unit,
+      memo,
+      display,
+    }
+    if (router.query !== newQuery && !skipRouterPush) {
+      router.push(
+        {
+          pathname: `${username}`,
+          query: newQuery,
         },
-      },
-      undefined,
-      { shallow: true },
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        undefined,
+        { shallow: true },
+      )
+    }
+  }
+  React.useEffect(handleAmountChange, [currentAmount])
+
+
+  function handleRealtimePriceSubscriptionData(subscriptionResult: SubscriptionResult<RealtimePriceWsSubscription>) {
+    console.log("got subscription data new realtime price", subscriptionResult?.data?.realtimePrice)
+    console.log("hasLoaded", hasLoaded)
+    // TODO on first load, compute the conversion rate and set the amount or sats
+    if (!hasLoaded) setHasLoaded(true)
+  }
+
+  React.useEffect(()=>{
+    setCurrentAmount(state.currentAmount)
   }, [state.currentAmount])
 
   // Toggle Current Amount
@@ -353,27 +371,6 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
       </div>
     </Container>
   )
-}
-
-function safeAmount(amount: any, hasLeadingZeros?: boolean) {
-  try {
-    if (isNaN(amount)) return 0
-    const theSafeAmount = (
-      amount !== "NaN" &&
-      amount !== undefined &&
-      amount !== "" &&
-      typeof amount === "string"
-        ? !amount?.includes("NaN")
-        : true
-    )
-      ? amount
-      : 0
-    console.log("safeAmount", Number(theSafeAmount))
-    return Number(theSafeAmount)
-  } catch (e) {
-    console.log("safeAmountError", e)
-    return 0
-  }
 }
 
 export default ParsePayment
