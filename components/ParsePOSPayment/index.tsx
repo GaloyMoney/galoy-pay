@@ -49,12 +49,17 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   const { username, amount, sats, unit, memo } = router.query
   const { display } = parseDisplayCurrency(router.query)
   const [hasLoaded, setHasLoaded] = React.useState(false)
-  const { currencyToSats, satsToCurrency } = useRealtimePrice(display, handleRealtimePriceSubscriptionData)
+  const { currencyToSats, satsToCurrency } = useRealtimePrice(
+    display,
+    handleRealtimePriceSubscriptionData,
+  )
   const { currencyList } = useDisplayCurrency()
   const [valueInFiat, setValueInFiat] = React.useState("0.00")
   const [valueInSats, setValueInSats] = React.useState(0)
   const [currentAmount, setCurrentAmount] = React.useState(state.currentAmount)
-  const [currencyMetadata, setCurrencyMetadata] = React.useState<Currency>(defaultCurrencyMetadata)
+  const [currencyMetadata, setCurrencyMetadata] = React.useState<Currency>(
+    defaultCurrencyMetadata,
+  )
 
   const prevUnit = React.useRef(AmountUnit.Cent)
 
@@ -66,7 +71,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     const initialDisplay = display ?? "USD"
     const initialUnit = unit ?? "SAT"
     const inititalQuery = router.query
-    console.log('Initial query:', inititalQuery)
+    console.log("Initial query:", inititalQuery)
     const newQuery: ParsedUrlQuery = {
       amount: initialAmount,
       sats: initialSats,
@@ -74,7 +79,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
       memo: memo ?? "",
       display: initialDisplay,
     }
-    console.log('New query:', newQuery)
+    console.log("New query:", newQuery)
     if (inititalQuery !== newQuery) {
       router.push(
         {
@@ -91,7 +96,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
         { shallow: true },
       )
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const updateCurrentAmountWithParams = React.useCallback((): UpdateAmount => {
@@ -129,7 +134,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           memo,
           display,
           amount,
-          sats
+          sats,
         },
       },
       undefined,
@@ -150,9 +155,9 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
       // format the fiat
       amt = safeAmount(amt)
       amt =
-          currencyMetadata.fractionDigits === 0
-            ? amt.toFixed()
-            : amt.toFixed(currencyMetadata.fractionDigits)
+        currencyMetadata.fractionDigits === 0
+          ? amt.toFixed()
+          : amt.toFixed(currencyMetadata.fractionDigits)
     }
 
     setValueInFiat(amt)
@@ -160,11 +165,8 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     let sats =
       unit === AmountUnit.Sat
         ? currentAmount
-        : currencyToSats(
-            Number(currentAmount),
-            display,
-            currencyMetadata.fractionDigits,
-          ).convertedCurrencyAmount
+        : currencyToSats(Number(currentAmount), display, currencyMetadata.fractionDigits)
+            .convertedCurrencyAmount
     sats = safeAmount(sats).toFixed()
     setValueInSats(sats)
     console.log("satsConversion", sats)
@@ -189,15 +191,19 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   }
   React.useEffect(handleAmountChange, [currentAmount])
 
-
-  function handleRealtimePriceSubscriptionData(subscriptionResult: SubscriptionResult<RealtimePriceWsSubscription>) {
-    console.log("got subscription data new realtime price", subscriptionResult?.data?.realtimePrice)
+  function handleRealtimePriceSubscriptionData(
+    subscriptionResult: SubscriptionResult<RealtimePriceWsSubscription>,
+  ) {
+    console.log(
+      "got subscription data new realtime price",
+      subscriptionResult?.data?.realtimePrice,
+    )
     console.log("hasLoaded", hasLoaded)
     // TODO on first load, compute the conversion rate and set the amount or sats
     if (!hasLoaded) setHasLoaded(true)
   }
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     setCurrentAmount(state.currentAmount)
   }, [state.currentAmount])
 
