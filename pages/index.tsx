@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import Card from "react-bootstrap/Card"
 import Col from "react-bootstrap/Col"
 import Container from "react-bootstrap/Container"
@@ -10,9 +10,7 @@ import { gql, useQuery } from "@apollo/client"
 import { GRAPHQL_URI } from "../lib/config"
 import { useRouter } from "next/router"
 import { useDisplayCurrency } from "../lib/use-display-currency"
-import { usePriceConversion } from "../lib/use-price-conversion"
 import { useCurrencyListQuery } from "../lib/graphql/generated"
-import { DisplayCurrency } from "../lib/types/amounts"
 
 const GET_NODE_STATS = gql`
   query nodeIds {
@@ -28,7 +26,6 @@ function Home() {
     : `https://mempool.space/lightning/node/`
   const { loading, error, data } = useQuery(GET_NODE_STATS)
   const { formatCurrency } = useDisplayCurrency()
-  const result = usePriceConversion()
   const { data: currencyData } = useCurrencyListQuery()
   const [selectedDisplayCurrency, setSelectedDisplayCurrency] = React.useState("EUR")
 

@@ -1,6 +1,6 @@
-import { gql } from "@apollo/client"
+import { gql, SubscriptionResult } from "@apollo/client"
 import * as React from "react"
-import { useRealtimePriceWsSubscription } from "../lib/graphql/generated"
+import { RealtimePriceWsSubscription, useRealtimePriceWsSubscription } from "../lib/graphql/generated"
 import { useDisplayCurrency } from "../lib/use-display-currency"
 
 gql`
@@ -25,12 +25,18 @@ gql`
   }
 `
 
-const useRealtimePrice = (currency: string) => {
+const useRealtimePrice = (
+  currency: string,
+  onSubscriptionDataCallback?: (subscriptionData: SubscriptionResult<RealtimePriceWsSubscription, any>) => void
+) => {
   const priceRef = React.useRef<number>(0)
   const { formatCurrency } = useDisplayCurrency()
 
   const { data } = useRealtimePriceWsSubscription({
     variables: { currency },
+    onSubscriptionData({ subscriptionData }) {
+      if (onSubscriptionDataCallback) onSubscriptionDataCallback(subscriptionData)
+    },
   })
 
   const conversions = React.useMemo(

@@ -35,9 +35,23 @@ export enum AmountUnit {
 
 function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Props) {
   const router = useRouter()
+  const { username, amount, sats, unit, memo } = router.query
   const { display } = parseDisplayCurrency(router.query)
-  const { currencyToSats, satsToCurrency } = useRealtimePrice(display)
-  const { formatCurrency, currencyList } = useDisplayCurrency()
+  const [hasLoaded, setHasLoaded] = React.useState(false)
+  const { currencyToSats, satsToCurrency } = useRealtimePrice(display, (data) => {
+    console.log("hasLoaded", hasLoaded)
+    // on first load, compute the conversion rate
+    if (!hasLoaded){
+      if (unit === AmountUnit.Sat) {
+        state.currentAmount = sats
+      } else {
+        state.currentAmount = amount
+      }
+    }
+    setHasLoaded(true)
+    console.log("got sub data", data)
+  })
+  const { currencyList } = useDisplayCurrency()
   const [valueInFiat, setValueInFiat] = React.useState("0.00")
   const [valueInSats, setValueInSats] = React.useState(0)
   const [currencyMetadata, setCurrencyMetadata] = React.useState<Currency>({
@@ -48,7 +62,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     fractionDigits: 2,
     __typename: "Currency",
   })
-  const { username, amount, sats, unit, memo } = router.query
+
   const prevUnit = React.useRef(AmountUnit.Cent)
 
   // load up all query params on first load, even if they are not passed
@@ -56,15 +70,17 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     console.log("initialAmount", amount)
     const initialAmount = safeAmount(amount)
     const initialSats = safeAmount(sats)
+    const initialDisplay = display ?? "USD"
+    const initialUnit = unit ?? "SAT"
     router.push(
       {
         pathname: `${username}`,
         query: {
           amount: initialAmount,
           sats: initialSats,
-          unit: unit ?? "SAT",
+          unit: initialUnit,
           memo: memo ?? "",
-          display: display ?? "USD",
+          display: initialDisplay,
         },
       },
       undefined,
@@ -106,6 +122,8 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           unit: newUnit,
           memo,
           display,
+          amount,
+          sats
         },
       },
       undefined,
@@ -123,11 +141,15 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
       currencyMetadata.fractionDigits,
     )
     let amount = unit === AmountUnit.Sat ? convertedCurrencyAmount : state.currentAmount
-    amount = safeAmount(amount)
-    amount =
-      currencyMetadata.fractionDigits === 0
-        ? amount.toFixed()
-        : amount.toFixed(currencyMetadata.fractionDigits)
+    if (unit === AmountUnit.Sat || currencyMetadata.fractionDigits === 0) {
+       // format the fiat
+        amount = safeAmount(amount)
+        amount =
+          currencyMetadata.fractionDigits === 0
+            ? amount.toFixed()
+            : amount.toFixed(currencyMetadata.fractionDigits)
+    }
+
     setValueInFiat(amount)
     console.log("amountConversion", amount)
 
