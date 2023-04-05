@@ -27,7 +27,7 @@ function Home() {
   const { loading, error, data } = useQuery(GET_NODE_STATS)
   const { formatCurrency } = useDisplayCurrency()
   const { data: currencyData } = useCurrencyListQuery()
-  const [selectedDisplayCurrency, setSelectedDisplayCurrency] = React.useState("EUR")
+  const [selectedDisplayCurrency, setSelectedDisplayCurrency] = React.useState("USD")
 
   const router = useRouter()
   const [username, setUsername] = React.useState<string>("")
