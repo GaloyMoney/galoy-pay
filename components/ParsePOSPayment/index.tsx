@@ -32,7 +32,8 @@ interface UpdateAmount {
 
 export enum AmountUnit {
   Sat = "SAT",
-  Cent = "CENT",
+  Cent = "CENT", // TODO: eventually depreciate this for Fiat, but don't want to break existing POS links
+  Fiat = "FIAT",
 }
 
 const defaultCurrencyMetadata: Currency = {
@@ -48,8 +49,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   const router = useRouter()
   const { username, amount, sats, unit, memo } = router.query
   const { display } = parseDisplayCurrency(router.query)
-  const [hasLoaded, setHasLoaded] = React.useState(false)
-  const { currencyToSats, satsToCurrency } = useRealtimePrice(
+  const { currencyToSats, satsToCurrency, hasLoaded } = useRealtimePrice(
     display,
     handleRealtimePriceSubscriptionData,
   )
@@ -64,20 +64,24 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   const prevUnit = React.useRef(AmountUnit.Cent)
 
   // onload
-  // load up all query params on first load, even if they are not passed
+  // set all query params on first load, even if they are not passed
   useEffect(() => {
-    const initialAmount = safeAmount(amount).toString()
-    const initialSats = safeAmount(sats).toString()
-    const initialDisplay = display ?? "USD"
+    console.log("<onload effect>")
     const initialUnit = unit ?? "SAT"
-    const inititalQuery = router.query
+    const initialAmount = safeAmount(amount, undefined, "CENTS").toString()
+    const initialSats = safeAmount(sats, undefined, "SAT").toString()
+    const initialDisplay = display ?? "USD"
+    const inititalQuery = { ...router.query }
+    const initialUsername = router.query.username
     console.log("Initial query:", inititalQuery)
+    delete inititalQuery?.currency
     const newQuery: ParsedUrlQuery = {
       amount: initialAmount,
       sats: initialSats,
       unit: initialUnit,
       memo: memo ?? "",
       display: initialDisplay,
+      username: initialUsername,
     }
     console.log("New query:", newQuery)
     if (inititalQuery !== newQuery) {
@@ -96,10 +100,12 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
         { shallow: true },
       )
     }
+    console.log("</onload effect>")
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const updateCurrentAmountWithParams = React.useCallback((): UpdateAmount => {
+    console.log("<updateCurrentAmountWithParams effect>")
     if (unit === AmountUnit.Sat) {
       if (sats === currentAmount) {
         return {
@@ -119,6 +125,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
         return { shouldUpdate: true, value: amount.toString() }
       }
     }
+    console.log("</updateCurrentAmountWithParams effect>")
     return { shouldUpdate: false, value: null }
   }, [amount, sats, unit, currentAmount])
 
@@ -144,7 +151,8 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
 
   // Update Params From Current Amount
   const handleAmountChange = (skipRouterPush?: boolean) => {
-    if (!unit) return
+    console.log("<handleAmountChange effect>")
+    if (!unit || currentAmount === "") return
     const { convertedCurrencyAmount } = satsToCurrency(
       currentAmount,
       display,
@@ -153,7 +161,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     let amt = unit === AmountUnit.Sat ? convertedCurrencyAmount : currentAmount
     if (unit === AmountUnit.Sat || currencyMetadata.fractionDigits === 0) {
       // format the fiat
-      amt = safeAmount(amt)
+      amt = safeAmount(amt, undefined, "SAT")
       amt =
         currencyMetadata.fractionDigits === 0
           ? amt.toFixed()
@@ -167,7 +175,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
         ? currentAmount
         : currencyToSats(Number(currentAmount), display, currencyMetadata.fractionDigits)
             .convertedCurrencyAmount
-    sats = safeAmount(sats).toFixed()
+    sats = safeAmount(sats, undefined, "SAT").toFixed()
     setValueInSats(sats)
     console.log("satsConversion", sats)
     const newQuery = {
@@ -188,8 +196,10 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
         { shallow: true },
       )
     }
+    console.log("</handleAmountChange effect>")
   }
-  React.useEffect(handleAmountChange, [currentAmount])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  React.useEffect(handleAmountChange, [currentAmount, hasLoaded])
 
   function handleRealtimePriceSubscriptionData(
     subscriptionResult: SubscriptionResult<RealtimePriceWsSubscription>,
@@ -198,17 +208,16 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
       "got subscription data new realtime price",
       subscriptionResult?.data?.realtimePrice,
     )
-    console.log("hasLoaded", hasLoaded)
-    // TODO on first load, compute the conversion rate and set the amount or sats
-    if (!hasLoaded) setHasLoaded(true)
   }
 
   React.useEffect(() => {
+    console.log("<currentAmount change effect/>")
     setCurrentAmount(state.currentAmount)
   }, [state.currentAmount])
 
   // Toggle Current Amount
   React.useEffect(() => {
+    console.log("<unit change effect>")
     if (!unit || unit === prevUnit.current) return
     if (unit === AmountUnit.Cent) {
       const { convertedCurrencyAmount } = currencyToSats(
@@ -232,21 +241,24 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
         payload: convertedCurrencyAmount?.toString(),
       })
     }
+    console.log("</unit change effect>")
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unit])
 
   // Update CurrencyMetadata
   React.useEffect(() => {
+    console.log("<display, currencyList effect>")
     const latestCurrencyMetadata = currencyList?.find((c) => c.id === display)
     if (latestCurrencyMetadata) {
       setCurrencyMetadata(latestCurrencyMetadata)
       console.log("update latestCurrencyMetadata", latestCurrencyMetadata)
     }
+    console.log("</display, currencyList effect>")
   }, [display, currencyList])
 
   // Update Current Amount From Params
   React.useEffect(() => {
-    console.log("dispatch changed locally", amount, sats, unit)
+    console.log("<dispatch called>", amount, sats, unit)
     if (!unit || !sats || !amount) return
     const { shouldUpdate, value } = updateCurrentAmountWithParams()
     if (shouldUpdate && value) {
@@ -255,6 +267,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
         payload: value?.toString(),
       })
     }
+    console.log("</dispatch called>")
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount, sats, unit, dispatch])
 

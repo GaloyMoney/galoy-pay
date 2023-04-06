@@ -36,6 +36,7 @@ const useRealtimePrice = (
 ) => {
   const priceRef = React.useRef<number>(0)
   const { formatCurrency } = useDisplayCurrency()
+  const hasLoaded = React.useRef<boolean>(false)
 
   const { data } = useRealtimePriceWsSubscription({
     variables: { currency },
@@ -43,6 +44,13 @@ const useRealtimePrice = (
       if (onSubscriptionDataCallback) onSubscriptionDataCallback(subscriptionData)
     },
   })
+
+  React.useEffect(() => {
+    if (data && !hasLoaded.current) {
+      // Subscription data has loaded for the first time
+      hasLoaded.current = true
+    }
+  }, [data])
 
   const conversions = React.useMemo(
     () => ({
@@ -80,6 +88,7 @@ const useRealtimePrice = (
           formattedCurrency,
         }
       },
+      hasLoaded,
     }),
     [priceRef, formatCurrency],
   )
@@ -103,6 +112,7 @@ const useRealtimePrice = (
           formattedCurrency: "0",
         }
       },
+      hasLoaded: false,
     }
   }
 

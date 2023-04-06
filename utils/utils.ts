@@ -36,7 +36,7 @@ export function parseDisplayCurrency(query: ParsedUrlQuery) {
   }
 }
 
-export function safeAmount(amount: any, hasLeadingZeros?: boolean) {
+export function safeAmount(amount: any, hasLeadingZeros?: boolean, unit?: any) {
   try {
     if (isNaN(amount)) return 0
     const theSafeAmount = (
@@ -49,7 +49,7 @@ export function safeAmount(amount: any, hasLeadingZeros?: boolean) {
     )
       ? amount
       : 0
-    console.log("safeAmount", Number(theSafeAmount))
+    console.log("safeAmount", Number(theSafeAmount), ` ${unit}`)
     return Number(theSafeAmount)
   } catch (e) {
     console.log("safeAmountError", e)
