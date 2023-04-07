@@ -33,8 +33,9 @@ const USD_MAX_INVOICE_TIME = "5.00"
 function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: Props) {
   const OS = getOS()
   const deviceDetails = window.navigator.userAgent
+  const router = useRouter()
+  const { username, amount, unit, sats, memo } = router.query
 
-  const { username, amount, unit, sats, memo } = useRouter().query
   const { usdToSats, satsToUsd } = useSatPrice()
 
   const [expiredInvoiceError, setExpiredInvoiceError] = React.useState<string>("")
@@ -122,16 +123,30 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
   React.useEffect(() => {
     if (!walletId || !Number(paymentAmount)) return
 
+    let amt = paymentAmount
+    if (recipientWalletCurrency === "USD") {
+      if (!router.query.sats || typeof router.query.sats !== "string") {
+        alert("No sats amount provided")
+        return
+      } else {
+        const usdAmount = satsToUsd(Number(router.query.sats))
+        if (isNaN(usdAmount)) return
+        const cents = parseFloat(usdAmount.toFixed(2)) * 100
+        amt = cents.toFixed()
+      }
+    }
+    if (amt === null) return
+
     createInvoice({
       variables: {
         input: {
           recipientWalletId: walletId,
-          amount: Number(paymentAmount),
+          amount: Number(amt),
           ...(memo ? { memo: memo.toString() } : {}),
         },
       },
     })
-  }, [amount, walletId, paymentAmount, createInvoice, memo])
+  }, [amount, walletId, paymentAmount, createInvoice, memo, satsToUsd])
 
   const isMobileDevice = useCallback(() => {
     const mobileDevice = /android|iPhone|iPod|kindle|HMSCore|windows phone|ipad/i
