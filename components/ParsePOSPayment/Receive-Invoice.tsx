@@ -146,7 +146,14 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
         },
       },
     })
-  }, [amount, walletId, paymentAmount, createInvoice, memo, satsToUsd])
+  }, [
+    amount,
+    walletId,
+    paymentAmount,
+    createInvoice,
+    memo,
+    recipientWalletCurrency === "USD" ? satsToUsd : null,
+  ])
 
   const isMobileDevice = useCallback(() => {
     const mobileDevice = /android|iPhone|iPod|kindle|HMSCore|windows phone|ipad/i
