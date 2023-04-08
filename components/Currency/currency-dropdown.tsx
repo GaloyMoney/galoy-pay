@@ -6,7 +6,7 @@ export default function CurrencyDropdown({
   onSelectedDisplayCurrencyChange,
   name,
   style,
-  showOnlyFlag = false
+  showOnlyFlag = false,
 }: {
   onSelectedDisplayCurrencyChange?: (newDisplayCurrency: string) => void
   name?: string
@@ -16,7 +16,9 @@ export default function CurrencyDropdown({
   const router = useRouter()
   const { data: currencyData } = useCurrencyListQuery()
   const [selectedDisplayCurrency, setSelectedDisplayCurrency] = React.useState(
-    (router.query.display && typeof(router.query.display) === "string" ) ? router.query.display : "USD"
+    router.query.display && typeof router.query.display === "string"
+      ? router.query.display
+      : "USD",
   )
 
   useEffect(() => {
@@ -45,12 +47,16 @@ export default function CurrencyDropdown({
           onSelectedDisplayCurrencyChange(newDisplayCurrency?.id ?? "USD")
       }}
     >
-       {currencyData?.currencyList?.map((option) => {
-        const isSelected = selectedDisplayCurrency === option.id;
-        const displayValue = showOnlyFlag ? option.flag : `${option.id} ${option.name} ${option.flag ? option.flag : ""}`;
+      {currencyData?.currencyList?.map((option) => {
+        const isSelected = selectedDisplayCurrency === option.id
+        const displayValue = showOnlyFlag
+          ? option.flag
+          : `${option.id} ${option.name} ${option.flag ? option.flag : ""}`
         return (
           <option key={option.id} value={option.id}>
-            {isSelected ? displayValue : `${option.id} ${option.name} ${option.flag ? option.flag : ""}`}
+            {isSelected
+              ? displayValue
+              : `${option.id} ${option.name} ${option.flag ? option.flag : ""}`}
           </option>
         )
       })}

@@ -89,7 +89,12 @@ function ReceivePayment() {
             <p className={styles.username}>{`Pay ${username}`}</p>
             <div style={{ marginLeft: "12px", marginTop: "9px" }}>
               <CurrencyDropdown
-                style={{border: "none", width: "42px", height: "42px", fontSize: "22px"}}
+                style={{
+                  border: "none",
+                  width: "42px",
+                  height: "42px",
+                  fontSize: "22px",
+                }}
                 showOnlyFlag={true}
                 onSelectedDisplayCurrencyChange={(newDisplayCurrency) => {
                   router.push(
