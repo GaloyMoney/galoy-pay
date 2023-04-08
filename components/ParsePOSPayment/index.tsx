@@ -293,7 +293,8 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           }`}
         >
           {currencyMetadata.symbol}
-          {valueInFiat} {currencyMetadata.flag}
+          {valueInFiat}
+
         </div>
         <div
           className={`${unit === AmountUnit.Sat ? styles.zero_order : styles.first_order}
