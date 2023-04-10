@@ -32,7 +32,7 @@ export function parseDisplayCurrency(query: ParsedUrlQuery) {
   const display = query.display as string | null
 
   return {
-    display: display || "USD",
+    display: display ?? localStorage.getItem("display") ?? "USD",
   }
 }
 

@@ -104,7 +104,7 @@ function Home() {
                             </label>
                             <CurrencyDropdown
                               name="display"
-                              style={{ height: "42px" }}
+                              style={{ height: "42px", width: "100%" }}
                               onSelectedDisplayCurrencyChange={(newDisplayCurrency) => {
                                 if (newDisplayCurrency) {
                                   setSelectedDisplayCurrency(newDisplayCurrency)

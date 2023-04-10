@@ -15,13 +15,22 @@ import CurrencyDropdown from "../components/Currency/currency-dropdown"
 
 function ReceivePayment() {
   const router = useRouter()
-  const { username, memo } = router.query
+  const { username, memo, display } = router.query
 
   let accountUsername: string
   if (username == undefined) {
     accountUsername = ""
   } else {
     accountUsername = username.toString()
+  }
+
+  if (!display) {
+    const displayFromLocal = localStorage.getItem("display") ?? "USD"
+    const queryString = window.location.search
+    const searchParams = new URLSearchParams(queryString)
+    searchParams.set("display", displayFromLocal)
+    const newQueryString = searchParams.toString()
+    window.history.pushState(null, "", "?" + newQueryString)
   }
 
   const manifestParams = new URLSearchParams()
@@ -94,9 +103,11 @@ function ReceivePayment() {
                   width: "42px",
                   height: "42px",
                   fontSize: "22px",
+                  backgroundColor: "transparent",
                 }}
                 showOnlyFlag={true}
                 onSelectedDisplayCurrencyChange={(newDisplayCurrency) => {
+                  localStorage.setItem("display", newDisplayCurrency)
                   router.push(
                     {
                       query: { ...router.query, display: newDisplayCurrency },

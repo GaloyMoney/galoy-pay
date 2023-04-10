@@ -66,7 +66,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     const initialUnit = unit ?? "SAT"
     const initialAmount = safeAmount(amount, undefined, "CENTS").toString()
     const initialSats = safeAmount(sats, undefined, "SAT").toString()
-    const initialDisplay = display ?? "USD"
+    const initialDisplay = display ?? localStorage.getItem("display") ?? "USD"
     const inititalQuery = { ...router.query }
     const initialUsername = router.query.username
     delete inititalQuery?.currency
