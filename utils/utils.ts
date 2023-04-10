@@ -49,10 +49,8 @@ export function safeAmount(amount: any, hasLeadingZeros?: boolean, unit?: any) {
     )
       ? amount
       : 0
-    console.log("safeAmount", Number(theSafeAmount), ` ${unit}`)
     return Number(theSafeAmount)
   } catch (e) {
-    console.log("safeAmountError", e)
     return 0
   }
 }

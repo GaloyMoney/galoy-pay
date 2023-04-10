@@ -51,12 +51,12 @@ export default function CurrencyDropdown({
         const isSelected = selectedDisplayCurrency === option.id
         const displayValue = showOnlyFlag
           ? option.flag
-          : `${option.id} ${option.name} ${option.flag ? option.flag : ""}`
+          : `${option.id} - ${option.name} ${option.flag ? option.flag : ""}`
         return (
           <option key={option.id} value={option.id}>
             {isSelected
               ? displayValue
-              : `${option.id} ${option.name} ${option.flag ? option.flag : ""}`}
+              : `${option.id} - ${option.name} ${option.flag ? option.flag : ""}`}
           </option>
         )
       })}
