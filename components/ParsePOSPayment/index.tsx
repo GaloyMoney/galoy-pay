@@ -56,6 +56,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   const [currencyMetadata, setCurrencyMetadata] = React.useState<Currency>(
     defaultCurrencyMetadata,
   )
+  const [numOfChanges, setNumOfChanges] = React.useState(0)
 
   const prevUnit = React.useRef(AmountUnit.Cent)
 
@@ -141,7 +142,9 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
 
   // Update Params From Current Amount
   const handleAmountChange = (skipRouterPush?: boolean) => {
-    if (!unit || currentAmount === "") return
+    if (!unit || (currentAmount === "" && numOfChanges === 0)) return
+    setNumOfChanges(numOfChanges + 1)
+
     const { convertedCurrencyAmount } = satsToCurrency(
       currentAmount,
       display,
