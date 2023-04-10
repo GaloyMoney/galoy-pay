@@ -145,6 +145,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     if (!unit || (currentAmount === "" && numOfChanges === 0)) return
     setNumOfChanges(numOfChanges + 1)
 
+    // 1) format the fiat amount
     const { convertedCurrencyAmount } = satsToCurrency(
       currentAmount,
       display,
@@ -152,15 +153,15 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     )
     let amt = unit === AmountUnit.Sat ? convertedCurrencyAmount : currentAmount
     if (unit === AmountUnit.Sat || currencyMetadata.fractionDigits === 0) {
-      // format the fiat
       amt = safeAmount(amt, undefined, "SAT")
       amt =
         currencyMetadata.fractionDigits === 0
           ? amt.toFixed()
           : amt.toFixed(currencyMetadata.fractionDigits)
     }
-
     setValueInFiat(amt)
+
+    // 2) format the sats amount
     let sats =
       unit === AmountUnit.Sat
         ? currentAmount
@@ -168,6 +169,8 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
             .convertedCurrencyAmount
     sats = safeAmount(sats, undefined, "SAT").toFixed()
     setValueInSats(sats)
+
+    // 3) update the query params
     const newQuery = {
       amount: amt,
       sats,

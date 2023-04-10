@@ -44,8 +44,7 @@
     "react/react-in-jsx-scope": "off",
 
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "no-async-promise-executor": "off",
-    "no-unused-expressions": "off"
+    "no-async-promise-executor": "off"
   },
   "settings": {
     "import/resolver": {
