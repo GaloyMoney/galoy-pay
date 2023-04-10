@@ -1,13 +1,13 @@
 import { useSubscription } from "@galoymoney/client"
 import { useRouter } from "next/router"
-import React from "react"
+import React, { useRef } from "react"
 import Image from "react-bootstrap/Image"
 import useSatPrice from "../../lib/use-sat-price"
 import { ACTIONS, ACTION_TYPE } from "../../pages/_reducer"
 import { formatOperand } from "../../utils/utils"
 import styles from "./payment-outcome.module.css"
 import Receipt from "./receipt"
-import Modal from "react-bootstrap/Modal"
+import { useReactToPrint } from "react-to-print"
 
 interface Props {
   paymentRequest: string
@@ -19,27 +19,15 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
   const router = useRouter()
   const { amount, unit, sats, username, memo } = router.query
   const { satsToUsd } = useSatPrice()
-  const [isPrint, setIsPrint] = React.useState(false)
-  const [show, setShow] = React.useState(false)
+  const componentRef = useRef<HTMLDivElement | null>(null)
 
   if (!paymentRequest) {
     return null
   }
 
-  const printReceipt = () => {
-    setIsPrint(true)
-    setShow(true)
-    setTimeout(() => {
-      if (typeof window !== "undefined") {
-        window.print()
-      }
-    }, 500)
-  }
-
-  const closePayment = () => {
-    setShow(false)
-    dispatch({ type: ACTIONS.CREATE_NEW_INVOICE })
-  }
+  const printReceipt = useReactToPrint({
+    content: () => componentRef.current,
+  })
 
   const { loading, data, error, errorsMessage } = useSubscription.lnInvoicePaymentStatus({
     variables: {
@@ -67,7 +55,7 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
   )
 
   const downloadReceipt = (
-    <button className={styles.pay_new_btn} onClick={printReceipt}>
+    <button className={styles.pay_new_btn} onClick={() => printReceipt()}>
       <Image
         src="/icons/print-icon.svg"
         alt="print icon"
@@ -78,29 +66,6 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
       Print Receipt
     </button>
   )
-
-  if (isPrint) {
-    return (
-      <Modal
-        show={show}
-        fullscreen={true}
-        onHide={() => closePayment()}
-        backdropClassName={styles.backdrop}
-      >
-        <Modal.Header closeButton>Transaction Receipt</Modal.Header>
-        <Modal.Body>
-          <Receipt
-            amount={amount}
-            sats={sats}
-            username={username}
-            paymentRequest={paymentRequest}
-            memo={memo}
-            paymentAmount={paymentAmount}
-          />
-        </Modal.Body>
-      </Modal>
-    )
-  }
 
   if (data) {
     const { status, errors } = data.lnInvoicePaymentStatus
@@ -122,7 +87,7 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
               The invoice of{" "}
               {unit === "SAT"
                 ? `${formatOperand(
-                    paymentAmount?.toString(),
+                    sats?.toString(),
                   )} sats (~ ${usdValueInSatUnit})`
                 : ` $${formatOperand(
                     amount?.toString() ?? satsToUsd(Number(paymentAmount)).toFixed(2),
@@ -131,12 +96,26 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
                   )} sats)`}{" "}
               has been paid
             </p>
+
+            <div className={styles.hideReceipt}>
+              <div ref={componentRef}>
+                <Receipt
+                  amount={amount}
+                  sats={sats}
+                  username={username}
+                  paymentRequest={paymentRequest}
+                  paymentAmount={paymentAmount}
+                  memo={memo}
+                />
+              </div>
+            </div>
             {downloadReceipt}
           </div>
           {backToCashRegisterButton}
         </div>
       )
     }
+
     if (errors.length > 0 || errorsMessage) {
       return (
         <div className={styles.container}>

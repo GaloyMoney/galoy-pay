@@ -90,3 +90,9 @@
 .link:hover {
   text-decoration: none;
 }
+
+.hideReceipt{
+  position: absolute;
+  left: -9999px;
+  visibility: hidden;
+}
