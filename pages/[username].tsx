@@ -119,7 +119,9 @@ function ReceivePayment() {
                     { shallow: true },
                   )
                   setTimeout(() => {
-                    window.location.reload() // hard reload to re-calculate currency
+                    // hard reload to re-calculate currency
+                    // in a future PR we can manage state globally for selected display currency
+                    window.location.reload()
                   }, 100)
                 }}
               />

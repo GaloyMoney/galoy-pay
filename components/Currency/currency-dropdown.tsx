@@ -20,6 +20,7 @@ export default function CurrencyDropdown({
       ? router.query.display
       : localStorage.getItem("display") ?? "USD",
   )
+  const [isDropDownOpen, setIsDropDownOpen] = React.useState(false)
 
   useEffect(() => {
     if (router.query?.display && typeof router.query.display === "string") {
@@ -43,20 +44,29 @@ export default function CurrencyDropdown({
         if (newDisplayCurrency) {
           setSelectedDisplayCurrency(newDisplayCurrency.id)
         }
-        if (onSelectedDisplayCurrencyChange)
+        if (onSelectedDisplayCurrencyChange) {
           onSelectedDisplayCurrencyChange(newDisplayCurrency?.id ?? "USD")
+        }
+        setIsDropDownOpen(false)
+      }}
+      onFocus={() => {
+        setIsDropDownOpen(true)
+      }}
+      onBlur={() => {
+        setIsDropDownOpen(false)
       }}
     >
       {currencyData?.currencyList?.map((option) => {
+        const fullLabel = `${option.id} - ${option.name} ${
+          option.flag ? option.flag : ""
+        }`
+        const flagOnlyLabel = option.flag
         const isSelected = selectedDisplayCurrency === option.id
-        const displayValue = showOnlyFlag
-          ? option.flag
-          : `${option.id} - ${option.name} ${option.flag ? option.flag : ""}`
         return (
           <option key={option.id} value={option.id}>
-            {isSelected
-              ? displayValue
-              : `${option.id} - ${option.name} ${option.flag ? option.flag : ""}`}
+            {isDropDownOpen && fullLabel}
+            {!isDropDownOpen &&
+              (isSelected ? (showOnlyFlag ? flagOnlyLabel : fullLabel) : fullLabel)}
           </option>
         )
       })}
