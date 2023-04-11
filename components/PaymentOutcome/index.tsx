@@ -86,9 +86,7 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
             <p className={styles.text}>
               The invoice of{" "}
               {unit === "SAT"
-                ? `${formatOperand(
-                    sats?.toString(),
-                  )} sats (~ ${usdValueInSatUnit})`
+                ? `${formatOperand(sats?.toString())} sats (~ ${usdValueInSatUnit})`
                 : ` $${formatOperand(
                     amount?.toString() ?? satsToUsd(Number(paymentAmount)).toFixed(2),
                   )} (~${formatOperand(
@@ -97,6 +95,7 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
               has been paid
             </p>
 
+            {/* the component for printing receipt */}
             <div className={styles.hideReceipt}>
               <div ref={componentRef}>
                 <Receipt

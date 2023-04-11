@@ -24,7 +24,8 @@ function receipt(props: Props) {
       <div className="text-center">
         <span>Transaction Amount</span>
         <h1>
-          {formatOperand(props.sats?.toString() ?? Number(props.paymentAmount).toFixed())} sats
+          {formatOperand(props.sats?.toString() ?? Number(props.paymentAmount).toFixed())}{" "}
+          sats
         </h1>
         <span>
           {" "}

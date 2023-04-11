@@ -91,7 +91,8 @@
   text-decoration: none;
 }
 
-.hideReceipt{
+/* make the receipt hidden on render but still accessible in the DOM */
+.hideReceipt {
   position: absolute;
   left: -9999px;
   visibility: hidden;
