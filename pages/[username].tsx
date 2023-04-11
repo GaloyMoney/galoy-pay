@@ -16,6 +16,8 @@ import CurrencyDropdown from "../components/Currency/currency-dropdown"
 function ReceivePayment() {
   const router = useRouter()
   const { username, memo, display } = router.query
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
 
   let accountUsername: string
   if (username == undefined) {
@@ -100,10 +102,11 @@ function ReceivePayment() {
               <CurrencyDropdown
                 style={{
                   border: "none",
-                  width: "42px",
+                  outline: "none",
+                  width: isIOS || isSafari ? "70px" : "42px",
                   height: "42px",
                   fontSize: "22px",
-                  backgroundColor: "transparent",
+                  backgroundColor: "white",
                 }}
                 showOnlyFlag={true}
                 onSelectedDisplayCurrencyChange={(newDisplayCurrency) => {
