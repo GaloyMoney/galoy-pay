@@ -4,7 +4,7 @@ import Container from "react-bootstrap/Container"
 import Image from "react-bootstrap/Image"
 import useRealtimePrice from "../../lib/use-realtime-price"
 import { ACTION_TYPE, ACTIONS } from "../../pages/_reducer"
-import { parseDisplayCurrency, safeAmount } from "../../utils/utils"
+import { formatOperand, parseDisplayCurrency, safeAmount } from "../../utils/utils"
 import Memo from "../Memo"
 import DigitButton from "./Digit-Button"
 import styles from "./parse-payment.module.css"
@@ -274,7 +274,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           className={`${unit === AmountUnit.Sat ? styles.zero_order : styles.first_order}
           }`}
         >
-          {valueInSats} sats
+          {unit === "CENT" ? "≈" : ""} {formatOperand(valueInSats.toString())} sats
         </div>
         {state.createdInvoice ? null : (
           <button title="toggle currency" onClick={() => toggleCurrency()}>
