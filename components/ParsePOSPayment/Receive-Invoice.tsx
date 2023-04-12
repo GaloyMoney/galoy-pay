@@ -133,6 +133,10 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
         if (isNaN(usdAmount)) return
         const cents = parseFloat(usdAmount.toFixed(2)) * 100
         amt = cents.toFixed()
+        if (cents < 0.01){
+          setExpiredInvoiceError(`Amount is too small. Must be larger than ${usdToSats(0.01).toFixed()} sats`)
+          return
+        }
       }
     }
     if (amt === null) return
@@ -216,7 +220,7 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
   if ((errorString && !loading) || expiredInvoiceError) {
     const invalidInvoiceError =
       recipientWalletCurrency === "USD" && Number(amount?.toString()) <= 0
-        ? "Enter an amount greater than 1 cent"
+        ? `Enter an amount greater than 1 cent (${usdToSats(0.01).toFixed()} sats)`
         : expiredInvoiceError ?? null
     return (
       <div className={styles.error}>
