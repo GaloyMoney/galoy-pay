@@ -62,9 +62,6 @@ const useRealtimePrice = (
           currency: display,
           withSign: true,
         })
-        // if ((display === "USD" || display === "EUR") && convertedCurrencyAmount < 0.01) {
-        //   formattedCurrency = "0"
-        // }
         return {
           convertedCurrencyAmount,
           formattedCurrency,
@@ -80,9 +77,6 @@ const useRealtimePrice = (
           currency: display,
           withSign: true,
         })
-        // if ((display === "USD" || display === "EUR") && convertedCurrencyAmount < 0.01) {
-        //   formattedCurrency = "0"
-        // }
         return {
           convertedCurrencyAmount,
           formattedCurrency,

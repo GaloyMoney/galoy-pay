@@ -64,12 +64,12 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   // set all query params on first load, even if they are not passed
   useEffect(() => {
     const initialUnit = unit ?? "SAT"
-    const initialAmount = safeAmount(amount, undefined, "CENTS").toString()
-    const initialSats = safeAmount(sats, undefined, "SAT").toString()
+    const initialAmount = safeAmount(amount).toString()
+    const initialSats = safeAmount(sats).toString()
     const initialDisplay = display ?? localStorage.getItem("display") ?? "USD"
-    const inititalQuery = { ...router.query }
+    const initialQuery = { ...router.query }
     const initialUsername = router.query.username
-    delete inititalQuery?.currency
+    delete initialQuery?.currency
     const newQuery: ParsedUrlQuery = {
       amount: initialAmount,
       sats: initialSats,
@@ -78,7 +78,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
       display: initialDisplay,
       username: initialUsername,
     }
-    if (inititalQuery !== newQuery) {
+    if (initialQuery !== newQuery) {
       router.push(
         {
           pathname: `${username}`,
@@ -153,27 +153,27 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     )
     let amt = unit === AmountUnit.Sat ? convertedCurrencyAmount : currentAmount
     if (unit === AmountUnit.Sat || currencyMetadata.fractionDigits === 0) {
-      amt = safeAmount(amt, undefined, "SAT")
+      const safeAmt = safeAmount(amt)
       amt =
         currencyMetadata.fractionDigits === 0
-          ? amt.toFixed()
-          : amt.toFixed(currencyMetadata.fractionDigits)
+          ? safeAmt.toFixed()
+          : safeAmt.toFixed(currencyMetadata.fractionDigits)
     }
     setValueInFiat(amt)
 
     // 2) format the sats amount
-    let sats =
+    let satsAmt =
       unit === AmountUnit.Sat
         ? currentAmount
         : currencyToSats(Number(currentAmount), display, currencyMetadata.fractionDigits)
             .convertedCurrencyAmount
-    sats = safeAmount(sats, undefined, "SAT").toFixed()
-    setValueInSats(sats)
+    satsAmt = safeAmount(satsAmt).toFixed()
+    setValueInSats(satsAmt)
 
     // 3) update the query params
     const newQuery = {
       amount: amt,
-      sats,
+      sats: satsAmt,
       currency: defaultWalletCurrency,
       unit,
       memo,
