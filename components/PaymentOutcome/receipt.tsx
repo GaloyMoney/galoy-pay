@@ -16,7 +16,7 @@ interface Props {
 
 function receipt(props: Props) {
   const usdValueInSatUnit =
-    props.amount === "0.00" ? "~ less than 1 cent" : `$ ${props.amount}`
+    props.amount === "0.00" ? "less than 1 cent" : `$ ${props.amount}`
   return (
     <div className="w-100">
       <div className="d-flex justify-content-center">
