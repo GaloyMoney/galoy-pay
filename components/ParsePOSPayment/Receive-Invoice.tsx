@@ -133,8 +133,10 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
         if (isNaN(usdAmount)) return
         const cents = parseFloat(usdAmount.toFixed(2)) * 100
         amt = cents.toFixed()
-        if (cents < 0.01){
-          setExpiredInvoiceError(`Amount is too small. Must be larger than ${usdToSats(0.01).toFixed()} sats`)
+        if (cents < 0.01) {
+          setExpiredInvoiceError(
+            `Amount is too small. Must be larger than ${usdToSats(0.01).toFixed()} sats`,
+          )
           return
         }
       }
