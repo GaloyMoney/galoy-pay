@@ -24,7 +24,9 @@ function Home() {
     ? `https://mempool.space/signet/lightning/node/`
     : `https://mempool.space/lightning/node/`
   const { loading, error, data } = useQuery(GET_NODE_STATS)
-  const [selectedDisplayCurrency, setSelectedDisplayCurrency] = React.useState("USD")
+  const [selectedDisplayCurrency, setSelectedDisplayCurrency] = React.useState(
+    localStorage.getItem("display") ?? "USD",
+  )
 
   const router = useRouter()
   const [username, setUsername] = React.useState<string>("")
@@ -35,7 +37,7 @@ function Home() {
     router.push(
       {
         pathname: username,
-        query: { display: selectedDisplayCurrency ?? "USD" },
+        query: { display: selectedDisplayCurrency },
       },
       undefined,
       { shallow: true },

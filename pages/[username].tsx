@@ -103,10 +103,12 @@ function ReceivePayment() {
                 style={{
                   border: "none",
                   outline: "none",
-                  width: isIOS || isSafari ? "70px" : "42px",
+                  width: isIOS || isSafari ? "72px" : "56px",
                   height: "42px",
-                  fontSize: "22px",
+                  fontSize: "18px",
                   backgroundColor: "white",
+                  textAlign: "center",
+                  verticalAlign: "middle",
                 }}
                 showOnlyFlag={true}
                 onSelectedDisplayCurrencyChange={(newDisplayCurrency) => {
