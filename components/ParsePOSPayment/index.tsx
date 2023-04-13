@@ -6,9 +6,9 @@ import useRealtimePrice from "../../lib/use-realtime-price"
 import { ACTION_TYPE, ACTIONS } from "../../pages/_reducer"
 import {
   formatOperand,
-  getDecimalSeparatorSymbol,
   parseDisplayCurrency,
   safeAmount,
+  getLocaleConfig,
 } from "../../utils/utils"
 import Memo from "../Memo"
 import DigitButton from "./Digit-Button"
@@ -333,7 +333,10 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
               digit={"."}
               dispatch={dispatch}
               disabled={unit === AmountUnit.Sat}
-              displayValue={getDecimalSeparatorSymbol(navigator.language)}
+              displayValue={
+                getLocaleConfig({ locale: navigator.language, currency: display })
+                  .decimalSeparator
+              }
             />
           ) : (
             <DigitButton digit={""} dispatch={dispatch} disabled={true} />
