@@ -4,7 +4,12 @@ import Container from "react-bootstrap/Container"
 import Image from "react-bootstrap/Image"
 import useRealtimePrice from "../../lib/use-realtime-price"
 import { ACTION_TYPE, ACTIONS } from "../../pages/_reducer"
-import { formatOperand, parseDisplayCurrency, safeAmount } from "../../utils/utils"
+import {
+  formatOperand,
+  getDecimalSeparatorSymbol,
+  parseDisplayCurrency,
+  safeAmount,
+} from "../../utils/utils"
 import Memo from "../Memo"
 import DigitButton from "./Digit-Button"
 import styles from "./parse-payment.module.css"
@@ -12,6 +17,7 @@ import ReceiveInvoice from "./Receive-Invoice"
 import { useDisplayCurrency } from "../../lib/use-display-currency"
 import { Currency } from "../../lib/graphql/generated"
 import { ParsedUrlQuery } from "querystring"
+import CurrencyFormatter from "../Currency/currency-formatter"
 
 function isRunningStandalone() {
   return window.matchMedia("(display-mode: standalone)").matches
@@ -267,8 +273,12 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
             !unit || unit === AmountUnit.Cent ? styles.zero_order : styles.first_order
           }`}
         >
-          {currencyMetadata.symbol}
-          {valueInFiat}
+          <CurrencyFormatter
+            symbol={currencyMetadata.symbol}
+            amount={valueInFiat}
+            currencyCode={display}
+            fractionDigits={currencyMetadata.fractionDigits}
+          />
         </div>
         <div
           className={`${unit === AmountUnit.Sat ? styles.zero_order : styles.first_order}
@@ -308,11 +318,17 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           <DigitButton digit={"7"} dispatch={dispatch} />
           <DigitButton digit={"8"} dispatch={dispatch} />
           <DigitButton digit={"9"} dispatch={dispatch} />
-          <DigitButton
-            digit={"."}
-            dispatch={dispatch}
-            disabled={unit === AmountUnit.Sat}
-          />
+          {currencyMetadata.fractionDigits > 0 ? (
+            <DigitButton
+              digit={"."}
+              displayValue={getDecimalSeparatorSymbol(navigator.language)}
+              dispatch={dispatch}
+              disabled={unit === AmountUnit.Sat}
+            />
+          ) : (
+            <DigitButton digit={""} dispatch={dispatch} disabled={true} />
+          )}
+
           <DigitButton digit={"0"} dispatch={dispatch} />
           <button onClick={() => dispatch({ type: ACTIONS.DELETE_DIGIT })}>
             <Image

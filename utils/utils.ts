@@ -54,3 +54,14 @@ export function safeAmount(amount: number | string | string[] | undefined) {
     return 0
   }
 }
+
+export function getDecimalSeparatorSymbol(locale: string) {
+  try {
+    const formatter = new Intl.NumberFormat(locale)
+    const parts = formatter.formatToParts(1.1)
+    const decimalSeparator = parts.find((part) => part.type === "decimal")?.value
+    return decimalSeparator ?? "."
+  } catch (e) {
+    return "."
+  }
+}
