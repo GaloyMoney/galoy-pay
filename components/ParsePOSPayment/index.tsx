@@ -165,6 +165,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           ? safeAmt.toFixed()
           : safeAmt.toFixed(currencyMetadata.fractionDigits)
     }
+    if (isNaN(Number(amt))) return
     setValueInFiat(amt)
 
     // 2) format the sats amount
