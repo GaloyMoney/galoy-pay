@@ -17,7 +17,7 @@ import ReceiveInvoice from "./Receive-Invoice"
 import { useDisplayCurrency } from "../../lib/use-display-currency"
 import { Currency } from "../../lib/graphql/generated"
 import { ParsedUrlQuery } from "querystring"
-import CurrencyFormatter from "../Currency/currency-formatter"
+import CurrencyInput from "react-currency-input-field"
 
 function isRunningStandalone() {
   return window.matchMedia("(display-mode: standalone)").matches
@@ -56,7 +56,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   const { display } = parseDisplayCurrency(router.query)
   const { currencyToSats, satsToCurrency, hasLoaded } = useRealtimePrice(display)
   const { currencyList } = useDisplayCurrency()
-  const [valueInFiat, setValueInFiat] = React.useState("0.00")
+  const [valueInFiat, setValueInFiat] = React.useState("0")
   const [valueInSats, setValueInSats] = React.useState(0)
   const [currentAmount, setCurrentAmount] = React.useState(state.currentAmount)
   const [currencyMetadata, setCurrencyMetadata] = React.useState<Currency>(
@@ -273,12 +273,22 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
             !unit || unit === AmountUnit.Cent ? styles.zero_order : styles.first_order
           }`}
         >
-          <CurrencyFormatter
-            symbol={currencyMetadata.symbol}
-            amount={valueInFiat}
-            currencyCode={display}
-            fractionDigits={currencyMetadata.fractionDigits}
-          />
+          {!amount ? (
+            `${currencyMetadata.symbol} 0`
+          ) : (
+            <CurrencyInput
+              style={{
+                width: "100%",
+                border: 0,
+                backgroundColor: "white",
+                textAlign: "center",
+                fontWeight: 600,
+              }}
+              value={valueInFiat}
+              intlConfig={{ locale: navigator.language, currency: display }}
+              disabled={true}
+            />
+          )}
         </div>
         <div
           className={`${unit === AmountUnit.Sat ? styles.zero_order : styles.first_order}
@@ -321,9 +331,9 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           {currencyMetadata.fractionDigits > 0 ? (
             <DigitButton
               digit={"."}
-              displayValue={getDecimalSeparatorSymbol(navigator.language)}
               dispatch={dispatch}
               disabled={unit === AmountUnit.Sat}
+              displayValue={getDecimalSeparatorSymbol(navigator.language)}
             />
           ) : (
             <DigitButton digit={""} dispatch={dispatch} disabled={true} />
