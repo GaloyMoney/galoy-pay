@@ -76,8 +76,8 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     const initialSats = safeAmount(sats).toString()
     const initialDisplay = display ?? localStorage.getItem("display") ?? "USD"
     const initialUsername = router.query.username
-    const initialCurrency = router.query.currency ?? "USD"
     const initialQuery = { ...router.query }
+    delete initialQuery?.currency
     const newQuery: ParsedUrlQuery = {
       amount: initialAmount,
       sats: initialSats,
@@ -85,7 +85,6 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
       memo: memo ?? "",
       display: initialDisplay,
       username: initialUsername,
-      currency: initialCurrency,
     }
     if (initialQuery !== newQuery) {
       router.push(
@@ -97,7 +96,6 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
             unit: initialUnit,
             memo: memo ?? "",
             display: initialDisplay,
-            currency: initialCurrency,
           },
         },
         undefined,
@@ -334,7 +332,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           <DigitButton digit={"7"} dispatch={dispatch} />
           <DigitButton digit={"8"} dispatch={dispatch} />
           <DigitButton digit={"9"} dispatch={dispatch} />
-          {currencyMetadata.fractionDigits > 0 && unit !== "SAT" ? (
+          {(currencyMetadata.fractionDigits > 0 ) ? (
             <DigitButton
               digit={"."}
               dispatch={dispatch}
