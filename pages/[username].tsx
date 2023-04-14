@@ -41,7 +41,7 @@ function ReceivePayment() {
   }
 
   const { data, error: usernameError } = useQuery.accountDefaultWallet({
-    variables: { username: accountUsername }
+    variables: { username: accountUsername },
   })
 
   const [state, dispatch] = React.useReducer(reducer, {

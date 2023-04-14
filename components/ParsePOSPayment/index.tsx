@@ -329,7 +329,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           <DigitButton digit={"7"} dispatch={dispatch} />
           <DigitButton digit={"8"} dispatch={dispatch} />
           <DigitButton digit={"9"} dispatch={dispatch} />
-          {(currencyMetadata.fractionDigits > 0 ) ? (
+          {currencyMetadata.fractionDigits > 0 ? (
             <DigitButton
               digit={"."}
               dispatch={dispatch}
