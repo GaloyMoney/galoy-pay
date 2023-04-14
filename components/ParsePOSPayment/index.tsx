@@ -58,9 +58,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   const { currencyList } = useDisplayCurrency()
   const [valueInFiat, setValueInFiat] = React.useState("0")
   const [valueInSats, setValueInSats] = React.useState(0)
-  const [currentAmount, setCurrentAmount] = React.useState(
-    isNaN(Number(state.currentAmount)) ? "0" : state.currentAmount,
-  )
+  const [currentAmount, setCurrentAmount] = React.useState(state.currentAmount)
   const [currencyMetadata, setCurrencyMetadata] = React.useState<Currency>(
     defaultCurrencyMetadata,
   )
@@ -177,7 +175,6 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
         : currencyToSats(Number(currentAmount), display, currencyMetadata.fractionDigits)
             .convertedCurrencyAmount
     satsAmt = safeAmount(satsAmt).toFixed()
-    if (isNaN(Number(satsAmt))) return
     setValueInSats(satsAmt)
 
     // 3) update the query params
@@ -204,7 +201,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   React.useEffect(handleAmountChange, [currentAmount, hasLoaded])
 
   React.useEffect(() => {
-    setCurrentAmount(safeAmount(state.currentAmount))
+    setCurrentAmount(state.currentAmount)
   }, [state.currentAmount])
 
   // Toggle Current Amount
