@@ -58,7 +58,9 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   const { currencyList } = useDisplayCurrency()
   const [valueInFiat, setValueInFiat] = React.useState("0")
   const [valueInSats, setValueInSats] = React.useState(0)
-  const [currentAmount, setCurrentAmount] = React.useState(state.currentAmount)
+  const [currentAmount, setCurrentAmount] = React.useState(
+    isNaN(Number(state.currentAmount)) ? "0" : state.currentAmount,
+  )
   const [currencyMetadata, setCurrencyMetadata] = React.useState<Currency>(
     defaultCurrencyMetadata,
   )
@@ -73,9 +75,9 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     const initialAmount = safeAmount(amount).toString()
     const initialSats = safeAmount(sats).toString()
     const initialDisplay = display ?? localStorage.getItem("display") ?? "USD"
-    const initialQuery = { ...router.query }
     const initialUsername = router.query.username
-    delete initialQuery?.currency
+    const initialCurrency = router.query.currency ?? "USD"
+    const initialQuery = { ...router.query }
     const newQuery: ParsedUrlQuery = {
       amount: initialAmount,
       sats: initialSats,
@@ -83,6 +85,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
       memo: memo ?? "",
       display: initialDisplay,
       username: initialUsername,
+      currency: initialCurrency,
     }
     if (initialQuery !== newQuery) {
       router.push(
@@ -94,6 +97,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
             unit: initialUnit,
             memo: memo ?? "",
             display: initialDisplay,
+            currency: initialCurrency,
           },
         },
         undefined,
@@ -175,6 +179,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
         : currencyToSats(Number(currentAmount), display, currencyMetadata.fractionDigits)
             .convertedCurrencyAmount
     satsAmt = safeAmount(satsAmt).toFixed()
+    if (isNaN(Number(satsAmt))) return
     setValueInSats(satsAmt)
 
     // 3) update the query params
@@ -201,7 +206,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   React.useEffect(handleAmountChange, [currentAmount, hasLoaded])
 
   React.useEffect(() => {
-    setCurrentAmount(state.currentAmount)
+    setCurrentAmount(safeAmount(state.currentAmount))
   }, [state.currentAmount])
 
   // Toggle Current Amount
@@ -329,7 +334,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           <DigitButton digit={"7"} dispatch={dispatch} />
           <DigitButton digit={"8"} dispatch={dispatch} />
           <DigitButton digit={"9"} dispatch={dispatch} />
-          {currencyMetadata.fractionDigits > 0 ? (
+          {currencyMetadata.fractionDigits > 0 && unit !== "SAT" ? (
             <DigitButton
               digit={"."}
               dispatch={dispatch}

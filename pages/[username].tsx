@@ -15,7 +15,7 @@ import CurrencyDropdown from "../components/Currency/currency-dropdown"
 
 function ReceivePayment() {
   const router = useRouter()
-  const { username, memo, display } = router.query
+  const { username, memo, display, currency } = router.query
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
 
@@ -42,6 +42,16 @@ function ReceivePayment() {
 
   const { data, error: usernameError } = useQuery.accountDefaultWallet({
     variables: { username: accountUsername },
+    onCompleted(data) {
+      if (!currency) {
+        const currencyLocal = data?.accountDefaultWallet.walletCurrency ?? "USD"
+        const queryString = window.location.search
+        const searchParams = new URLSearchParams(queryString)
+        searchParams.set("currency", currencyLocal)
+        const newQueryString = searchParams.toString()
+        window.history.pushState(null, "", "?" + newQueryString)
+      }
+    },
   })
 
   const [state, dispatch] = React.useReducer(reducer, {
