@@ -296,7 +296,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
           }`}
         >
           {unit === "CENT" ? "≈" : ""} {formatOperand(valueInSats.toString())} sat
-          {!hasLoaded && (
+          {!hasLoaded.current && (
             <span
               style={{
                 fontSize: "1rem",
