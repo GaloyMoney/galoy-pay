@@ -108,8 +108,8 @@ function Home() {
                               name="display"
                               style={{ height: "42px", width: "100%" }}
                               onSelectedDisplayCurrencyChange={(newDisplayCurrency) => {
-                                localStorage.setItem("display", newDisplayCurrency)
                                 if (newDisplayCurrency) {
+                                  localStorage.setItem("display", newDisplayCurrency)
                                   setSelectedDisplayCurrency(newDisplayCurrency)
                                 }
                               }}
