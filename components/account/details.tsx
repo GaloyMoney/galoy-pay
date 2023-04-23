@@ -13,6 +13,10 @@ const Details: React.FC<{
   return (
     <div className="shadow p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-2 gap-4">
       <div>
+        <p className="mb-4 font-semibold text-gray-600">Account ID</p>
+        <p className={`text-gray-600 ${emptyClass}`}>{data?.id}</p>
+      </div>
+      <div>
         <p className="mb-4 font-semibold text-gray-600">Phone</p>
         <p className={`text-gray-600 ${emptyClass}`}>{data?.owner?.phone}</p>
       </div>
