@@ -97,7 +97,7 @@
 
 .lightning_addr > div:nth-child(2) button {
   background: linear-gradient(0deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)),
-  linear-gradient(268.08deg, #fb5607 8.75%, #ffbe0b 98.45%);;
+    linear-gradient(268.08deg, #fb5607 8.75%, #ffbe0b 98.45%);
   color: #fff;
   padding: 0.45rem 0.75rem;
   border-radius: 8px;
