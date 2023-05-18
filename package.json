@@ -2,6 +2,9 @@
   "name": "admin-panel",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "20"
+  },
   "scripts": {
     "build": "next build",
     "check-code": "yarn tsc:check && yarn eslint:check && yarn prettier:check",
@@ -31,7 +34,7 @@
     "@graphql-codegen/typescript-operations": "^3.0.3",
     "@graphql-codegen/typescript-react-apollo": "^3.3.7",
     "@types/jest": "^29.5.1",
-    "@types/node": "18.16.6",
+    "@types/node": "20.1.7",
     "@types/react": "18.0.38",
     "@types/react-dom": "18.2.4",
     "@typescript-eslint/eslint-plugin": "^5.50.0",
