@@ -12,6 +12,7 @@ export const ACTIONS = {
   SET_AMOUNT_FROM_PARAMS: "set-amount-from-search",
   PINNED_TO_HOMESCREEN_MODAL_VISIBLE: "pin-to-home-screen-modal-visible",
   BACK: "back-by-one-history",
+  ADD_MEMO: "add-memo",
 }
 
 export type ACTION_TYPE = {
@@ -104,6 +105,7 @@ function reducer(state: React.ComponentState, { type, payload }: ACTION_TYPE) {
         ...state,
         createdInvoice: false,
         currentAmount: "0",
+        memo: "",
       }
 
     case ACTIONS.BACK:
@@ -116,6 +118,13 @@ function reducer(state: React.ComponentState, { type, payload }: ACTION_TYPE) {
       return {
         ...state,
         pinnedToHomeScreenModalVisible: payload,
+      }
+    
+    case ACTIONS.ADD_MEMO:
+      console.log(payload)
+      return {
+        ...state,
+        memo: payload,
       }
 
     default:
