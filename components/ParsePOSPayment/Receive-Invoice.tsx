@@ -9,6 +9,7 @@ import Tooltip from "react-bootstrap/Tooltip"
 import { QRCode } from "react-qrcode-logo"
 import { useTimer } from "react-timer-hook"
 import { useScreenshot } from "use-react-screenshot"
+import { requestPayment } from "lnurl-withdraw"; 
 
 import { URL_HOST_DOMAIN, USD_INVOICE_EXPIRE_INTERVAL } from "../../config/config"
 import useCreateInvoice from "../../hooks/use-Create-Invoice"
@@ -40,6 +41,7 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
 
   const [expiredInvoiceError, setExpiredInvoiceError] = React.useState<string>("")
   const [copied, setCopied] = React.useState<boolean>(false)
+  const [readingNfc, setReadingNfc] = React.useState<boolean>(false)
   const [shareState, setShareState] = React.useState<"not-set">()
   const [image, takeScreenShot] = useScreenshot()
   const [openModal, setOpenModal] = React.useState<boolean>(false)
@@ -206,6 +208,28 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
     setTimeout(() => {
       setCopied(false)
     }, 3000)
+  }
+
+  const readNfc = async () => {
+    if (typeof NDEFReader === 'undefined') {
+      setReadingNfc(false)
+      console.error("NFC Reader is not available")
+      return 
+    }
+
+    try {
+      const reader = new NDEFReader();
+      await reader.scan();
+      console.log('Scanning for NFC tags');
+
+      reader.onreadingerror = () => { 
+        console.log('Error reading NFC tag');
+      };
+
+    } catch (error) {
+      console.error(error)
+      setReadingNfc(false)
+    }
   }
 
   if ((errorString && !loading) || expiredInvoiceError) {
