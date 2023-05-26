@@ -281,6 +281,15 @@ function ReceiveInvoice({ recipientWalletCurrency, walletId, state, dispatch }: 
                   {copied ? "Copied" : "Copy"}
                 </button>
               </OverlayTrigger>
+              <button>
+                <Image
+                  src="/icons/nfc.svg"
+                  alt="nfc icon"
+                  width="18px"
+                  height="18px"
+                />
+                Read Card
+              </button>
 
               <Share
                 shareData={shareData}
