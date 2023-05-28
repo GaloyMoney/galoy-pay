@@ -119,7 +119,7 @@ function reducer(state: React.ComponentState, { type, payload }: ACTION_TYPE) {
         ...state,
         pinnedToHomeScreenModalVisible: payload,
       }
-    
+
     case ACTIONS.ADD_MEMO:
       return {
         ...state,

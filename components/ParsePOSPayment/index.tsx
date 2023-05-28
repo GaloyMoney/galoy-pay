@@ -339,8 +339,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
         )}
       </div>
 
-      <Memo state={state}
-            dispatch={dispatch} />
+      <Memo state={state} dispatch={dispatch} />
 
       {state.createdInvoice ? (
         <ReceiveInvoice

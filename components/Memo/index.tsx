@@ -9,7 +9,7 @@ interface Props {
   dispatch: React.Dispatch<ACTION_TYPE>
 }
 
-const Memo = ({ state,dispatch }: Props) => {
+const Memo = ({ state, dispatch }: Props) => {
   const router = useRouter()
   const { username, amount, sats, unit, memo, display } = router.query
   const [openModal, setOpenModal] = React.useState<boolean>(false)
@@ -114,13 +114,12 @@ const Memo = ({ state,dispatch }: Props) => {
           <Modal.Body>
             <input
               className={styles.modal_input}
-              value={memo?state.memo:note}
+              value={memo ? state.memo : note}
               name="note"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>{
-                  setNote(e.target.value)
-                  dispatch({ type: ACTIONS.ADD_MEMO, payload: e.target.value })
-                }
-              }
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setNote(e.target.value)
+                dispatch({ type: ACTIONS.ADD_MEMO, payload: e.target.value })
+              }}
               type="text"
             />
           </Modal.Body>
