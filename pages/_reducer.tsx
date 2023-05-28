@@ -121,7 +121,6 @@ function reducer(state: React.ComponentState, { type, payload }: ACTION_TYPE) {
       }
     
     case ACTIONS.ADD_MEMO:
-      console.log(payload)
       return {
         ...state,
         memo: payload,
