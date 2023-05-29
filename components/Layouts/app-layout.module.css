@@ -156,7 +156,8 @@
 
 .main {
   position: absolute;
-  width: calc(100vw - 1rem);
+  width: 100vw;
+  margin: 0 auto;
   min-height: 100vh;
 }
 
@@ -193,6 +194,7 @@
   padding: 0;
   font-size: 15px;
   text-align: center;
+  width: calc(100vw - 1rem);
 }
 
 .footer_text > p > a {
