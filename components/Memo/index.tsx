@@ -1,10 +1,15 @@
 import { useRouter } from "next/router"
 import React from "react"
 import { Modal } from "react-bootstrap"
-
+import { ACTIONS, ACTION_TYPE } from "../../pages/_reducer"
 import styles from "./memo.module.css"
 
-const Memo = ({ createdInvoice }: React.ComponentState) => {
+interface Props {
+  state: React.ComponentState
+  dispatch: React.Dispatch<ACTION_TYPE>
+}
+
+const Memo = ({ state, dispatch }: Props) => {
   const router = useRouter()
   const { username, amount, sats, unit, memo, display } = router.query
   const [openModal, setOpenModal] = React.useState<boolean>(false)
@@ -45,18 +50,18 @@ const Memo = ({ createdInvoice }: React.ComponentState) => {
   return (
     <div className={styles.container}>
       <div>
-        {memo ? (
+        {state.memo ? (
           <div className={styles.note_wrapper}>
             <p>Note:</p>
-            <input readOnly value={memo} />
+            <input readOnly value={state.memo} />
           </div>
         ) : null}
         <button
           onClick={handleShow}
-          className={`${createdInvoice ? styles.disable_btn : styles.add_btn}`}
-          disabled={createdInvoice}
+          className={`${state.createdInvoice ? styles.disable_btn : styles.add_btn}`}
+          disabled={state.createdInvoice}
         >
-          {!createdInvoice && !memo ? "Add note" : null}
+          {!state.createdInvoice && !state.memo ? "Add note" : null}
           <svg
             width="19"
             height="19"
@@ -109,11 +114,12 @@ const Memo = ({ createdInvoice }: React.ComponentState) => {
           <Modal.Body>
             <input
               className={styles.modal_input}
-              value={note}
+              value={memo ? state.memo : note}
               name="note"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setNote(e.target.value)
-              }
+                dispatch({ type: ACTIONS.ADD_MEMO, payload: e.target.value })
+              }}
               type="text"
             />
           </Modal.Body>

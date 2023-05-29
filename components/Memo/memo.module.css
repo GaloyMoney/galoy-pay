@@ -22,6 +22,8 @@
 .note_wrapper > input {
   border: none;
   text-transform: capitalize;
+  position: relative;
+  z-index: -1;
 }
 
 .note_wrapper > p {
