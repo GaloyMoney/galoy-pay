@@ -2,14 +2,14 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: 'chore: have version for prepping docker build'
-      sha: ffb5caaacf1331b1e74f7c7f4893bfb7b3656eef
+      commitTitle: 'fix: work around frozen params issue'
+      sha: cffedd82af6e527d0adbc33bc9599db0850bf771
     path: .
   path: ../.github/workflows/vendor
 - contents:
   - git:
-      commitTitle: 'chore: have version for prepping docker build'
-      sha: ffb5caaacf1331b1e74f7c7f4893bfb7b3656eef
+      commitTitle: 'fix: work around frozen params issue'
+      sha: cffedd82af6e527d0adbc33bc9599db0850bf771
     path: .
   path: ./vendor
 kind: LockConfig
