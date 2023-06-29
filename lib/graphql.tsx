@@ -5,9 +5,14 @@ import {
   InMemoryCache,
   split,
   HttpLink,
+  ApolloLink,
 } from "@apollo/client"
-import { WebSocketLink } from "@apollo/client/link/ws"
 import { getMainDefinition } from "@apollo/client/utilities"
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions"
+import { RetryLink } from "@apollo/client/link/retry"
+import { onError } from "@apollo/client/link/error"
+
+import { createClient } from "graphql-ws"
 
 import { GRAPHQL_URI, GRAPHQL_SUBSCRIPTION_URI } from "./config"
 
@@ -15,14 +20,56 @@ const httpLink = new HttpLink({
   uri: GRAPHQL_URI,
 })
 
-const wsLink = new WebSocketLink({
-  uri: GRAPHQL_SUBSCRIPTION_URI,
-  options: {
-    reconnect: true,
+const wsLink = new GraphQLWsLink(
+  createClient({
+    url: GRAPHQL_SUBSCRIPTION_URI,
+    retryAttempts: 12,
+    connectionParams: {},
+    shouldRetry: (errOrCloseEvent) => {
+      console.warn({ errOrCloseEvent }, "entering shouldRetry function for websocket")
+      // TODO: understand how the backend is closing the connection
+      // for instance during a new version rollout or k8s upgrade
+      //
+      // in the meantime:
+      // returning true instead of the default 'Any non-`CloseEvent`'
+      // to force createClient to attempt a reconnection
+      return true
+    },
+    // Voluntary not using: webSocketImpl: WebSocket
+    // seems react native already have an implement of the websocket?
+    //
+    // TODO: implement keepAlive and reconnection?
+    // https://github.com/enisdenjo/graphql-ws/blob/master/docs/interfaces/client.ClientOptions.md#keepalive
+  }),
+)
+
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  // graphqlErrors should be managed locally
+  if (graphQLErrors)
+    graphQLErrors.forEach(({ message, locations, path }) => {
+      if (message === "PersistedQueryNotFound") {
+        console.log(`[GraphQL info]: Message: ${message}, Path: ${path}}`, {
+          locations,
+        })
+      } else {
+        console.warn(`[GraphQL error]: Message: ${message}, Path: ${path}}`, {
+          locations,
+        })
+      }
+    })
+  // only network error are managed globally
+  if (networkError) {
+    console.log(`[Network error]: ${networkError}`)
+  }
+})
+
+const retryLink = new RetryLink({
+  attempts: {
+    max: 5,
   },
 })
 
-const splitLink = split(
+const link = split(
   ({ query }) => {
     const definition = getMainDefinition(query)
     return (
@@ -30,11 +77,11 @@ const splitLink = split(
     )
   },
   wsLink,
-  httpLink,
+  ApolloLink.from([errorLink, retryLink, httpLink]),
 )
 
 const client = new ApolloClient({
-  link: splitLink,
+  link,
   cache: new InMemoryCache(),
 })
 
