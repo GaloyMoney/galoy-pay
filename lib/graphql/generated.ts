@@ -25,8 +25,12 @@ export type Scalars = {
   CentAmount: number
   /** An alias name that a user can set for a wallet (with which they have transactions) */
   ContactAlias: string
+  /** A CCA2 country code (ex US, FR, etc) */
+  CountryCode: string
   /** Display currency of an account */
   DisplayCurrency: string
+  /** Feedback shared with our user */
+  Feedback: string
   /** Hex-encoded string of 32 bytes */
   Hex32Bytes: string
   Language: string
@@ -36,6 +40,8 @@ export type Scalars = {
   LnPaymentSecret: string
   /** Text field in a lightning payment transaction */
   Memo: string
+  /** (Positive) amount of minutes */
+  Minutes: string
   /** An address for an on-chain bitcoin destination */
   OnChainAddress: string
   OnChainTxHash: string
@@ -88,9 +94,16 @@ export type AccountTransactionsArgs = {
   walletIds?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["WalletId"]>>>
 }
 
+export type AccountDeletePayload = {
+  readonly __typename: "AccountDeletePayload"
+  readonly errors: ReadonlyArray<Error>
+  readonly success: Scalars["Boolean"]
+}
+
 export const AccountLevel = {
   One: "ONE",
   Two: "TWO",
+  Zero: "ZERO",
 } as const
 
 export type AccountLevel = (typeof AccountLevel)[keyof typeof AccountLevel]
@@ -241,6 +254,12 @@ export type Coordinates = {
   readonly longitude: Scalars["Float"]
 }
 
+export type Country = {
+  readonly __typename: "Country"
+  readonly id: Scalars["CountryCode"]
+  readonly supportedAuthChannels: ReadonlyArray<PhoneCodeChannelType>
+}
+
 export type Currency = {
   readonly __typename: "Currency"
   readonly flag: Scalars["String"]
@@ -248,6 +267,15 @@ export type Currency = {
   readonly id: Scalars["ID"]
   readonly name: Scalars["String"]
   readonly symbol: Scalars["String"]
+}
+
+export type DepositFeesInformation = {
+  readonly __typename: "DepositFeesInformation"
+  readonly minBankFee: Scalars["String"]
+  /** below this amount minBankFee will be charged */
+  readonly minBankFeeThreshold: Scalars["String"]
+  /** ratio to charge as basis points above minBankFeeThreshold amount */
+  readonly ratio: Scalars["String"]
 }
 
 export type DeviceNotificationTokenCreateInput = {
@@ -267,10 +295,20 @@ export const ExchangeCurrencyUnit = {
 
 export type ExchangeCurrencyUnit =
   (typeof ExchangeCurrencyUnit)[keyof typeof ExchangeCurrencyUnit]
+export type FeedbackSubmitInput = {
+  readonly feedback: Scalars["Feedback"]
+}
+
+export type FeesInformation = {
+  readonly __typename: "FeesInformation"
+  readonly deposit: DepositFeesInformation
+}
+
 /** Provides global settings for the application which might have an impact for the user. */
 export type Globals = {
   readonly __typename: "Globals"
   readonly buildInformation: BuildInformation
+  readonly feesInformation: FeesInformation
   /** The domain name for lightning addresses accepted by this Galoy instance */
   readonly lightningAddressDomain: Scalars["String"]
   readonly lightningAddressDomainAliases: ReadonlyArray<Scalars["String"]>
@@ -281,6 +319,8 @@ export type Globals = {
    * This can be used to know if an invoice belongs to one of our nodes.
    */
   readonly nodesIds: ReadonlyArray<Scalars["String"]>
+  /** A list of countries and their supported auth channels */
+  readonly supportedCountries: ReadonlyArray<Country>
 }
 
 export type GraphQlApplicationError = Error & {
@@ -342,6 +382,7 @@ export type IntraLedgerUsdPaymentSendInput = {
 }
 
 export const InvoicePaymentStatus = {
+  Expired: "EXPIRED",
   Paid: "PAID",
   Pending: "PENDING",
 } as const
@@ -359,6 +400,8 @@ export type LnInvoice = {
 export type LnInvoiceCreateInput = {
   /** Amount in satoshis. */
   readonly amount: Scalars["SatAmount"]
+  /** Optional invoice expiration time in minutes. */
+  readonly expiresIn?: InputMaybe<Scalars["Minutes"]>
   /** Optional memo for the lightning invoice. */
   readonly memo?: InputMaybe<Scalars["Memo"]>
   /** Wallet ID for a BTC wallet belonging to the current account. */
@@ -369,6 +412,8 @@ export type LnInvoiceCreateOnBehalfOfRecipientInput = {
   /** Amount in satoshis. */
   readonly amount: Scalars["SatAmount"]
   readonly descriptionHash?: InputMaybe<Scalars["Hex32Bytes"]>
+  /** Optional invoice expiration time in minutes. */
+  readonly expiresIn?: InputMaybe<Scalars["Minutes"]>
   /** Optional memo for the lightning invoice. */
   readonly memo?: InputMaybe<Scalars["Memo"]>
   /** Wallet ID for a BTC wallet which belongs to any account. */
@@ -413,6 +458,8 @@ export type LnNoAmountInvoice = {
 }
 
 export type LnNoAmountInvoiceCreateInput = {
+  /** Optional invoice expiration time in minutes. */
+  readonly expiresIn?: InputMaybe<Scalars["Minutes"]>
   /** Optional memo for the lightning invoice. */
   readonly memo?: InputMaybe<Scalars["Memo"]>
   /** ID for either a USD or BTC wallet belonging to the account of the current user. */
@@ -420,6 +467,8 @@ export type LnNoAmountInvoiceCreateInput = {
 }
 
 export type LnNoAmountInvoiceCreateOnBehalfOfRecipientInput = {
+  /** Optional invoice expiration time in minutes. */
+  readonly expiresIn?: InputMaybe<Scalars["Minutes"]>
   /** Optional memo for the lightning invoice. */
   readonly memo?: InputMaybe<Scalars["Memo"]>
   /** ID for either a USD or BTC wallet which belongs to the account of any user. */
@@ -476,6 +525,8 @@ export type LnUpdate = {
 export type LnUsdInvoiceCreateInput = {
   /** Amount in USD cents. */
   readonly amount: Scalars["CentAmount"]
+  /** Optional invoice expiration time in minutes. */
+  readonly expiresIn?: InputMaybe<Scalars["Minutes"]>
   /** Optional memo for the lightning invoice. */
   readonly memo?: InputMaybe<Scalars["Memo"]>
   /** Wallet ID for a USD wallet belonging to the current user. */
@@ -486,6 +537,8 @@ export type LnUsdInvoiceCreateOnBehalfOfRecipientInput = {
   /** Amount in USD cents. */
   readonly amount: Scalars["CentAmount"]
   readonly descriptionHash?: InputMaybe<Scalars["Hex32Bytes"]>
+  /** Optional invoice expiration time in minutes. */
+  readonly expiresIn?: InputMaybe<Scalars["Minutes"]>
   /** Optional memo for the lightning invoice. Acts as a note to the recipient. */
   readonly memo?: InputMaybe<Scalars["Memo"]>
   /** Wallet ID for a USD wallet which belongs to the account of any user. */
@@ -518,11 +571,13 @@ export type MobileVersions = {
 
 export type Mutation = {
   readonly __typename: "Mutation"
+  readonly accountDelete: AccountDeletePayload
   readonly accountUpdateDefaultWalletId: AccountUpdateDefaultWalletIdPayload
   readonly accountUpdateDisplayCurrency: AccountUpdateDisplayCurrencyPayload
   readonly captchaCreateChallenge: CaptchaCreateChallengePayload
   readonly captchaRequestAuthCode: SuccessPayload
   readonly deviceNotificationTokenCreate: SuccessPayload
+  readonly feedbackSubmit: SuccessPayload
   /**
    * Actions a payment which is internal to the ledger e.g. it does
    * not use onchain/lightning. Returns payment status (success,
@@ -538,13 +593,13 @@ export type Mutation = {
   /**
    * Returns a lightning invoice for an associated wallet.
    * When invoice is paid the value will be credited to a BTC wallet.
-   * Expires after 24 hours.
+   * Expires after 'expiresIn' or 24 hours.
    */
   readonly lnInvoiceCreate: LnInvoicePayload
   /**
    * Returns a lightning invoice for an associated wallet.
    * When invoice is paid the value will be credited to a BTC wallet.
-   * Expires after 24 hours.
+   * Expires after 'expiresIn' or 24 hours.
    */
   readonly lnInvoiceCreateOnBehalfOfRecipient: LnInvoicePayload
   readonly lnInvoiceFeeProbe: SatAmountPayload
@@ -557,13 +612,13 @@ export type Mutation = {
   /**
    * Returns a lightning invoice for an associated wallet.
    * Can be used to receive any supported currency value (currently USD or BTC).
-   * Expires after 24 hours.
+   * Expires after 'expiresIn' or 24 hours for BTC invoices or 5 minutes for USD invoices.
    */
   readonly lnNoAmountInvoiceCreate: LnNoAmountInvoicePayload
   /**
    * Returns a lightning invoice for an associated wallet.
    * Can be used to receive any supported currency value (currently USD or BTC).
-   * Expires after 24 hours.
+   * Expires after 'expiresIn' or 24 hours for BTC invoices or 5 minutes for USD invoices.
    */
   readonly lnNoAmountInvoiceCreateOnBehalfOfRecipient: LnNoAmountInvoicePayload
   readonly lnNoAmountInvoiceFeeProbe: SatAmountPayload
@@ -583,14 +638,14 @@ export type Mutation = {
   /**
    * Returns a lightning invoice denominated in satoshis for an associated wallet.
    * When invoice is paid the equivalent value at invoice creation will be credited to a USD wallet.
-   * Expires after 5 minutes (short expiry time because there is a USD/BTC exchange rate
+   * Expires after 'expiresIn' or 5 minutes (short expiry time because there is a USD/BTC exchange rate
    * associated with the amount).
    */
   readonly lnUsdInvoiceCreate: LnInvoicePayload
   /**
    * Returns a lightning invoice denominated in satoshis for an associated wallet.
    * When invoice is paid the equivalent value at invoice creation will be credited to a USD wallet.
-   * Expires after 5 minutes (short expiry time because there is a USD/BTC exchange rate
+   * Expires after 'expiresIn' or 5 minutes (short expiry time because there is a USD/BTC exchange rate
    *   associated with the amount).
    */
   readonly lnUsdInvoiceCreateOnBehalfOfRecipient: LnInvoicePayload
@@ -605,6 +660,7 @@ export type Mutation = {
   /** @deprecated will be moved to AccountContact */
   readonly userContactUpdateAlias: UserContactUpdateAliasPayload
   readonly userLogin: AuthTokenPayload
+  readonly userLoginUpgrade: UpgradePayload
   readonly userLogout: AuthTokenPayload
   /** @deprecated Use QuizCompletedMutation instead */
   readonly userQuizQuestionUpdateCompleted: UserQuizQuestionUpdateCompletedPayload
@@ -628,6 +684,10 @@ export type MutationCaptchaRequestAuthCodeArgs = {
 
 export type MutationDeviceNotificationTokenCreateArgs = {
   input: DeviceNotificationTokenCreateInput
+}
+
+export type MutationFeedbackSubmitArgs = {
+  input: FeedbackSubmitInput
 }
 
 export type MutationIntraLedgerPaymentSendArgs = {
@@ -726,6 +786,10 @@ export type MutationUserLoginArgs = {
   input: UserLoginInput
 }
 
+export type MutationUserLoginUpgradeArgs = {
+  input: UserLoginUpgradeInput
+}
+
 export type MutationUserLogoutArgs = {
   input: UserLogoutInput
 }
@@ -778,6 +842,8 @@ export type OnChainAddressPayload = {
 export type OnChainPaymentSendAllInput = {
   readonly address: Scalars["OnChainAddress"]
   readonly memo?: InputMaybe<Scalars["Memo"]>
+  readonly speed?: InputMaybe<PayoutSpeed>
+  /** @deprecated Ignored - will be replaced */
   readonly targetConfirmations?: InputMaybe<Scalars["TargetConfirmations"]>
   readonly walletId: Scalars["WalletId"]
 }
@@ -786,6 +852,8 @@ export type OnChainPaymentSendInput = {
   readonly address: Scalars["OnChainAddress"]
   readonly amount: Scalars["SatAmount"]
   readonly memo?: InputMaybe<Scalars["Memo"]>
+  readonly speed?: InputMaybe<PayoutSpeed>
+  /** @deprecated Ignored - will be replaced */
   readonly targetConfirmations?: InputMaybe<Scalars["TargetConfirmations"]>
   readonly walletId: Scalars["WalletId"]
 }
@@ -793,6 +861,7 @@ export type OnChainPaymentSendInput = {
 export type OnChainTxFee = {
   readonly __typename: "OnChainTxFee"
   readonly amount: Scalars["SatAmount"]
+  /** @deprecated Ignored - will be removed */
   readonly targetConfirmations: Scalars["TargetConfirmations"]
 }
 
@@ -811,6 +880,8 @@ export type OnChainUsdPaymentSendAsBtcDenominatedInput = {
   readonly address: Scalars["OnChainAddress"]
   readonly amount: Scalars["SatAmount"]
   readonly memo?: InputMaybe<Scalars["Memo"]>
+  readonly speed?: InputMaybe<PayoutSpeed>
+  /** @deprecated Ignored - will be replaced */
   readonly targetConfirmations?: InputMaybe<Scalars["TargetConfirmations"]>
   readonly walletId: Scalars["WalletId"]
 }
@@ -819,6 +890,8 @@ export type OnChainUsdPaymentSendInput = {
   readonly address: Scalars["OnChainAddress"]
   readonly amount: Scalars["CentAmount"]
   readonly memo?: InputMaybe<Scalars["Memo"]>
+  readonly speed?: InputMaybe<PayoutSpeed>
+  /** @deprecated Ignored - will be replaced */
   readonly targetConfirmations?: InputMaybe<Scalars["TargetConfirmations"]>
   readonly walletId: Scalars["WalletId"]
 }
@@ -826,6 +899,7 @@ export type OnChainUsdPaymentSendInput = {
 export type OnChainUsdTxFee = {
   readonly __typename: "OnChainUsdTxFee"
   readonly amount: Scalars["CentAmount"]
+  /** @deprecated Ignored - will be removed */
   readonly targetConfirmations: Scalars["TargetConfirmations"]
 }
 
@@ -866,6 +940,11 @@ export const PaymentSendResult = {
 } as const
 
 export type PaymentSendResult = (typeof PaymentSendResult)[keyof typeof PaymentSendResult]
+export const PayoutSpeed = {
+  Fast: "FAST",
+} as const
+
+export type PayoutSpeed = (typeof PayoutSpeed)[keyof typeof PayoutSpeed]
 export const PhoneCodeChannelType = {
   Sms: "SMS",
   Whatsapp: "WHATSAPP",
@@ -998,6 +1077,7 @@ export type QueryLnInvoicePaymentStatusArgs = {
 export type QueryOnChainTxFeeArgs = {
   address: Scalars["OnChainAddress"]
   amount: Scalars["SatAmount"]
+  speed?: InputMaybe<PayoutSpeed>
   targetConfirmations?: InputMaybe<Scalars["TargetConfirmations"]>
   walletId: Scalars["WalletId"]
 }
@@ -1005,6 +1085,7 @@ export type QueryOnChainTxFeeArgs = {
 export type QueryOnChainUsdTxFeeArgs = {
   address: Scalars["OnChainAddress"]
   amount: Scalars["CentAmount"]
+  speed?: InputMaybe<PayoutSpeed>
   targetConfirmations?: InputMaybe<Scalars["TargetConfirmations"]>
   walletId: Scalars["WalletId"]
 }
@@ -1012,6 +1093,7 @@ export type QueryOnChainUsdTxFeeArgs = {
 export type QueryOnChainUsdTxFeeAsBtcDenominatedArgs = {
   address: Scalars["OnChainAddress"]
   amount: Scalars["SatAmount"]
+  speed?: InputMaybe<PayoutSpeed>
   targetConfirmations?: InputMaybe<Scalars["TargetConfirmations"]>
   walletId: Scalars["WalletId"]
 }
@@ -1100,7 +1182,8 @@ export type SettlementViaLn = {
 
 export type SettlementViaOnChain = {
   readonly __typename: "SettlementViaOnChain"
-  readonly transactionHash: Scalars["OnChainTxHash"]
+  readonly transactionHash?: Maybe<Scalars["OnChainTxHash"]>
+  readonly vout?: Maybe<Scalars["Int"]>
 }
 
 export type Subscription = {
@@ -1202,6 +1285,13 @@ export const TxStatus = {
 } as const
 
 export type TxStatus = (typeof TxStatus)[keyof typeof TxStatus]
+export type UpgradePayload = {
+  readonly __typename: "UpgradePayload"
+  readonly authToken?: Maybe<Scalars["AuthToken"]>
+  readonly errors: ReadonlyArray<Error>
+  readonly success: Scalars["Boolean"]
+}
+
 /** A wallet belonging to an account which contains a USD balance and a list of transactions. */
 export type UsdWallet = Wallet & {
   readonly __typename: "UsdWallet"
@@ -1310,6 +1400,11 @@ export type UserLoginInput = {
   readonly phone: Scalars["Phone"]
 }
 
+export type UserLoginUpgradeInput = {
+  readonly code: Scalars["OneTimeAuthCode"]
+  readonly phone: Scalars["Phone"]
+}
+
 export type UserLogoutInput = {
   readonly authToken: Scalars["AuthToken"]
 }
@@ -1404,6 +1499,22 @@ export const WalletCurrency = {
 } as const
 
 export type WalletCurrency = (typeof WalletCurrency)[keyof typeof WalletCurrency]
+export type LnInvoicePaymentStatusSubscriptionVariables = Exact<{
+  input: LnInvoicePaymentStatusInput
+}>
+
+export type LnInvoicePaymentStatusSubscription = {
+  readonly __typename: "Subscription"
+  readonly lnInvoicePaymentStatus: {
+    readonly __typename: "LnInvoicePaymentStatusPayload"
+    readonly status?: InvoicePaymentStatus | null
+    readonly errors: ReadonlyArray<{
+      readonly __typename: "GraphQLApplicationError"
+      readonly message: string
+    }>
+  }
+}
+
 export type LnNoAmountInvoiceCreateOnBehalfOfRecipientMutationVariables = Exact<{
   walletId: Scalars["WalletId"]
 }>
@@ -1419,6 +1530,50 @@ export type LnNoAmountInvoiceCreateOnBehalfOfRecipientMutation = {
     readonly invoice?: {
       readonly __typename: "LnNoAmountInvoice"
       readonly paymentRequest: string
+    } | null
+  }
+}
+
+export type LnUsdInvoiceCreateOnBehalfOfRecipientMutationVariables = Exact<{
+  input: LnUsdInvoiceCreateOnBehalfOfRecipientInput
+}>
+
+export type LnUsdInvoiceCreateOnBehalfOfRecipientMutation = {
+  readonly __typename: "Mutation"
+  readonly lnUsdInvoiceCreateOnBehalfOfRecipient: {
+    readonly __typename: "LnInvoicePayload"
+    readonly errors: ReadonlyArray<{
+      readonly __typename: "GraphQLApplicationError"
+      readonly message: string
+    }>
+    readonly invoice?: {
+      readonly __typename: "LnInvoice"
+      readonly paymentHash: string
+      readonly paymentRequest: string
+      readonly paymentSecret: string
+      readonly satoshis?: number | null
+    } | null
+  }
+}
+
+export type LnInvoiceCreateOnBehalfOfRecipientsMutationVariables = Exact<{
+  input: LnInvoiceCreateOnBehalfOfRecipientInput
+}>
+
+export type LnInvoiceCreateOnBehalfOfRecipientsMutation = {
+  readonly __typename: "Mutation"
+  readonly lnInvoiceCreateOnBehalfOfRecipient: {
+    readonly __typename: "LnInvoicePayload"
+    readonly errors: ReadonlyArray<{
+      readonly __typename: "GraphQLApplicationError"
+      readonly message: string
+    }>
+    readonly invoice?: {
+      readonly __typename: "LnInvoice"
+      readonly paymentHash: string
+      readonly paymentRequest: string
+      readonly paymentSecret: string
+      readonly satoshis?: number | null
     } | null
   }
 }
@@ -1514,6 +1669,19 @@ export type PriceSubscription = {
   }
 }
 
+export type AccountDefaultWalletsQueryVariables = Exact<{
+  username: Scalars["Username"]
+}>
+
+export type AccountDefaultWalletsQuery = {
+  readonly __typename: "Query"
+  readonly accountDefaultWallet: {
+    readonly __typename: "PublicWallet"
+    readonly id: string
+    readonly walletCurrency: WalletCurrency
+  }
+}
+
 export type AccountDefaultWalletQueryVariables = Exact<{
   username: Scalars["Username"]
   walletCurrency: WalletCurrency
@@ -1573,6 +1741,52 @@ export type AccountDefaultWallet2Query = {
   }
 }
 
+export const LnInvoicePaymentStatusDocument = gql`
+  subscription lnInvoicePaymentStatus($input: LnInvoicePaymentStatusInput!) {
+    lnInvoicePaymentStatus(input: $input) {
+      __typename
+      errors {
+        message
+        __typename
+      }
+      status
+    }
+  }
+`
+
+/**
+ * __useLnInvoicePaymentStatusSubscription__
+ *
+ * To run a query within a React component, call `useLnInvoicePaymentStatusSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useLnInvoicePaymentStatusSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLnInvoicePaymentStatusSubscription({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useLnInvoicePaymentStatusSubscription(
+  baseOptions: Apollo.SubscriptionHookOptions<
+    LnInvoicePaymentStatusSubscription,
+    LnInvoicePaymentStatusSubscriptionVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useSubscription<
+    LnInvoicePaymentStatusSubscription,
+    LnInvoicePaymentStatusSubscriptionVariables
+  >(LnInvoicePaymentStatusDocument, options)
+}
+export type LnInvoicePaymentStatusSubscriptionHookResult = ReturnType<
+  typeof useLnInvoicePaymentStatusSubscription
+>
+export type LnInvoicePaymentStatusSubscriptionResult =
+  Apollo.SubscriptionResult<LnInvoicePaymentStatusSubscription>
 export const LnNoAmountInvoiceCreateOnBehalfOfRecipientDocument = gql`
   mutation lnNoAmountInvoiceCreateOnBehalfOfRecipient($walletId: WalletId!) {
     mutationData: lnNoAmountInvoiceCreateOnBehalfOfRecipient(
@@ -1631,6 +1845,134 @@ export type LnNoAmountInvoiceCreateOnBehalfOfRecipientMutationOptions =
   Apollo.BaseMutationOptions<
     LnNoAmountInvoiceCreateOnBehalfOfRecipientMutation,
     LnNoAmountInvoiceCreateOnBehalfOfRecipientMutationVariables
+  >
+export const LnUsdInvoiceCreateOnBehalfOfRecipientDocument = gql`
+  mutation lnUsdInvoiceCreateOnBehalfOfRecipient(
+    $input: LnUsdInvoiceCreateOnBehalfOfRecipientInput!
+  ) {
+    lnUsdInvoiceCreateOnBehalfOfRecipient(input: $input) {
+      errors {
+        __typename
+        message
+      }
+      invoice {
+        __typename
+        paymentHash
+        paymentRequest
+        paymentSecret
+        satoshis
+      }
+      __typename
+    }
+  }
+`
+export type LnUsdInvoiceCreateOnBehalfOfRecipientMutationFn = Apollo.MutationFunction<
+  LnUsdInvoiceCreateOnBehalfOfRecipientMutation,
+  LnUsdInvoiceCreateOnBehalfOfRecipientMutationVariables
+>
+
+/**
+ * __useLnUsdInvoiceCreateOnBehalfOfRecipientMutation__
+ *
+ * To run a mutation, you first call `useLnUsdInvoiceCreateOnBehalfOfRecipientMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLnUsdInvoiceCreateOnBehalfOfRecipientMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [lnUsdInvoiceCreateOnBehalfOfRecipientMutation, { data, loading, error }] = useLnUsdInvoiceCreateOnBehalfOfRecipientMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useLnUsdInvoiceCreateOnBehalfOfRecipientMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    LnUsdInvoiceCreateOnBehalfOfRecipientMutation,
+    LnUsdInvoiceCreateOnBehalfOfRecipientMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<
+    LnUsdInvoiceCreateOnBehalfOfRecipientMutation,
+    LnUsdInvoiceCreateOnBehalfOfRecipientMutationVariables
+  >(LnUsdInvoiceCreateOnBehalfOfRecipientDocument, options)
+}
+export type LnUsdInvoiceCreateOnBehalfOfRecipientMutationHookResult = ReturnType<
+  typeof useLnUsdInvoiceCreateOnBehalfOfRecipientMutation
+>
+export type LnUsdInvoiceCreateOnBehalfOfRecipientMutationResult =
+  Apollo.MutationResult<LnUsdInvoiceCreateOnBehalfOfRecipientMutation>
+export type LnUsdInvoiceCreateOnBehalfOfRecipientMutationOptions =
+  Apollo.BaseMutationOptions<
+    LnUsdInvoiceCreateOnBehalfOfRecipientMutation,
+    LnUsdInvoiceCreateOnBehalfOfRecipientMutationVariables
+  >
+export const LnInvoiceCreateOnBehalfOfRecipientsDocument = gql`
+  mutation lnInvoiceCreateOnBehalfOfRecipients(
+    $input: LnInvoiceCreateOnBehalfOfRecipientInput!
+  ) {
+    lnInvoiceCreateOnBehalfOfRecipient(input: $input) {
+      errors {
+        __typename
+        message
+      }
+      invoice {
+        __typename
+        paymentHash
+        paymentRequest
+        paymentSecret
+        satoshis
+      }
+      __typename
+    }
+  }
+`
+export type LnInvoiceCreateOnBehalfOfRecipientsMutationFn = Apollo.MutationFunction<
+  LnInvoiceCreateOnBehalfOfRecipientsMutation,
+  LnInvoiceCreateOnBehalfOfRecipientsMutationVariables
+>
+
+/**
+ * __useLnInvoiceCreateOnBehalfOfRecipientsMutation__
+ *
+ * To run a mutation, you first call `useLnInvoiceCreateOnBehalfOfRecipientsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLnInvoiceCreateOnBehalfOfRecipientsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [lnInvoiceCreateOnBehalfOfRecipientsMutation, { data, loading, error }] = useLnInvoiceCreateOnBehalfOfRecipientsMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useLnInvoiceCreateOnBehalfOfRecipientsMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    LnInvoiceCreateOnBehalfOfRecipientsMutation,
+    LnInvoiceCreateOnBehalfOfRecipientsMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<
+    LnInvoiceCreateOnBehalfOfRecipientsMutation,
+    LnInvoiceCreateOnBehalfOfRecipientsMutationVariables
+  >(LnInvoiceCreateOnBehalfOfRecipientsDocument, options)
+}
+export type LnInvoiceCreateOnBehalfOfRecipientsMutationHookResult = ReturnType<
+  typeof useLnInvoiceCreateOnBehalfOfRecipientsMutation
+>
+export type LnInvoiceCreateOnBehalfOfRecipientsMutationResult =
+  Apollo.MutationResult<LnInvoiceCreateOnBehalfOfRecipientsMutation>
+export type LnInvoiceCreateOnBehalfOfRecipientsMutationOptions =
+  Apollo.BaseMutationOptions<
+    LnInvoiceCreateOnBehalfOfRecipientsMutation,
+    LnInvoiceCreateOnBehalfOfRecipientsMutationVariables
   >
 export const CurrencyListDocument = gql`
   query currencyList {
@@ -1867,6 +2209,66 @@ export function usePriceSubscription(
 }
 export type PriceSubscriptionHookResult = ReturnType<typeof usePriceSubscription>
 export type PriceSubscriptionResult = Apollo.SubscriptionResult<PriceSubscription>
+export const AccountDefaultWalletsDocument = gql`
+  query accountDefaultWallets($username: Username!) {
+    accountDefaultWallet(username: $username) {
+      __typename
+      id
+      walletCurrency
+    }
+  }
+`
+
+/**
+ * __useAccountDefaultWalletsQuery__
+ *
+ * To run a query within a React component, call `useAccountDefaultWalletsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAccountDefaultWalletsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAccountDefaultWalletsQuery({
+ *   variables: {
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useAccountDefaultWalletsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    AccountDefaultWalletsQuery,
+    AccountDefaultWalletsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<AccountDefaultWalletsQuery, AccountDefaultWalletsQueryVariables>(
+    AccountDefaultWalletsDocument,
+    options,
+  )
+}
+export function useAccountDefaultWalletsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    AccountDefaultWalletsQuery,
+    AccountDefaultWalletsQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<
+    AccountDefaultWalletsQuery,
+    AccountDefaultWalletsQueryVariables
+  >(AccountDefaultWalletsDocument, options)
+}
+export type AccountDefaultWalletsQueryHookResult = ReturnType<
+  typeof useAccountDefaultWalletsQuery
+>
+export type AccountDefaultWalletsLazyQueryHookResult = ReturnType<
+  typeof useAccountDefaultWalletsLazyQuery
+>
+export type AccountDefaultWalletsQueryResult = Apollo.QueryResult<
+  AccountDefaultWalletsQuery,
+  AccountDefaultWalletsQueryVariables
+>
 export const AccountDefaultWalletDocument = gql`
   query accountDefaultWallet($username: Username!, $walletCurrency: WalletCurrency!) {
     accountDefaultWallet(username: $username, walletCurrency: $walletCurrency) {

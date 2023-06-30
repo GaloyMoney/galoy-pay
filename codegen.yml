@@ -7,6 +7,8 @@ documents:
   - "lib/**/*.tsx"
   - "pages/**/*.ts"
   - "pages/**/*.tsx"
+  - "hooks/**/*.ts"
+  - "hooks/**/*.tsx"
 generates:
   lib/graphql/generated.ts:
     schema: "lib/graphql/local-schema.gql"
@@ -50,3 +52,6 @@ generates:
         Seconds: "number"
         DisplayCurrency: "string"
         SignedDisplayMajorAmount: "string"
+        CountryCode: "string"
+        Feedback: "string"
+        Minutes: "string"

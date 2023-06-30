@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.12",
-    "@galoymoney/client": "0.1.43",
+    "@galoymoney/client": "^0.2.2",
     "bech32": "^2.0.0",
     "bitcoinjs-lib": "5.0.5",
     "bolt11": "1.3.4",
@@ -46,7 +46,6 @@
     "react-qrcode-logo": "^2.9.0",
     "react-refresh": "^0.14.0",
     "react-to-print": "^2.14.12",
-    "subscriptions-transport-ws": "^0.11.0",
     "use-debounce": "^8.0.4",
     "use-react-screenshot": "^3.0.0"
   },

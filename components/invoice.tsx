@@ -6,9 +6,8 @@ import Tooltip from "react-bootstrap/Tooltip"
 import Lottie from "react-lottie"
 import { QRCode } from "react-qrcode-logo"
 
-import { useSubscription } from "@galoymoney/client"
-
 import animationData from "./success-animation.json"
+import { useLnInvoicePaymentStatusSubscription } from "../lib/graphql/generated"
 
 export default function Invoice({
   paymentRequest,
@@ -19,7 +18,7 @@ export default function Invoice({
 }) {
   const [showCopied, setShowCopied] = useState(false)
 
-  const { loading, data, error, errorsMessage } = useSubscription.lnInvoicePaymentStatus({
+  const { loading, data, error } = useLnInvoicePaymentStatusSubscription({
     variables: {
       input: { paymentRequest },
     },
@@ -40,7 +39,7 @@ export default function Invoice({
 
   if (error) {
     console.error(error)
-    return <div className="error">{errorsMessage}</div>
+    return <div className="error">{error.message}</div>
   }
 
   if (loading) {

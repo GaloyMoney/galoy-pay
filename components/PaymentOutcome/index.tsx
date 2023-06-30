@@ -1,4 +1,3 @@
-import { useSubscription } from "@galoymoney/client"
 import { useRouter } from "next/router"
 import React, { useRef } from "react"
 import Image from "react-bootstrap/Image"
@@ -6,11 +5,26 @@ import { ACTIONS, ACTION_TYPE } from "../../pages/_reducer"
 import styles from "./payment-outcome.module.css"
 import Receipt from "./receipt"
 import { useReactToPrint } from "react-to-print"
+import { gql } from "@apollo/client"
+import { useLnInvoicePaymentStatusSubscription } from "../../lib/graphql/generated"
 interface Props {
   paymentRequest: string
   paymentAmount: string | string[] | undefined
   dispatch: React.Dispatch<ACTION_TYPE>
 }
+
+gql`
+  subscription lnInvoicePaymentStatus($input: LnInvoicePaymentStatusInput!) {
+    lnInvoicePaymentStatus(input: $input) {
+      __typename
+      errors {
+        message
+        __typename
+      }
+      status
+    }
+  }
+`
 
 function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
   const router = useRouter()
@@ -21,15 +35,16 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
     content: () => componentRef.current,
   })
 
-  if (!paymentRequest) {
-    return null
-  }
-
-  const { loading, data, error, errorsMessage } = useSubscription.lnInvoicePaymentStatus({
+  const { loading, data, error } = useLnInvoicePaymentStatusSubscription({
     variables: {
       input: { paymentRequest },
     },
+    skip: !paymentRequest,
   })
+
+  if (!paymentRequest) {
+    return null
+  }
 
   if (data !== undefined) {
     if (error) console.error(error)
@@ -101,7 +116,7 @@ function PaymentOutcome({ paymentRequest, paymentAmount, dispatch }: Props) {
       )
     }
 
-    if (errors.length > 0 || errorsMessage) {
+    if (errors.length > 0 || error?.message) {
       return (
         <div className={styles.container}>
           <div aria-labelledby="Payment unsuccessful">

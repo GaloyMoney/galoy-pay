@@ -1,11 +1,56 @@
 import { useState } from "react"
 
-import { useMutation } from "@galoymoney/client"
+import { gql } from "@apollo/client"
+import {
+  useLnInvoiceCreateOnBehalfOfRecipientsMutation,
+  useLnUsdInvoiceCreateOnBehalfOfRecipientMutation,
+} from "../lib/graphql/generated"
 
 interface Props {
   recipientWalletCurrency: string | undefined
 }
 
+gql`
+  mutation lnUsdInvoiceCreateOnBehalfOfRecipient(
+    $input: LnUsdInvoiceCreateOnBehalfOfRecipientInput!
+  ) {
+    lnUsdInvoiceCreateOnBehalfOfRecipient(input: $input) {
+      errors {
+        __typename
+        message
+      }
+      invoice {
+        __typename
+        paymentHash
+        paymentRequest
+        paymentSecret
+        satoshis
+      }
+      __typename
+    }
+  }
+`
+
+gql`
+  mutation lnInvoiceCreateOnBehalfOfRecipients(
+    $input: LnInvoiceCreateOnBehalfOfRecipientInput!
+  ) {
+    lnInvoiceCreateOnBehalfOfRecipient(input: $input) {
+      errors {
+        __typename
+        message
+      }
+      invoice {
+        __typename
+        paymentHash
+        paymentRequest
+        paymentSecret
+        satoshis
+      }
+      __typename
+    }
+  }
+`
 const useCreateInvoice = ({ recipientWalletCurrency }: Props) => {
   const [invoiceStatus, setInvoiceStatus] = useState<
     "loading" | "new" | "need-update" | "expired"
@@ -13,10 +58,10 @@ const useCreateInvoice = ({ recipientWalletCurrency }: Props) => {
 
   const mutation =
     recipientWalletCurrency === "USD"
-      ? useMutation.lnUsdInvoiceCreateOnBehalfOfRecipient
-      : useMutation.lnInvoiceCreateOnBehalfOfRecipient
+      ? useLnUsdInvoiceCreateOnBehalfOfRecipientMutation
+      : useLnInvoiceCreateOnBehalfOfRecipientsMutation
 
-  const [createInvoice, { loading, errorsMessage, error, data }] = mutation({
+  const [createInvoice, { loading, error, data }] = mutation({
     onError: console.error,
     onCompleted: () => setInvoiceStatus("new"),
   })
@@ -26,7 +71,7 @@ const useCreateInvoice = ({ recipientWalletCurrency }: Props) => {
     setInvoiceStatus,
     invoiceStatus,
     loading,
-    errorsMessage,
+    errorsMessage: error?.message,
     error,
     data,
   }
