@@ -1,5 +1,5 @@
 let GRAPHQL_HOSTNAME = process.env.NEXT_PUBLIC_GRAPHQL_HOSTNAME as string
-const WEBSOCKET_HOSTNAME = process.env.NEXT_PUBLIC_WEBSOCKET_HOSTNAME as string
+const WEBSOCKET_URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL as string
 
 // we need an internal dns to properly propagate the ip related headers to api
 // if we use the api endpoints, nginx will rewrite the header to prevent spoofing
@@ -23,7 +23,7 @@ if (!GRAPHQL_HOSTNAME) {
 
 const GRAPHQL_URI_INTERNAL = `http://${GRAPHQL_HOSTNAME_INTERNAL}/graphql`
 const GRAPHQL_URI = `https://${GRAPHQL_HOSTNAME}/graphql`
-const GRAPHQL_SUBSCRIPTION_URI = `wss://${WEBSOCKET_HOSTNAME}/graphql`
+const GRAPHQL_SUBSCRIPTION_URI = `${WEBSOCKET_URL}` // 'wss://ws.staging.galoy.io/graphql'
 
 const NOSTR_PUBKEY = process.env.NOSTR_PUBKEY as string
 
