@@ -24,5 +24,5 @@ fi
   git merge --no-edit ${BRANCH}
   git add -A
   git status
-  git commit -m "Bump admin-panel image to '${digest}'"
+  git commit -m "chore(deps): bump admin-panel image to '${digest}'"
 )
