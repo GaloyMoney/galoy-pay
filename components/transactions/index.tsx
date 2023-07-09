@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ApolloError, useLazyQuery } from "@apollo/client"
+import { ApolloError } from "@apollo/client"
 
 import Login from "../login"
 import { isAuthenticated } from "../../utils"
@@ -14,17 +14,15 @@ import LnInvoice from "./ln-invoice"
 
 import { reportError } from "../../utils"
 import {
-  LIGHTNING_INVOICE,
-  LIGHTNING_PAYMENT,
-  TRANSACTIONS_BY_HASH,
-  TRANSACTION_BY_ID,
-} from "../../graphql/queries"
-import {
   LightningInvoice,
   LightningPayment,
   TransactionByIdQuery,
   TransactionsByHashQuery,
-} from "../../graphql/types"
+  useLightningInvoiceLazyQuery,
+  useLightningPaymentLazyQuery,
+  useTransactionByIdLazyQuery,
+  useTransactionsByHashLazyQuery,
+} from "../../generated"
 
 export type TransactionListType =
   | TransactionsByHashQuery["transactionsByHash"]
@@ -39,10 +37,10 @@ function TransactionDetails() {
   const [invoice, setInvoice] = useState<null | LightningInvoice>(null)
   const [searchValue, setSearchValue] = useState("")
 
-  const handleTxnsData = (txns: TransactionListType) => {
+  const handleTxnsData = (txns: any /* TransactionListType */) => {
     setData(txns)
     const txn = txns?.find(
-      (txn) =>
+      (txn: any) =>
         txn?.initiationVia.__typename !== "InitiationViaIntraLedger" &&
         txn?.settlementVia.__typename !== "SettlementViaIntraLedger",
     )
@@ -69,9 +67,8 @@ function TransactionDetails() {
     setInvoice(null)
   }
 
-  const [getTransactionsByHash, { loading: loadingTransactionsByHash }] = useLazyQuery(
-    TRANSACTIONS_BY_HASH,
-    {
+  const [getTransactionsByHash, { loading: loadingTransactionsByHash }] =
+    useTransactionsByHashLazyQuery({
       onCompleted({ transactionsByHash }) {
         setPayment(null)
         setInvoice(null)
@@ -84,12 +81,10 @@ function TransactionDetails() {
       },
       onError: onTxnsError,
       fetchPolicy: "cache-and-network",
-    },
-  )
+    })
 
-  const [getTransactionById, { loading: loadingTransactionById }] = useLazyQuery(
-    TRANSACTION_BY_ID,
-    {
+  const [getTransactionById, { loading: loadingTransactionById }] =
+    useTransactionByIdLazyQuery({
       onCompleted({ transactionById }) {
         setPayment(null)
         setInvoice(null)
@@ -102,10 +97,9 @@ function TransactionDetails() {
       },
       onError: onTxnsError,
       fetchPolicy: "cache-and-network",
-    },
-  )
+    })
 
-  const [getLnPayment, { loading: loadingLnPayment }] = useLazyQuery(LIGHTNING_PAYMENT, {
+  const [getLnPayment, { loading: loadingLnPayment }] = useLightningPaymentLazyQuery({
     onCompleted({ lightningPayment }) {
       setPayment(lightningPayment)
     },
@@ -116,7 +110,7 @@ function TransactionDetails() {
     fetchPolicy: "cache-and-network",
   })
 
-  const [getLnInvoice, { loading: loadingLnInvoice }] = useLazyQuery(LIGHTNING_INVOICE, {
+  const [getLnInvoice, { loading: loadingLnInvoice }] = useLightningInvoiceLazyQuery({
     onCompleted({ lightningInvoice }) {
       setInvoice(lightningInvoice)
     },

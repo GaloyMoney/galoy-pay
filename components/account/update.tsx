@@ -1,9 +1,9 @@
 "use client"
 
-import { AccountData } from "./index"
+import { Account } from "../../generated"
 
 type PropType = {
-  accountDetails: AccountData
+  accountDetails: Account
   updateLevel: () => void
   updatingLevel: boolean
   updateStatus: () => void

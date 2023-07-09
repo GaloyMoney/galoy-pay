@@ -4,7 +4,7 @@ import { TransactionListType } from "."
 import { formatDate, formatNumber } from "../../utils"
 
 type Props = {
-  transactions: TransactionListType
+  transactions: any /* TransactionListType */
   loading: boolean
 }
 
@@ -62,7 +62,7 @@ const Transactions: React.FC<Props> = ({ transactions, loading = false }) => {
   const isInternalTx =
     hasData &&
     transactions.every(
-      (txn) => txn?.initiationVia.__typename === "InitiationViaIntraLedger",
+      (txn: any) => txn?.initiationVia.__typename === "InitiationViaIntraLedger",
     )
   return (
     <div className="shadow w-full overflow-hidden rounded-lg shadow-xs">
@@ -85,31 +85,27 @@ const Transactions: React.FC<Props> = ({ transactions, loading = false }) => {
           </thead>
           <tbody className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
             {hasData &&
-              // FIXME: txn should not be null
-              // .filter(item => item) doesn't work type-wise
-              transactions
-                .filter((item) => item)
-                .map((txn) => (
-                  <tr key={txn?.id} className="text-gray-700 dark:text-gray-400">
-                    <td className="px-4 py-3">{txn?.id}</td>
-                    <td className="px-4 py-3">
-                      {mapViaType(txn?.initiationVia?.__typename ?? "")}
-                    </td>
-                    <td className="px-4 py-3">
-                      {mapViaType(txn?.settlementVia?.__typename ?? "")}
-                    </td>
-                    <td className="px-4 py-3">{formatNumber(txn?.settlementAmount)}</td>
-                    <td className="px-4 py-3">{formatNumber(txn?.settlementFee)}</td>
-                    <td className="px-4 py-3">
-                      {formatNumber(txn?.settlementPrice?.formattedAmount ?? "")}
-                    </td>
-                    <td className="px-4 py-3">{txn?.direction}</td>
-                    <td className="px-4 py-3">{txn?.status}</td>
-                    <td className="px-4 py-3 break-all">{txn?.memo}</td>
-                    <td className="px-4 py-3 break-all">{hashOrCounterParty(txn)}</td>
-                    <td className="px-4 py-3">{formatDate(txn?.createdAt)}</td>
-                  </tr>
-                ))}
+              transactions.map((txn: any) => (
+                <tr key={txn?.id} className="text-gray-700 dark:text-gray-400">
+                  <td className="px-4 py-3">{txn?.id}</td>
+                  <td className="px-4 py-3">
+                    {mapViaType(txn?.initiationVia?.__typename ?? "")}
+                  </td>
+                  <td className="px-4 py-3">
+                    {mapViaType(txn?.settlementVia?.__typename ?? "")}
+                  </td>
+                  <td className="px-4 py-3">{formatNumber(txn?.settlementAmount)}</td>
+                  <td className="px-4 py-3">{formatNumber(txn?.settlementFee)}</td>
+                  <td className="px-4 py-3">
+                    {formatNumber(txn?.settlementPrice?.formattedAmount ?? "")}
+                  </td>
+                  <td className="px-4 py-3">{txn?.direction}</td>
+                  <td className="px-4 py-3">{txn?.status}</td>
+                  <td className="px-4 py-3 break-all">{txn?.memo}</td>
+                  <td className="px-4 py-3 break-all">{hashOrCounterParty(txn)}</td>
+                  <td className="px-4 py-3">{formatDate(txn?.createdAt)}</td>
+                </tr>
+              ))}
             {!hasData && (
               <tr className="text-gray-700 dark:text-gray-400">
                 <td colSpan={11} className="px-4 py-3 text-center">

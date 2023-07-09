@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { AccountBusinessInfo, AccountData } from "./index"
+import { AccountBusinessInfo } from "./index"
+import { Account } from "../../generated"
 
 const isValidLatitude = (latitude: number) =>
   isFinite(latitude) && Math.abs(latitude) <= 90
@@ -14,7 +15,7 @@ const isValidBusinessInfo = ({ title, coordinates }: AccountBusinessInfo) =>
   isValidTitle(title)
 
 const BusinessMapUpdate: React.FC<{
-  accountDetails: AccountData
+  accountDetails: Account
   update: (info: AccountBusinessInfo) => void
   deleteBusiness: (username: string) => void
   updating: boolean

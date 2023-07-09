@@ -1,5 +1,6 @@
 "use client"
 
+import { LightningInvoice } from "../../generated"
 import { formatDate } from "../../utils"
 
 const emptyInvoice = {
@@ -13,18 +14,8 @@ const emptyInvoice = {
   secretPreImage: "0000000000000000000000000000000000000000000000000000000000000000",
 }
 
-// FIXME: use types from graphql schema
 type Props = {
-  invoice: {
-    createdAt: number
-    confirmedAt?: number
-    description?: string
-    expiresAt?: number
-    isSettled: boolean
-    received?: number
-    request?: string
-    secretPreImage: string
-  }
+  invoice: LightningInvoice
   loading: boolean
 }
 

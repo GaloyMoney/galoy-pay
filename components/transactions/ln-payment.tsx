@@ -1,9 +1,10 @@
 "use client"
 
-import { LightningPayment, LnPaymentStatus } from "../../graphql/types"
+import { LightningPayment, LnPaymentStatus } from "../../generated"
 import { formatDate } from "../../utils"
 
 const emptyPayment: LightningPayment = {
+  __typename: "LightningPayment",
   status: LnPaymentStatus.Pending,
   amount: 0,
   roundedUpFee: 0,
@@ -12,7 +13,7 @@ const emptyPayment: LightningPayment = {
   request: "lnbc1000000000000000000000000000000000000000000000000000000000000",
   destination: "000000000000000000000000000000000000000000000000000000000000000000",
   revealedPreImage: "0000000000000000000000000000000000000000000000000000000000000000",
-}
+} as const
 
 type Props = {
   payment: LightningPayment
@@ -40,7 +41,7 @@ const LnPayment: React.FC<Props> = ({ payment, loading = false }) => {
       </div>
       <div>
         <p className="mb-4 font-semibold text-gray-600">Created At</p>
-        <p className={`text-gray-600 ${emptyClass}`}>{formatDate(data.createdAt)}</p>
+        <p className={`text-gray-600 ${emptyClass}`}>{formatDate(data.createdAt ?? 0)}</p>
       </div>
       <div>
         <p className="mb-4 font-semibold text-gray-600">Confirmed At</p>

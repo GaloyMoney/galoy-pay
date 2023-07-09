@@ -1,22 +1,22 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { useMutation } from "@apollo/client"
 
 import AuthCodeForm from "./auth-code-form"
-import { CAPTCHA_CREATE_CHALLENGE, CAPTCHA_REQUEST_AUTH_CODE } from "../graphql/mutations"
+import {
+  useCaptchaCreateChallengeMutation,
+  useCaptchaRequestAuthCodeMutation,
+} from "../generated"
 
 type GraphQLError = {
   message: string
 }
 
 const CaptchaChallenge: React.FC<{ phoneNumber: string }> = ({ phoneNumber }) => {
-  const [createCaptchaChallenge, { loading: createLoading }] = useMutation(
-    CAPTCHA_CREATE_CHALLENGE,
-  )
-  const [requestCaptchaAuthCode, { loading: requestLoading }] = useMutation(
-    CAPTCHA_REQUEST_AUTH_CODE,
-  )
+  const [createCaptchaChallenge, { loading: createLoading }] =
+    useCaptchaCreateChallengeMutation()
+  const [requestCaptchaAuthCode, { loading: requestLoading }] =
+    useCaptchaRequestAuthCodeMutation()
 
   const [captchaState, setCaptchaState] = useState<{
     status: "loading" | "error" | "ready" | "success"

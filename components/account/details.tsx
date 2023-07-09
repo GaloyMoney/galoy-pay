@@ -1,10 +1,10 @@
 "use client"
 
-import { AccountData } from "./index"
+import { Account } from "../../generated"
 import { formatDate } from "../../utils"
 
 const Details: React.FC<{
-  accountDetails: AccountData
+  accountDetails: Account
   loading?: boolean
 }> = ({ accountDetails, loading = false }) => {
   const data = accountDetails
