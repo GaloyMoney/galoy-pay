@@ -25,7 +25,7 @@ EOF
 
 gh pr close ${BOT_BRANCH} || true
 gh pr create \
-  --title bump-admin-panel-image-${ref} \
+  --title "chore(deps): bump-admin-panel-image-${ref}" \
   --body-file ../body.md \
   --base ${BRANCH} \
   --head ${BOT_BRANCH} \
