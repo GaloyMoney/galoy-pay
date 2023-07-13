@@ -9,6 +9,42 @@ query accountDetailsByUserPhone($phone: Phone!) {
       id
       language
       phone
+      email {
+        address
+        verified
+      }
+      createdAt
+    }
+    coordinates {
+      latitude
+      longitude
+    }
+    wallets {
+      id
+      walletCurrency
+      accountId
+      balance
+      pendingIncomingBalance
+    }
+    createdAt
+  }
+}
+
+query accountDetailsByEmail($email: EmailAddress!) {
+  accountDetailsByEmail(email: $email) {
+    id
+    username
+    level
+    status
+    title
+    owner {
+      id
+      language
+      phone
+      email {
+        address
+        verified
+      }
       createdAt
     }
     coordinates {
@@ -49,6 +85,10 @@ mutation accountUpdateLevel($input: AccountUpdateLevelInput!) {
         id
         language
         phone
+        email {
+          address
+          verified
+        }
         createdAt
       }
       coordinates {
@@ -82,6 +122,10 @@ mutation businessUpdateMapInfo($input: BusinessUpdateMapInfoInput!) {
         id
         language
         phone
+        email {
+          address
+          verified
+        }
         createdAt
       }
       coordinates {
@@ -115,6 +159,10 @@ mutation accountUpdateStatus($input: AccountUpdateStatusInput!) {
         id
         language
         phone
+        email {
+          address
+          verified
+        }
         createdAt
       }
       coordinates {
@@ -144,6 +192,10 @@ query accountDetailsByUsername($username: Username!) {
       id
       language
       phone
+      email {
+        address
+        verified
+      }
       createdAt
     }
     coordinates {

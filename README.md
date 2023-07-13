@@ -13,15 +13,15 @@ With a default installation, Admin Panel can be accessed with `admin.domain.com`
 This project uses Next.js, to run it locally, you need to set the following environment variables (in a `.env.local` file):
 
 ```
-NEXT_PUBLIC_GRAPHQL_URL=http://localhost:4002/admin/graphql
-NEXT_PUBLIC_GALOY_AUTH_ENDPOINT=http://localhost:4002/auth
+export NEXT_PUBLIC_GRAPHQL_URL=http://localhost:4002/admin/graphql
+export NEXT_PUBLIC_GALOY_AUTH_ENDPOINT=http://localhost:4002/auth
 ```
 
 for staging:
 
 ```
-NEXT_PUBLIC_GRAPHQL_URL=https://admin-api.staging.galoy.io/graphql
-NEXT_PUBLIC_GALOY_AUTH_ENDPOINT=https://admin-api.staging.galoy.io/auth
+export NEXT_PUBLIC_GRAPHQL_URL=https://admin-api.staging.galoy.io/graphql
+export NEXT_PUBLIC_GALOY_AUTH_ENDPOINT=https://admin-api.staging.galoy.io/auth
 ```
 
 Then, in the project directory, you can run:

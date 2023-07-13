@@ -15,6 +15,10 @@ export function validUsername(username: string) {
   return username.length >= 3 && username.match(/(?!^(1|3|bc1|lnbc1))^[0-9a-z_]{3,50}$/i)
 }
 
+export function validEmail(email: string) {
+  return /^.+@\S+\.\S+$/.test(email)
+}
+
 export const logout = () => {
   window.sessionStorage.clear()
   window.location.href = "/"

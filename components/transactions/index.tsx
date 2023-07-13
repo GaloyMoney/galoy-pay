@@ -80,7 +80,6 @@ function TransactionDetails() {
         handleTxnsData(transactionsByHash)
       },
       onError: onTxnsError,
-      fetchPolicy: "cache-and-network",
     })
 
   const [getTransactionById, { loading: loadingTransactionById }] =
@@ -96,7 +95,6 @@ function TransactionDetails() {
         handleTxnsData([transactionById])
       },
       onError: onTxnsError,
-      fetchPolicy: "cache-and-network",
     })
 
   const [getLnPayment, { loading: loadingLnPayment }] = useLightningPaymentLazyQuery({
@@ -107,7 +105,6 @@ function TransactionDetails() {
       console.warn(error.message)
       setPayment(null)
     },
-    fetchPolicy: "cache-and-network",
   })
 
   const [getLnInvoice, { loading: loadingLnInvoice }] = useLightningInvoiceLazyQuery({
@@ -118,7 +115,6 @@ function TransactionDetails() {
       console.warn(error.message)
       setInvoice(null)
     },
-    fetchPolicy: "cache-and-network",
   })
 
   const search = () => {

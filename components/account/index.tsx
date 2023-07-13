@@ -3,7 +3,7 @@
 import { useState } from "react"
 
 import Login from "../login"
-import { isAuthenticated } from "../../utils"
+import { isAuthenticated, validEmail } from "../../utils"
 import Layout from "../layout"
 
 import SearchHeader from "../search-header"
@@ -17,6 +17,7 @@ import {
   AccountLevel,
   AccountStatus,
   Coordinates,
+  useAccountDetailsByEmailLazyQuery,
   useAccountDetailsByUserPhoneLazyQuery,
   useAccountDetailsByUsernameLazyQuery,
   useAccountUpdateLevelMutation,
@@ -34,17 +35,6 @@ function AccountDetails() {
   const [data, setData] = useState<null | Account>(null)
   const [searchValue, setSearchValue] = useState("")
 
-  const [getAccountByUsername, { loading: loadingAccountByUsername }] =
-    useAccountDetailsByUsernameLazyQuery({
-      onCompleted(data) {
-        if (data.accountDetailsByUsername) {
-          setData(data.accountDetailsByUsername)
-        }
-      },
-      onError: reportError,
-      fetchPolicy: "no-cache",
-    })
-
   const [updateAccountStatus, { loading: loadingAccountStatus }] =
     useAccountUpdateStatusMutation({
       onCompleted({ accountUpdateStatus }) {
@@ -57,7 +47,6 @@ function AccountDetails() {
         }
       },
       onError: reportError,
-      fetchPolicy: "no-cache",
     })
 
   const [updateAccountLevel, { loading: loadingAccountLevel }] =
@@ -72,7 +61,6 @@ function AccountDetails() {
         }
       },
       onError: reportError,
-      fetchPolicy: "no-cache",
     })
 
   const [updateBusinessMap, { loading: loadingBusinessMap }] =
@@ -87,15 +75,22 @@ function AccountDetails() {
         }
       },
       onError: reportError,
-      fetchPolicy: "no-cache",
     })
 
   const [deleteBusiness] = useBusinessDeleteMapInfoMutation({
     onError: reportError,
-    fetchPolicy: "no-cache",
   })
 
-  // Define the lazy query at the top level
+  const [getAccountByUsername, { loading: loadingAccountByUsername }] =
+    useAccountDetailsByUsernameLazyQuery({
+      onCompleted(data) {
+        if (data.accountDetailsByUsername) {
+          setData(data.accountDetailsByUsername)
+        }
+      },
+      onError: reportError,
+    })
+
   const [getAccountDetailsByUserPhone, { loading: loadingAccountByPhone }] =
     useAccountDetailsByUserPhoneLazyQuery({
       onCompleted(data) {
@@ -106,10 +101,22 @@ function AccountDetails() {
         }
       },
       onError: reportError,
-      fetchPolicy: "no-cache",
     })
 
-  const loading = loadingAccountByPhone || loadingAccountByUsername
+  const [getAccountDetailsByEmail, { loading: loadingAccountByEmail }] =
+    useAccountDetailsByEmailLazyQuery({
+      onCompleted(data) {
+        if (data.accountDetailsByEmail) {
+          data.accountDetailsByEmail
+
+          setData(data.accountDetailsByEmail)
+        }
+      },
+      onError: reportError,
+    })
+
+  const loading =
+    loadingAccountByPhone || loadingAccountByUsername || loadingAccountByEmail
 
   const usernameOrPhone = data?.username ?? data?.owner.phone
 
@@ -120,8 +127,11 @@ function AccountDetails() {
     if (searchValue && validUsername(searchValue)) {
       return getAccountByUsername({ variables: { username: searchValue } })
     }
+    if (searchValue && validEmail(searchValue)) {
+      return getAccountDetailsByEmail({ variables: { email: searchValue } })
+    }
     // invalid search
-    alert("Please enter a full phone number or username")
+    alert("Please enter a full phone number, username or email")
   }
 
   const changeLevel = () => {

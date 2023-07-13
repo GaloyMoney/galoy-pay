@@ -21,6 +21,8 @@ export type Scalars = {
   AuthToken: { input: string; output: string; }
   /** Display currency of an account */
   DisplayCurrency: { input: string; output: string; }
+  /** Email address */
+  EmailAddress: { input: string; output: string; }
   Language: { input: string; output: string; }
   LnPaymentPreImage: { input: string; output: string; }
   /** BOLT11 lightning invoice payment request with the amount included */
@@ -190,6 +192,12 @@ export type Coordinates = {
   readonly __typename: 'Coordinates';
   readonly latitude: Scalars['Float']['output'];
   readonly longitude: Scalars['Float']['output'];
+};
+
+export type Email = {
+  readonly __typename: 'Email';
+  readonly address?: Maybe<Scalars['EmailAddress']['output']>;
+  readonly verified?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type Error = {
@@ -371,6 +379,7 @@ export type PsbtDetailPayload = {
 
 export type Query = {
   readonly __typename: 'Query';
+  readonly accountDetailsByEmail: Account;
   readonly accountDetailsByUserPhone: Account;
   readonly accountDetailsByUsername: Account;
   readonly allLevels: ReadonlyArray<AccountLevel>;
@@ -380,6 +389,11 @@ export type Query = {
   readonly transactionById?: Maybe<Transaction>;
   readonly transactionsByHash?: Maybe<ReadonlyArray<Maybe<Transaction>>>;
   readonly wallet: Wallet;
+};
+
+
+export type QueryAccountDetailsByEmailArgs = {
+  email: Scalars['EmailAddress']['input'];
 };
 
 
@@ -546,6 +560,8 @@ export type UsdWalletTransactionsByAddressArgs = {
 export type User = {
   readonly __typename: 'User';
   readonly createdAt: Scalars['Timestamp']['output'];
+  /** Email address */
+  readonly email?: Maybe<Email>;
   readonly id: Scalars['ID']['output'];
   readonly language: Scalars['Language']['output'];
   readonly phone: Scalars['Phone']['output'];
@@ -621,7 +637,14 @@ export type AccountDetailsByUserPhoneQueryVariables = Exact<{
 }>;
 
 
-export type AccountDetailsByUserPhoneQuery = { readonly __typename: 'Query', readonly accountDetailsByUserPhone: { readonly __typename: 'Account', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'User', readonly id: string, readonly language: string, readonly phone: string, readonly createdAt: number }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } };
+export type AccountDetailsByUserPhoneQuery = { readonly __typename: 'Query', readonly accountDetailsByUserPhone: { readonly __typename: 'Account', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'User', readonly id: string, readonly language: string, readonly phone: string, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } };
+
+export type AccountDetailsByEmailQueryVariables = Exact<{
+  email: Scalars['EmailAddress']['input'];
+}>;
+
+
+export type AccountDetailsByEmailQuery = { readonly __typename: 'Query', readonly accountDetailsByEmail: { readonly __typename: 'Account', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'User', readonly id: string, readonly language: string, readonly phone: string, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } };
 
 export type BusinessDeleteMapInfoMutationVariables = Exact<{
   input: BusinessDeleteMapInfoInput;
@@ -635,28 +658,28 @@ export type AccountUpdateLevelMutationVariables = Exact<{
 }>;
 
 
-export type AccountUpdateLevelMutation = { readonly __typename: 'Mutation', readonly accountUpdateLevel: { readonly __typename: 'AccountDetailPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly accountDetails?: { readonly __typename: 'Account', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'User', readonly id: string, readonly language: string, readonly phone: string, readonly createdAt: number }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } | null } };
+export type AccountUpdateLevelMutation = { readonly __typename: 'Mutation', readonly accountUpdateLevel: { readonly __typename: 'AccountDetailPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly accountDetails?: { readonly __typename: 'Account', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'User', readonly id: string, readonly language: string, readonly phone: string, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } | null } };
 
 export type BusinessUpdateMapInfoMutationVariables = Exact<{
   input: BusinessUpdateMapInfoInput;
 }>;
 
 
-export type BusinessUpdateMapInfoMutation = { readonly __typename: 'Mutation', readonly businessUpdateMapInfo: { readonly __typename: 'AccountDetailPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly accountDetails?: { readonly __typename: 'Account', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'User', readonly id: string, readonly language: string, readonly phone: string, readonly createdAt: number }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } | null } };
+export type BusinessUpdateMapInfoMutation = { readonly __typename: 'Mutation', readonly businessUpdateMapInfo: { readonly __typename: 'AccountDetailPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly accountDetails?: { readonly __typename: 'Account', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'User', readonly id: string, readonly language: string, readonly phone: string, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } | null } };
 
 export type AccountUpdateStatusMutationVariables = Exact<{
   input: AccountUpdateStatusInput;
 }>;
 
 
-export type AccountUpdateStatusMutation = { readonly __typename: 'Mutation', readonly accountUpdateStatus: { readonly __typename: 'AccountDetailPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly accountDetails?: { readonly __typename: 'Account', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'User', readonly id: string, readonly language: string, readonly phone: string, readonly createdAt: number }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } | null } };
+export type AccountUpdateStatusMutation = { readonly __typename: 'Mutation', readonly accountUpdateStatus: { readonly __typename: 'AccountDetailPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly accountDetails?: { readonly __typename: 'Account', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'User', readonly id: string, readonly language: string, readonly phone: string, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } | null } };
 
 export type AccountDetailsByUsernameQueryVariables = Exact<{
   username: Scalars['Username']['input'];
 }>;
 
 
-export type AccountDetailsByUsernameQuery = { readonly __typename: 'Query', readonly accountDetailsByUsername: { readonly __typename: 'Account', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'User', readonly id: string, readonly language: string, readonly phone: string, readonly createdAt: number }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } };
+export type AccountDetailsByUsernameQuery = { readonly __typename: 'Query', readonly accountDetailsByUsername: { readonly __typename: 'Account', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'User', readonly id: string, readonly language: string, readonly phone: string, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } };
 
 export type CaptchaCreateChallengeMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -711,6 +734,10 @@ export const AccountDetailsByUserPhoneDocument = gql`
       id
       language
       phone
+      email {
+        address
+        verified
+      }
       createdAt
     }
     coordinates {
@@ -756,6 +783,67 @@ export function useAccountDetailsByUserPhoneLazyQuery(baseOptions?: Apollo.LazyQ
 export type AccountDetailsByUserPhoneQueryHookResult = ReturnType<typeof useAccountDetailsByUserPhoneQuery>;
 export type AccountDetailsByUserPhoneLazyQueryHookResult = ReturnType<typeof useAccountDetailsByUserPhoneLazyQuery>;
 export type AccountDetailsByUserPhoneQueryResult = Apollo.QueryResult<AccountDetailsByUserPhoneQuery, AccountDetailsByUserPhoneQueryVariables>;
+export const AccountDetailsByEmailDocument = gql`
+    query accountDetailsByEmail($email: EmailAddress!) {
+  accountDetailsByEmail(email: $email) {
+    id
+    username
+    level
+    status
+    title
+    owner {
+      id
+      language
+      phone
+      email {
+        address
+        verified
+      }
+      createdAt
+    }
+    coordinates {
+      latitude
+      longitude
+    }
+    wallets {
+      id
+      walletCurrency
+      accountId
+      balance
+      pendingIncomingBalance
+    }
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useAccountDetailsByEmailQuery__
+ *
+ * To run a query within a React component, call `useAccountDetailsByEmailQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAccountDetailsByEmailQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAccountDetailsByEmailQuery({
+ *   variables: {
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useAccountDetailsByEmailQuery(baseOptions: Apollo.QueryHookOptions<AccountDetailsByEmailQuery, AccountDetailsByEmailQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AccountDetailsByEmailQuery, AccountDetailsByEmailQueryVariables>(AccountDetailsByEmailDocument, options);
+      }
+export function useAccountDetailsByEmailLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AccountDetailsByEmailQuery, AccountDetailsByEmailQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AccountDetailsByEmailQuery, AccountDetailsByEmailQueryVariables>(AccountDetailsByEmailDocument, options);
+        }
+export type AccountDetailsByEmailQueryHookResult = ReturnType<typeof useAccountDetailsByEmailQuery>;
+export type AccountDetailsByEmailLazyQueryHookResult = ReturnType<typeof useAccountDetailsByEmailLazyQuery>;
+export type AccountDetailsByEmailQueryResult = Apollo.QueryResult<AccountDetailsByEmailQuery, AccountDetailsByEmailQueryVariables>;
 export const BusinessDeleteMapInfoDocument = gql`
     mutation businessDeleteMapInfo($input: BusinessDeleteMapInfoInput!) {
   businessDeleteMapInfo(input: $input) {
@@ -807,6 +895,10 @@ export const AccountUpdateLevelDocument = gql`
         id
         language
         phone
+        email {
+          address
+          verified
+        }
         createdAt
       }
       coordinates {
@@ -867,6 +959,10 @@ export const BusinessUpdateMapInfoDocument = gql`
         id
         language
         phone
+        email {
+          address
+          verified
+        }
         createdAt
       }
       coordinates {
@@ -927,6 +1023,10 @@ export const AccountUpdateStatusDocument = gql`
         id
         language
         phone
+        email {
+          address
+          verified
+        }
         createdAt
       }
       coordinates {
@@ -983,6 +1083,10 @@ export const AccountDetailsByUsernameDocument = gql`
       id
       language
       phone
+      email {
+        address
+        verified
+      }
       createdAt
     }
     coordinates {

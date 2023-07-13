@@ -45,6 +45,14 @@ function MyApp({ Component, pageProps }: AppProps) {
     link: ApolloLink.from([errorLink, authLink.concat(httpLink)]),
     cache,
     credentials: "include",
+    defaultOptions: {
+      watchQuery: {
+        fetchPolicy: "no-cache",
+      },
+      query: {
+        fetchPolicy: "no-cache",
+      },
+    },
   })
 
   return (

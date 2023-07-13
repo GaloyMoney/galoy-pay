@@ -21,6 +21,16 @@ const Details: React.FC<{
         <p className={`text-gray-600 ${emptyClass}`}>{data?.owner?.phone}</p>
       </div>
       <div>
+        <p className="mb-4 font-semibold text-gray-600">Email address</p>
+        <p className={`text-gray-600 ${emptyClass}`}>{data?.owner?.email?.address}</p>
+      </div>
+      <div>
+        <p className="mb-4 font-semibold text-gray-600">Email verified</p>
+        <p className={`text-gray-600 ${emptyClass}`}>
+          {String(data?.owner?.email?.verified)}
+        </p>
+      </div>
+      <div>
         <p className="mb-4 font-semibold text-gray-600">Username</p>
         <p className={`text-gray-600 ${emptyClass}`}>{data?.username || "--"}</p>
       </div>
