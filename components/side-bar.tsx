@@ -6,11 +6,26 @@ import { useRouter } from "next/router"
 
 import Icon from "./icon"
 import { dashboardRoutes } from "../utils/routes"
-import { logout } from "../utils"
 import { IconType } from "./icons"
+import config from "../config"
 
 function SideBar() {
   const router = useRouter()
+  const { GALOY_AUTH_ENDPOINT } = config()
+  const logout = async () => {
+    await fetch(GALOY_AUTH_ENDPOINT + "/logout")
+    clearCookies()
+  }
+  const clearCookies = async () => {
+    await fetch(GALOY_AUTH_ENDPOINT + "/clearCookies", {
+      method: "GET",
+      redirect: "follow",
+      credentials: "include",
+    })
+    localStorage.clear()
+    sessionStorage.clear()
+    window.location.href = "/"
+  }
   return (
     <aside className="z-30 flex-shrink-0 hidden w-64 overflow-y-auto bg-white lg:block">
       <div className="py-4 text-gray-500">

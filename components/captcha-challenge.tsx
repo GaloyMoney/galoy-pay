@@ -7,6 +7,7 @@ import {
   useCaptchaCreateChallengeMutation,
   useCaptchaRequestAuthCodeMutation,
 } from "../generated"
+import config from "../config"
 
 type GraphQLError = {
   message: string
@@ -17,11 +18,11 @@ const CaptchaChallenge: React.FC<{ phoneNumber: string }> = ({ phoneNumber }) =>
     useCaptchaCreateChallengeMutation()
   const [requestCaptchaAuthCode, { loading: requestLoading }] =
     useCaptchaRequestAuthCodeMutation()
-
   const [captchaState, setCaptchaState] = useState<{
     status: "loading" | "error" | "ready" | "success"
     errorsMessage?: string
   }>({ status: "loading" })
+  const { GALOY_AUTH_ENDPOINT } = config()
 
   const captchaHandler = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,6 +79,7 @@ const CaptchaChallenge: React.FC<{ phoneNumber: string }> = ({ phoneNumber }) =>
   useEffect(() => {
     const initCaptcha = async () => {
       try {
+        await clearCookies()
         const { data, errors } = await createCaptchaChallenge()
 
         const gqlErrors = errors ?? data?.captchaCreateChallenge?.errors
@@ -128,17 +130,37 @@ const CaptchaChallenge: React.FC<{ phoneNumber: string }> = ({ phoneNumber }) =>
   const isLoading = captchaState.status === "loading" || createLoading || requestLoading
   const hasError = !isLoading && captchaState.status === "error"
 
+  const resetPage = async () => {
+    await clearCookies()
+    localStorage.clear()
+    sessionStorage.clear()
+    window.location.href = "/"
+  }
+
+  const clearCookies = () => {
+    return fetch(GALOY_AUTH_ENDPOINT + "/clearCookies", {
+      method: "GET",
+      redirect: "follow",
+      credentials: "include",
+    })
+  }
+
   return (
     <div className="captcha-challenge">
       <div className="intro">{"Verify you are human"}</div>
       <div id="captcha">{isLoading && <div className="loading">Loading...</div>}</div>
       {hasError && (
-        <div
-          className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800"
-          role="alert"
-        >
-          {captchaState.errorsMessage}
-        </div>
+        <>
+          <div
+            className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800"
+            role="alert"
+          >
+            {captchaState.errorsMessage}
+          </div>
+          <a onClick={resetPage} style={{ cursor: "pointer" }} className="underline">
+            Reload
+          </a>
+        </>
       )}
     </div>
   )

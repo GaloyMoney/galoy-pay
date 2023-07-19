@@ -12,6 +12,7 @@
     "dev": "next dev",
     "eslint:check": "next lint",
     "prettier:check": "prettier --check .",
+    "prettier:fix": "prettier --write .",
     "start": "next start",
     "test": "jest",
     "tsc:check": "tsc --pretty --noEmit --skipLibCheck"
