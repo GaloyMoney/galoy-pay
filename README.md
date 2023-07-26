@@ -16,6 +16,9 @@ In the project directory, create a file name `.env.local` and fill it with
 
 ```
 NEXT_PUBLIC_GRAPHQL_HOSTNAME='api.staging.galoy.io'
+NEXT_PUBLIC_GRAPHQL_HOSTNAME_INTERNAL='api.staging.galoy.io'
+NEXT_PUBLIC_GRAPHQL_URI_INTERNAL='api.staging.galoy.io'
+NEXT_PUBLIC_GRAPHQL_WEBSOCKET_URL='wss://ws.staging.galoy.io/graphql'
 ```
 
 (or use your custom API URL), then run

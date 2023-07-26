@@ -4,14 +4,24 @@ import React from "react"
 import Container from "react-bootstrap/Container"
 import Image from "react-bootstrap/Image"
 
-import { useQuery } from "@galoymoney/client"
-
 import ParsePayment from "../components/ParsePOSPayment"
 import PinToHomescreen from "../components/PinToHomescreen"
 import reducer, { ACTIONS } from "./_reducer"
 import styles from "./_user.module.css"
 import Head from "next/head"
 import CurrencyDropdown from "../components/Currency/currency-dropdown"
+import { gql } from "@apollo/client"
+import { useAccountDefaultWalletsQuery } from "../lib/graphql/generated"
+
+gql`
+  query accountDefaultWallets($username: Username!) {
+    accountDefaultWallet(username: $username) {
+      __typename
+      id
+      walletCurrency
+    }
+  }
+`
 
 function ReceivePayment() {
   const router = useRouter()
@@ -40,7 +50,7 @@ function ReceivePayment() {
     manifestParams.set("memo", memo.toString())
   }
 
-  const { data, error: usernameError } = useQuery.accountDefaultWallet({
+  const { data, error: usernameError } = useAccountDefaultWalletsQuery({
     variables: { username: accountUsername },
   })
 

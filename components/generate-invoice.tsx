@@ -47,7 +47,10 @@ function GenerateInvoice({
 
     createInvoice({
       variables: {
-        input: { recipientWalletId, amount: amt },
+        input: {
+          recipientWalletId,
+          amount: amt,
+        },
       },
     })
     if (currency !== "SATS" || recipientWalletCurrency === "USD") {
