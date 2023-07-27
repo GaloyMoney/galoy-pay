@@ -25,7 +25,7 @@ if (!GRAPHQL_HOSTNAME) {
     hostParts[0] = "ws"
     GRAPHQL_WEBSOCKET_URL = `wss://${hostParts.join(".")}/graphql`
   } else {
-    alert("window is undefined")
+    console.log("window is undefined")
   }
 }
 
