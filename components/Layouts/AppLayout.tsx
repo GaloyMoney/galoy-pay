@@ -133,14 +133,6 @@ const AppLayout = ({ children, username }: Props) => {
       <main className={`${openSideBar && styles.main_bg} ${styles.main}`}>
         {children}
         <div className={styles.footer}>
-          <div className={styles.footer_text}>
-            <p>
-              Bitcoin Beach Wallet is being renamed to Blink. Learn more:{" "}
-              <a href={`https://${URL_HOST_DOMAIN}`} target="_blank" rel="noreferrer">
-                {URL_HOST_DOMAIN}
-              </a>
-            </p>
-          </div>
           <a href="https://galoy.io" target="_blank" rel="noreferrer">
             <span>Powered by</span>
             <Image
