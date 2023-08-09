@@ -8,7 +8,7 @@ It's packaged as a docker image, and is automatically installed as part of the G
 
 With a default installation, Galoy-Pay can be accessed under `pay.domain.com`.
 
-Galoy-Pay uses query, mutation, and subscription operations from the Galoy's graphql API endpoints `api.domain.com` as defined in [schema.graphql](https://github.com/GaloyMoney/galoy/blob/main/src/graphql/main/schema.graphql)
+Galoy-Pay uses query, mutation, and subscription operations from the Galoy's graphql API endpoints `api.domain.com` as defined in [schema.graphql](https://github.com/GaloyMoney/galoy/blob/main/src/graphql/public/schema.graphql)
 
 ## How to run this repo locally?
 
