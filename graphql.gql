@@ -1,6 +1,7 @@
 query accountDetailsByUserPhone($phone: Phone!) {
   accountDetailsByUserPhone(phone: $phone) {
     id
+    uuid
     username
     level
     status
@@ -33,6 +34,7 @@ query accountDetailsByUserPhone($phone: Phone!) {
 query accountDetailsByEmail($email: EmailAddress!) {
   accountDetailsByEmail(email: $email) {
     id
+    uuid
     username
     level
     status
@@ -77,6 +79,7 @@ mutation accountUpdateLevel($input: AccountUpdateLevelInput!) {
     }
     accountDetails {
       id
+      uuid
       username
       level
       status
@@ -114,6 +117,7 @@ mutation businessUpdateMapInfo($input: BusinessUpdateMapInfoInput!) {
     }
     accountDetails {
       id
+      uuid
       username
       level
       status
@@ -151,6 +155,7 @@ mutation accountUpdateStatus($input: AccountUpdateStatusInput!) {
     }
     accountDetails {
       id
+      uuid
       username
       level
       status
@@ -184,6 +189,7 @@ mutation accountUpdateStatus($input: AccountUpdateStatusInput!) {
 query accountDetailsByUsername($username: Username!) {
   accountDetailsByUsername(username: $username) {
     id
+    uuid
     username
     level
     status

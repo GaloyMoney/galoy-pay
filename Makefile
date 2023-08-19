@@ -5,7 +5,7 @@ test:
 	yarn test
 
 codegen:
-	yarn dev:codegen
+	yarn codegen
 
 # 16 is exit code for critical https://classic.yarnpkg.com/lang/en/docs/cli/audit
 audit:
