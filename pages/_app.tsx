@@ -44,7 +44,7 @@ export default function Layout({
     `,
           }}
         />
-        <title>BitcoinBeach Cash Register</title>
+        <title>Blink Cash Register</title>
       </Head>
       <GraphQLProvider>
         <AppLayout username={username}>
