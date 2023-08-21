@@ -50,18 +50,18 @@ const AppLayout = ({ children, username }: Props) => {
           <li>{`Ways to pay ${username ?? "user"} `}</li>
           <li onClick={closeSideBar}>
             <Link href={cashRegisterLink}>
-              <a>
+              <>
                 <Image src="/register-black&white.svg" width={"15"} height={"15"} />
                 Cash Register App
-              </a>
+              </>
             </Link>
           </li>
           <li onClick={closeSideBar}>
             <Link href={payCodeLink}>
-              <a>
+              <>
                 <Image src="/paycode-black&white.svg" width={"15"} height={"15"} />
                 Printable Paycode
-              </a>
+              </>
             </Link>
           </li>
           <div className={styles.lightning_addr}>

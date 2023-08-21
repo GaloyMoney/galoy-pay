@@ -1,5 +1,7 @@
+import { NextResponse } from "next/server"
+import { URL } from "url"
+
 import crypto from "crypto"
-import originalUrl from "original-url"
 import {
   ApolloClient,
   ApolloLink,
@@ -8,7 +10,6 @@ import {
   HttpLink,
   InMemoryCache,
 } from "@apollo/client"
-import type { NextApiRequest, NextApiResponse } from "next"
 import Redis from "ioredis"
 
 import { GRAPHQL_URI_INTERNAL, NOSTR_PUBKEY } from "../../../lib/config"
@@ -103,11 +104,18 @@ if (nostrEnabled) {
   redis.on("error", (err) => console.log({ err }, "Redis error"))
 }
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
+export async function GET(
+  request: Request,
+  { params }: { params: { username: string } },
+) {
   console.log(NOSTR_PUBKEY)
 
-  const { username, amount, nostr } = req.query
-  const url = originalUrl(req)
+  const { searchParams, hostname } = new URL(request.url)
+
+  const username = params.username
+  const amount = searchParams.get("amount")
+  const nostr = searchParams.get("nostr")
+
   const accountUsername = username ? username.toString() : ""
 
   let walletId: string | null = null
@@ -117,8 +125,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       query: AccountDefaultWalletDocument,
       variables: { username: accountUsername, walletCurrency: "BTC" },
       context: {
-        "x-real-ip": req.headers["x-real-ip"],
-        "x-forwarded-for": req.headers["x-forwarded-for"],
+        "x-real-ip": request.headers.get("x-real-ip"),
+        "x-forwarded-for": request.headers.get("x-forwarded-for"),
       },
     })
     walletId = data?.accountDefaultWallet?.id
@@ -127,7 +135,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   }
 
   if (!walletId) {
-    return res.json({
+    return NextResponse.json({
       status: "ERROR",
       reason: `Couldn't find user '${username}'.`,
     })
@@ -135,16 +143,16 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
   const metadata = JSON.stringify([
     ["text/plain", `Payment to ${accountUsername}`],
-    ["text/identifier", `${accountUsername}@${url.hostname}`],
+    ["text/identifier", `${accountUsername}@${hostname}`],
   ])
 
   // lnurl options call
   if (!amount) {
-    return res.json({
-      callback: url.full,
+    return NextResponse.json({
+      callback: request.url,
       minSendable: 1000,
       maxSendable: 100000000000,
-      metadata: metadata,
+      metadata,
       tag: "payRequest",
       ...(nostrEnabled
         ? {
@@ -163,7 +171,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
     const amountSats = Math.round(parseInt(amount, 10) / 1000)
     if ((amountSats * 1000).toString() !== amount) {
-      return res.json({
+      return NextResponse.json({
         status: "ERROR",
         reason: "Millisatoshi amount is not supported, please send a value in full sats.",
       })
@@ -191,7 +199,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
     if ((errors && errors.length) || !invoice) {
       console.log("error getting invoice", errors)
-      return res.json({
+      return NextResponse.json({
         status: "ERROR",
         reason: `Failed to get invoice: ${errors ? errors[0].message : "unknown error"}`,
       })
@@ -201,13 +209,13 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       redis.set(`nostrInvoice:${invoice.paymentHash}`, nostr, "EX", 1440)
     }
 
-    return res.json({
+    return NextResponse.json({
       pr: invoice.paymentRequest,
       routes: [],
     })
   } catch (err: unknown) {
     console.log("unexpected error getting invoice", err)
-    res.json({
+    NextResponse.json({
       status: "ERROR",
       reason: err instanceof Error ? err.message : "unexpected error",
     })
