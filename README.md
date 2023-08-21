@@ -15,9 +15,14 @@ Galoy-Pay uses query, mutation, and subscription operations from the Galoy's gra
 In the project directory, create a file name `.env.local` and fill it with
 
 ```
+NEXT_PUBLIC_GRAPHQL_HOSTNAME='localhost:4002'
+NEXT_PUBLIC_GRAPHQL_WEBSOCKET_URL='FIXME'
+```
+
+for staging, use
+
+```
 NEXT_PUBLIC_GRAPHQL_HOSTNAME='api.staging.galoy.io'
-NEXT_PUBLIC_GRAPHQL_HOSTNAME_INTERNAL='api.staging.galoy.io'
-NEXT_PUBLIC_GRAPHQL_URI_INTERNAL='api.staging.galoy.io'
 NEXT_PUBLIC_GRAPHQL_WEBSOCKET_URL='wss://ws.staging.galoy.io/graphql'
 ```
 
@@ -27,8 +32,6 @@ NEXT_PUBLIC_GRAPHQL_WEBSOCKET_URL='wss://ws.staging.galoy.io/graphql'
 yarn install
 yarn dev
 ```
-
-This will run the app in the development mode.
 
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
@@ -65,4 +68,17 @@ yarn build
 
 This will build the app for production under a `build` folder. It will bundle React in production mode and optimize the build for the best performance. The build will be minified, and the bundled files will include unique hashes in their names.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Test lnurlp
+
+```
+GRAPHQL_HOSTNAME_INTERNAL="api.galoy-staging-galoy.svc.cluster.local"
+```
+
+or 
+```
+GRAPHQL_HOSTNAME_INTERNAL="localhost:4002"
+```
+
+This environment variable is needed for getting the lnurlp endpoint working.
+
+curl localhost:3000/.well-known/lnurlp/alice

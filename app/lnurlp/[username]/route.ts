@@ -1,5 +1,7 @@
+import { NextResponse } from "next/server"
+import { URL } from "url"
+
 import crypto from "crypto"
-import originalUrl from "original-url"
 import {
   ApolloClient,
   ApolloLink,
@@ -8,10 +10,15 @@ import {
   HttpLink,
   InMemoryCache,
 } from "@apollo/client"
-import type { NextApiRequest, NextApiResponse } from "next"
 import Redis from "ioredis"
 
 import { GRAPHQL_URI_INTERNAL, NOSTR_PUBKEY } from "../../../lib/config"
+import {
+  AccountDefaultWalletDocument,
+  AccountDefaultWalletQuery,
+  LnInvoiceCreateOnBehalfOfRecipientDocument,
+  LnInvoiceCreateOnBehalfOfRecipientMutation,
+} from "../../../lib/graphql/generated"
 
 const ipForwardingMiddleware = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => ({
@@ -35,7 +42,7 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 })
 
-const ACCOUNT_DEFAULT_WALLET = gql`
+gql`
   query accountDefaultWallet($username: Username!, $walletCurrency: WalletCurrency!) {
     accountDefaultWallet(username: $username, walletCurrency: $walletCurrency) {
       __typename
@@ -43,9 +50,7 @@ const ACCOUNT_DEFAULT_WALLET = gql`
       walletCurrency
     }
   }
-`
 
-const LNURL_INVOICE = gql`
   mutation lnInvoiceCreateOnBehalfOfRecipient(
     $walletId: WalletId!
     $amount: SatAmount!
@@ -69,35 +74,6 @@ const LNURL_INVOICE = gql`
   }
 `
 
-type CreateInvoiceOutput = {
-  invoice?: {
-    paymentRequest: string
-    paymentHash: string
-  }
-  errors?: {
-    message: string
-  }[]
-}
-
-type CreateInvoiceParams = {
-  walletId: string
-  amount: number
-  descriptionHash: string
-}
-
-async function createInvoice(params: CreateInvoiceParams): Promise<CreateInvoiceOutput> {
-  const {
-    data: {
-      mutationData: { errors, invoice },
-    },
-  } = await client.mutate({
-    mutation: LNURL_INVOICE,
-    variables: params,
-  })
-
-  return { errors, invoice }
-}
-
 const nostrEnabled = !!NOSTR_PUBKEY
 
 let redis: Redis | null = null
@@ -108,15 +84,15 @@ if (nostrEnabled) {
     sentinels: [
       {
         host: `${process.env.REDIS_0_DNS}`,
-        port: Number(process.env.REDIS_0_SENTINEL_PORT) || 26379,
+        port: 26379,
       },
       {
         host: `${process.env.REDIS_1_DNS}`,
-        port: Number(process.env.REDIS_1_SENTINEL_PORT) || 26379,
+        port: 26379,
       },
       {
         host: `${process.env.REDIS_2_DNS}`,
-        port: Number(process.env.REDIS_2_SENTINEL_PORT) || 26379,
+        port: 26379,
       },
     ],
     name: process.env.REDIS_MASTER_NAME ?? "mymaster",
@@ -128,16 +104,38 @@ if (nostrEnabled) {
   redis.on("error", (err) => console.log({ err }, "Redis error"))
 }
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
+export async function GET(
+  request: Request,
+  { params }: { params: { username: string } },
+) {
   console.log(NOSTR_PUBKEY)
 
-  const { username, amount, nostr } = req.query
-  const url = originalUrl(req)
+  const { searchParams, hostname } = new URL(request.url)
+
+  const username = params.username
+  const amount = searchParams.get("amount")
+  const nostr = searchParams.get("nostr")
+
   const accountUsername = username ? username.toString() : ""
 
-  const walletId = await getUserWalletId(accountUsername, req)
+  let walletId: string | null = null
+
+  try {
+    const { data } = await client.query<AccountDefaultWalletQuery>({
+      query: AccountDefaultWalletDocument,
+      variables: { username: accountUsername, walletCurrency: "BTC" },
+      context: {
+        "x-real-ip": request.headers.get("x-real-ip"),
+        "x-forwarded-for": request.headers.get("x-forwarded-for"),
+      },
+    })
+    walletId = data?.accountDefaultWallet?.id
+  } catch (err: unknown) {
+    console.log(err)
+  }
+
   if (!walletId) {
-    return res.json({
+    return NextResponse.json({
       status: "ERROR",
       reason: `Couldn't find user '${username}'.`,
     })
@@ -145,16 +143,16 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
   const metadata = JSON.stringify([
     ["text/plain", `Payment to ${accountUsername}`],
-    ["text/identifier", `${accountUsername}@${url.hostname}`],
+    ["text/identifier", `${accountUsername}@${hostname}`],
   ])
 
   // lnurl options call
   if (!amount) {
-    return res.json({
-      callback: url.full,
+    return NextResponse.json({
+      callback: request.url,
       minSendable: 1000,
       maxSendable: 100000000000,
-      metadata: metadata,
+      metadata,
       tag: "payRequest",
       ...(nostrEnabled
         ? {
@@ -173,7 +171,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
     const amountSats = Math.round(parseInt(amount, 10) / 1000)
     if ((amountSats * 1000).toString() !== amount) {
-      return res.json({
+      return NextResponse.json({
         status: "ERROR",
         reason: "Millisatoshi amount is not supported, please send a value in full sats.",
       })
@@ -187,15 +185,21 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       descriptionHash = crypto.createHash("sha256").update(metadata).digest("hex")
     }
 
-    const { invoice, errors } = await createInvoice({
-      walletId,
-      amount: amountSats,
-      descriptionHash,
+    const result = await client.mutate<LnInvoiceCreateOnBehalfOfRecipientMutation>({
+      mutation: LnInvoiceCreateOnBehalfOfRecipientDocument,
+      variables: {
+        walletId,
+        amount: amountSats,
+        descriptionHash,
+      },
     })
+
+    const errors = result.errors
+    const invoice = result.data?.mutationData?.invoice
 
     if ((errors && errors.length) || !invoice) {
       console.log("error getting invoice", errors)
-      return res.json({
+      return NextResponse.json({
         status: "ERROR",
         reason: `Failed to get invoice: ${errors ? errors[0].message : "unknown error"}`,
       })
@@ -205,32 +209,15 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       redis.set(`nostrInvoice:${invoice.paymentHash}`, nostr, "EX", 1440)
     }
 
-    return res.json({
+    return NextResponse.json({
       pr: invoice.paymentRequest,
       routes: [],
     })
   } catch (err: unknown) {
     console.log("unexpected error getting invoice", err)
-    res.json({
+    NextResponse.json({
       status: "ERROR",
       reason: err instanceof Error ? err.message : "unexpected error",
     })
-  }
-}
-
-const getUserWalletId = async (accountUsername: string, req: NextApiRequest) => {
-  try {
-    const { data } = await client.query({
-      query: ACCOUNT_DEFAULT_WALLET,
-      variables: { username: accountUsername, walletCurrency: "BTC" },
-      context: {
-        "x-real-ip": req.headers["x-real-ip"],
-        "x-forwarded-for": req.headers["x-forwarded-for"],
-      },
-    })
-    return data?.accountDefaultWallet?.id
-  } catch (err) {
-    console.log("error getting user wallet id:", err)
-    return undefined
   }
 }

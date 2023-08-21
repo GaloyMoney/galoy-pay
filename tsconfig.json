@@ -19,10 +19,16 @@
     "jsx": "preserve",
     "allowJs": true,
     "incremental": true,
-    "strict": true
+    "strict": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
     "**/*",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
