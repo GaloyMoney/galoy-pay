@@ -1,14 +1,18 @@
-import { NextApiRequest, NextApiResponse } from "next"
+import { NextResponse } from "next/server"
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
-  const {
-    query: { username, memo },
-  } = req
+export async function GET(
+  request: Request,
+  { params }: { params: { username: string } },
+) {
+  const username = params.username
 
-  const params = new URLSearchParams()
+  const { searchParams } = new URL(request.url)
+  const memo = searchParams.get("memo")
+
+  let startUrl = `/${username}`
 
   if (memo) {
-    params.set("memo", memo.toString())
+    startUrl = `${startUrl}?memo=${memo}`
   }
 
   const manifest = {
@@ -16,7 +20,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     short_name: `${username} Register`,
     description:
       "A Bitcoin POS cash register application that connects with the merchant's wallet",
-    start_url: `/${username}?${params.toString()}`,
+    start_url: startUrl,
     scope: "/",
     display: "standalone",
     background_color: "#536FF2",
@@ -66,5 +70,5 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     ],
   }
 
-  res.status(200).send(JSON.stringify(manifest))
+  NextResponse.json(manifest)
 }
