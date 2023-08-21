@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { URL } from "url"
 
+import crypto from "crypto"
 import {
   ApolloClient,
   ApolloLink,
@@ -11,11 +12,13 @@ import {
 } from "@apollo/client"
 import Redis from "ioredis"
 
-import { GRAPHQL_URI_INTERNAL, NOSTR_PUBKEY } from "../../../lib/config"
+import { GRAPHQL_URI_INTERNAL, NOSTR_PUBKEY } from "../../../../lib/config"
 import {
   AccountDefaultWalletDocument,
   AccountDefaultWalletQuery,
-} from "../../../lib/graphql/generated"
+  LnInvoiceCreateOnBehalfOfRecipientDocument,
+  LnInvoiceCreateOnBehalfOfRecipientMutation,
+} from "../../../../lib/graphql/generated"
 
 const ipForwardingMiddleware = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => ({
@@ -107,18 +110,28 @@ export async function GET(
 ) {
   console.log(NOSTR_PUBKEY)
 
-  const { hostname } = new URL(request.url)
+  const { searchParams, hostname } = new URL(request.url)
 
   const username = params.username
 
-  const accountUsername = username ? username.toString() : ""
+  // amount has to be in millisats for this to work
+  // this is part of the lnurl spec
+  const amount = searchParams.get("amount")
+  const nostr = searchParams.get("nostr")
+
+  if (!amount || !username) {
+    return NextResponse.json({
+      status: "ERROR",
+      reason: "Invalid request",
+    })
+  }
 
   let walletId: string | null = null
 
   try {
     const { data } = await client.query<AccountDefaultWalletQuery>({
       query: AccountDefaultWalletDocument,
-      variables: { username: accountUsername, walletCurrency: "BTC" },
+      variables: { username, walletCurrency: "BTC" },
       context: {
         "x-real-ip": request.headers.get("x-real-ip"),
         "x-forwarded-for": request.headers.get("x-forwarded-for"),
@@ -137,23 +150,65 @@ export async function GET(
   }
 
   const metadata = JSON.stringify([
-    ["text/plain", `Payment to ${accountUsername}`],
-    ["text/identifier", `${accountUsername}@${hostname}`],
+    ["text/plain", `Payment to ${username}`],
+    ["text/identifier", `${username}@${hostname}`],
   ])
 
-  const callback = `${request.url}/callback`
+  // lnurl generate invoice
+  try {
+    if (Array.isArray(amount) || Array.isArray(nostr)) {
+      throw new Error("Invalid request")
+    }
 
-  return NextResponse.json({
-    callback,
-    minSendable: 1000,
-    maxSendable: 100000000000,
-    metadata,
-    tag: "payRequest",
-    ...(nostrEnabled
-      ? {
-          allowsNostr: true,
-          nostrPubkey: NOSTR_PUBKEY,
-        }
-      : {}),
-  })
+    const amountSats = Math.round(parseInt(amount, 10) / 1000)
+    if ((amountSats * 1000).toString() !== amount) {
+      return NextResponse.json({
+        status: "ERROR",
+        reason: "Millisatoshi amount is not supported, please send a value in full sats.",
+      })
+    }
+
+    let descriptionHash: string
+
+    if (nostrEnabled && nostr) {
+      descriptionHash = crypto.createHash("sha256").update(nostr).digest("hex")
+    } else {
+      descriptionHash = crypto.createHash("sha256").update(metadata).digest("hex")
+    }
+
+    const result = await client.mutate<LnInvoiceCreateOnBehalfOfRecipientMutation>({
+      mutation: LnInvoiceCreateOnBehalfOfRecipientDocument,
+      variables: {
+        walletId,
+        amount: amountSats,
+        descriptionHash,
+      },
+    })
+
+    const errors = result.errors
+    const invoice = result.data?.mutationData?.invoice
+
+    if ((errors && errors.length) || !invoice) {
+      console.log("error getting invoice", errors)
+      return NextResponse.json({
+        status: "ERROR",
+        reason: `Failed to get invoice: ${errors ? errors[0].message : "unknown error"}`,
+      })
+    }
+
+    if (nostrEnabled && nostr && redis) {
+      redis.set(`nostrInvoice:${invoice.paymentHash}`, nostr, "EX", 1440)
+    }
+
+    return NextResponse.json({
+      pr: invoice.paymentRequest,
+      routes: [],
+    })
+  } catch (err: unknown) {
+    console.log("unexpected error getting invoice", err)
+    NextResponse.json({
+      status: "ERROR",
+      reason: err instanceof Error ? err.message : "unexpected error",
+    })
+  }
 }
