@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { URL } from "url"
+import originalUrl from "original-url"
 
 import {
   ApolloClient,
@@ -78,8 +78,7 @@ export async function GET(
 ) {
   console.log(NOSTR_PUBKEY)
 
-  const { hostname } = new URL(request.url)
-
+  const url = originalUrl(request)
   const username = params.username
 
   const accountUsername = username ? username.toString() : ""
@@ -109,10 +108,10 @@ export async function GET(
 
   const metadata = JSON.stringify([
     ["text/plain", `Payment to ${accountUsername}`],
-    ["text/identifier", `${accountUsername}@${hostname}`],
+    ["text/identifier", `${accountUsername}@${url.hostname}`],
   ])
 
-  const callback = `${request.url}/callback`
+  const callback = `${url.full}/callback`
 
   return NextResponse.json({
     callback,
