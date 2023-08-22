@@ -13,6 +13,8 @@ import { GRAPHQL_URL_INTERNAL, NOSTR_PUBKEY, PAY_SERVER } from "../../../lib/con
 import {
   AccountDefaultWalletDocument,
   AccountDefaultWalletQuery,
+  RealtimePriceInitialDocument,
+  RealtimePriceInitialQuery,
 } from "../../../lib/graphql/generated"
 import { URL_HOST_DOMAIN } from "../../../config/config"
 
@@ -33,6 +35,7 @@ const client = new ApolloClient({
     ipForwardingMiddleware,
     new HttpLink({
       uri: GRAPHQL_URL_INTERNAL,
+      fetchOptions: { cache: "no-store" },
     }),
   ),
   cache: new InMemoryCache(),
@@ -83,6 +86,27 @@ export async function GET(
   const username = params.username
 
   const amount = searchParams.get("amount")
+  const currency = searchParams.get("currency")
+
+  let amountInMsats: number | undefined
+
+  if (amount && currency && currency !== "BTC") {
+    const { data } = await client.query<RealtimePriceInitialQuery>({
+      query: RealtimePriceInitialDocument,
+      variables: { currency },
+      context: {
+        "x-real-ip": request.headers.get("x-real-ip"),
+        "x-forwarded-for": request.headers.get("x-forwarded-for"),
+      },
+    })
+
+    const { base, offset } = data.realtimePrice.btcSatPrice
+    const priceRef = base / 10 ** offset
+    const convertedCurrencyAmount = Math.round(Number(amount) / priceRef)
+    amountInMsats = convertedCurrencyAmount * 1000
+  } else if (amount && Number.isInteger(Number(amount))) {
+    amountInMsats = Number(amount) * 1000
+  }
 
   let walletId: string | null = null
 
@@ -117,9 +141,9 @@ export async function GET(
   let minSendable = 1000 // 1 sat in millisat
   let maxSendable = 100000000000 // 1 BTC in millisat
 
-  if (amount && Number.isInteger(Number(amount))) {
-    minSendable = Number(amount) * 1000
-    maxSendable = Number(amount) * 1000
+  if (amountInMsats) {
+    minSendable = amountInMsats
+    maxSendable = amountInMsats
   }
 
   return NextResponse.json({
