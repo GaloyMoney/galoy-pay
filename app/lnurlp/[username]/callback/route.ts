@@ -19,6 +19,7 @@ import {
   LnInvoiceCreateOnBehalfOfRecipientDocument,
   LnInvoiceCreateOnBehalfOfRecipientMutation,
 } from "../../../../lib/graphql/generated"
+import { URL_HOST_DOMAIN } from "../../../../config/config"
 
 const ipForwardingMiddleware = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => ({
@@ -110,7 +111,7 @@ export async function GET(
 ) {
   console.log(NOSTR_PUBKEY)
 
-  const { searchParams, hostname } = new URL(request.url)
+  const { searchParams } = new URL(request.url)
 
   const username = params.username
 
@@ -151,7 +152,7 @@ export async function GET(
 
   const metadata = JSON.stringify([
     ["text/plain", `Payment to ${username}`],
-    ["text/identifier", `${username}@${hostname}`],
+    ["text/identifier", `${username}@${URL_HOST_DOMAIN}`],
   ])
 
   // lnurl generate invoice
