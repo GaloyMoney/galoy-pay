@@ -7,7 +7,6 @@
   },
   "scripts": {
     "build": "next build",
-    "check-code": "yarn tsc:check && yarn eslint:check && yarn prettier:check",
     "codegen": "graphql-codegen  --config codegen.yml",
     "dev": "next dev",
     "eslint:check": "next lint",

@@ -1,5 +1,7 @@
 check-code:
-	yarn check-code
+	yarn tsc:check
+	# yarn eslint:check
+	yarn prettier:check
 
 test:
 	yarn test

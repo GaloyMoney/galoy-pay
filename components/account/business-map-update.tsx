@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { AccountBusinessInfo } from "./index"
-import { Account } from "../../generated"
+import { AuditedAccount } from "../../generated"
 
 const isValidLatitude = (latitude: number) =>
   isFinite(latitude) && Math.abs(latitude) <= 90
@@ -15,7 +15,7 @@ const isValidBusinessInfo = ({ title, coordinates }: AccountBusinessInfo) =>
   isValidTitle(title)
 
 const BusinessMapUpdate: React.FC<{
-  accountDetails: Account
+  accountDetails: AuditedAccount
   update: (info: AccountBusinessInfo) => void
   deleteBusiness: (username: string) => void
   updating: boolean

@@ -13,7 +13,7 @@ import BusinessMapUpdate from "./business-map-update"
 import { validPhone, validUsername, reportError } from "../../utils"
 
 import {
-  Account,
+  AuditedAccount,
   AccountLevel,
   AccountStatus,
   Coordinates,
@@ -32,7 +32,7 @@ export type AccountBusinessInfo = {
 }
 
 function AccountDetails() {
-  const [data, setData] = useState<null | Account>(null)
+  const [data, setData] = useState<null | AuditedAccount>(null)
   const [searchValue, setSearchValue] = useState("")
 
   const [updateAccountStatus, { loading: loadingAccountStatus }] =
