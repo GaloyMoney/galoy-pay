@@ -14,15 +14,15 @@ import { onError } from "@apollo/client/link/error"
 
 import { createClient } from "graphql-ws"
 
-import { GRAPHQL_URI, GRAPHQL_SUBSCRIPTION_URI } from "./config"
+import { GRAPHQL_URL, GRAPHQL_WEBSOCKET_URL } from "./config"
 
 const httpLink = new HttpLink({
-  uri: GRAPHQL_URI,
+  uri: GRAPHQL_URL,
 })
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: GRAPHQL_SUBSCRIPTION_URI,
+    url: GRAPHQL_WEBSOCKET_URL,
     retryAttempts: 12,
     connectionParams: {},
     shouldRetry: (errOrCloseEvent) => {

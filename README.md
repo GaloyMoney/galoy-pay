@@ -12,21 +12,24 @@ Galoy-Pay uses query, mutation, and subscription operations from the Galoy's gra
 
 ## How to run this repo locally?
 
-In the project directory, create a file name `.env.local` and fill it with
+In the project directory, create a file name `.env.local` and fill it for local dev with
 
 ```
-NEXT_PUBLIC_GRAPHQL_HOSTNAME='localhost:4002'
-NEXT_PUBLIC_GRAPHQL_WEBSOCKET_URL='FIXME'
+NEXT_PUBLIC_GRAPHQL_URL='http://localhost:4002/graphql'
+NEXT_PUBLIC_GRAPHQL_WEBSOCKET_URL='ws://localhost:4002/graphqlws'
+GRAPHQL_URL_INTERNAL="http://localhost:4002/graphql"
 ```
+
 
 for staging, use
 
 ```
-NEXT_PUBLIC_GRAPHQL_HOSTNAME='api.staging.galoy.io'
+NEXT_PUBLIC_GRAPHQL_URL='https://api.staging.galoy.io/graphql'
 NEXT_PUBLIC_GRAPHQL_WEBSOCKET_URL='wss://ws.staging.galoy.io/graphql'
+GRAPHQL_URL_INTERNAL="http://api.galoy-staging-galoy.svc.cluster.local"
 ```
 
-(or use your custom API URL), then run
+then run
 
 ```sh
 yarn install
@@ -70,15 +73,8 @@ This will build the app for production under a `build` folder. It will bundle Re
 
 ## Test lnurlp
 
-```
-GRAPHQL_HOSTNAME_INTERNAL="api.galoy-staging-galoy.svc.cluster.local"
-```
-
-or 
-```
-GRAPHQL_HOSTNAME_INTERNAL="localhost:4002"
-```
 
 This environment variable is needed for getting the lnurlp endpoint working.
 
 curl localhost:3000/.well-known/lnurlp/alice
+curl localhost:3000/.well-known/lnurlp/alice?amount=1234

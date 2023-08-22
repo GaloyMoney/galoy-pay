@@ -29,9 +29,7 @@ gql`
       __typename
     }
   }
-`
 
-gql`
   mutation lnInvoiceCreateOnBehalfOfRecipients(
     $input: LnInvoiceCreateOnBehalfOfRecipientInput!
   ) {

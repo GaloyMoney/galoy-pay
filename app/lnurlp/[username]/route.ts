@@ -9,7 +9,7 @@ import {
   InMemoryCache,
 } from "@apollo/client"
 
-import { GRAPHQL_URI, GRAPHQL_URI_INTERNAL, NOSTR_PUBKEY } from "../../../lib/config"
+import { GRAPHQL_URL_INTERNAL, NOSTR_PUBKEY, PAY_SERVER } from "../../../lib/config"
 import {
   AccountDefaultWalletDocument,
   AccountDefaultWalletQuery,
@@ -32,7 +32,7 @@ const client = new ApolloClient({
   link: concat(
     ipForwardingMiddleware,
     new HttpLink({
-      uri: GRAPHQL_URI_INTERNAL,
+      uri: GRAPHQL_URL_INTERNAL,
     }),
   ),
   cache: new InMemoryCache(),
@@ -78,16 +78,18 @@ export async function GET(
 ) {
   console.log(NOSTR_PUBKEY)
 
+  const { searchParams } = new URL(request.url)
+
   const username = params.username
 
-  const accountUsername = username ? username.toString() : ""
+  const amount = searchParams.get("amount")
 
   let walletId: string | null = null
 
   try {
     const { data } = await client.query<AccountDefaultWalletQuery>({
       query: AccountDefaultWalletDocument,
-      variables: { username: accountUsername, walletCurrency: "BTC" },
+      variables: { username, walletCurrency: "BTC" },
       context: {
         "x-real-ip": request.headers.get("x-real-ip"),
         "x-forwarded-for": request.headers.get("x-forwarded-for"),
@@ -106,17 +108,24 @@ export async function GET(
   }
 
   const metadata = JSON.stringify([
-    ["text/plain", `Payment to ${accountUsername}`],
-    ["text/identifier", `${accountUsername}@${URL_HOST_DOMAIN}`],
+    ["text/plain", `Payment to ${username}`],
+    ["text/identifier", `${username}@${URL_HOST_DOMAIN}`],
   ])
 
-  const payServer = GRAPHQL_URI.replace("/graphql", "").replace("api", "pay")
-  const callback = `${payServer}/lnurlp/${username}/callback`
+  const callback = `${PAY_SERVER}/lnurlp/${username}/callback`
+
+  let minSendable = 1000 // 1 sat in millisat
+  let maxSendable = 100000000000 // 1 BTC in millisat
+
+  if (amount && Number.isInteger(Number(amount))) {
+    minSendable = Number(amount) * 1000
+    maxSendable = Number(amount) * 1000
+  }
 
   return NextResponse.json({
     callback,
-    minSendable: 1000,
-    maxSendable: 100000000000,
+    minSendable,
+    maxSendable,
     metadata,
     tag: "payRequest",
     ...(nostrEnabled
