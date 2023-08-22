@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server"
-import originalUrl from "original-url"
 
 import {
   ApolloClient,
@@ -10,11 +9,12 @@ import {
   InMemoryCache,
 } from "@apollo/client"
 
-import { GRAPHQL_URI_INTERNAL, NOSTR_PUBKEY } from "../../../lib/config"
+import { GRAPHQL_URI, GRAPHQL_URI_INTERNAL, NOSTR_PUBKEY } from "../../../lib/config"
 import {
   AccountDefaultWalletDocument,
   AccountDefaultWalletQuery,
 } from "../../../lib/graphql/generated"
+import { URL_HOST_DOMAIN } from "../../../config/config"
 
 const ipForwardingMiddleware = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => ({
@@ -78,7 +78,6 @@ export async function GET(
 ) {
   console.log(NOSTR_PUBKEY)
 
-  const url = originalUrl(request)
   const username = params.username
 
   const accountUsername = username ? username.toString() : ""
@@ -108,10 +107,11 @@ export async function GET(
 
   const metadata = JSON.stringify([
     ["text/plain", `Payment to ${accountUsername}`],
-    ["text/identifier", `${accountUsername}@${url.hostname}`],
+    ["text/identifier", `${accountUsername}@${URL_HOST_DOMAIN}`],
   ])
 
-  const callback = `${url.full}/callback`
+  const payServer = GRAPHQL_URI.replace("/graphql", "").replace("api", "pay")
+  const callback = `${payServer}/.well-known/${username}/lnurlp/callback`
 
   return NextResponse.json({
     callback,
