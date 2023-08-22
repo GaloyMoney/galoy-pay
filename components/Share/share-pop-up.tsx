@@ -7,7 +7,7 @@ type ShareState = "pending" | "success" | "error"
 
 interface Props {
   shareData: ShareData
-  image?: string
+  image?: string | null
   getImage?: () => void
   shareState: string | undefined
   onClose: () => void

@@ -9,7 +9,7 @@ interface Props {
   onSuccess?: () => void
   onError?: (error?: unknown) => void
   onInteraction?: () => void
-  image?: string
+  image?: string | null
   getImage?: () => void
   shareState: string | undefined
   disabled?: boolean
