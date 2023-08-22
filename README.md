@@ -77,3 +77,4 @@ This will build the app for production under a `build` folder. It will bundle Re
 This environment variable is needed for getting the lnurlp endpoint working.
 
 curl localhost:3000/.well-known/lnurlp/alice
+curl localhost:3000/.well-known/lnurlp/alice?amount=1234

@@ -6,8 +6,6 @@ let GRAPHQL_WEBSOCKET_URL = process.env.NEXT_PUBLIC_GRAPHQL_WEBSOCKET_URL as str
 // for example: "api.galoy-name-galoy.svc.cluster.local"
 const GRAPHQL_URL_INTERNAL = process.env.GRAPHQL_URL_INTERNAL
 
-console.log(process.env)
-
 // this one should always be set
 // it's possible to always set it because it's not a NEXT_PUBLIC_ variable
 if (!GRAPHQL_URL_INTERNAL && typeof window === "undefined") {
@@ -40,4 +38,12 @@ if (!GRAPHQL_URL || !GRAPHQL_WEBSOCKET_URL) {
 
 const NOSTR_PUBKEY = process.env.NOSTR_PUBKEY
 
-export { GRAPHQL_URL, GRAPHQL_WEBSOCKET_URL, GRAPHQL_URL_INTERNAL, NOSTR_PUBKEY }
+const PAY_SERVER = GRAPHQL_URL.replace("/graphql", "").replace("api", "pay")
+
+export {
+  GRAPHQL_URL,
+  GRAPHQL_WEBSOCKET_URL,
+  GRAPHQL_URL_INTERNAL,
+  NOSTR_PUBKEY,
+  PAY_SERVER,
+}
