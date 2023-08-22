@@ -111,7 +111,7 @@ export async function GET(
   ])
 
   const payServer = GRAPHQL_URI.replace("/graphql", "").replace("api", "pay")
-  const callback = `${payServer}/.well-known/${username}/lnurlp/callback`
+  const callback = `${payServer}/${username}/lnurlp/callback`
 
   return NextResponse.json({
     callback,
