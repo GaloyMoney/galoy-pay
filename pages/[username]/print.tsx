@@ -2,21 +2,21 @@ import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 import Card from "react-bootstrap/Card"
 import Container from "react-bootstrap/Container"
-import originalUrl from "original-url"
 import ReactToPrint from "react-to-print"
 import { bech32 } from "bech32"
 import { QRCode } from "react-qrcode-logo"
 import { useRef } from "react"
 import { URL_HOST_DOMAIN } from "../../config/config"
+import { NextRequest } from "next/server"
 
 export async function getServerSideProps({
   req,
   params: { username },
 }: {
-  req: unknown
+  req: NextRequest
   params: { username: string }
 }) {
-  const url = originalUrl(req)
+  const url = new URL(req.url)
 
   const lnurl = bech32.encode(
     "lnurl",
