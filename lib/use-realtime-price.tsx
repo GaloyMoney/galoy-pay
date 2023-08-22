@@ -27,9 +27,7 @@ gql`
       }
     }
   }
-`
 
-gql`
   query realtimePriceInitial($currency: DisplayCurrency!) {
     realtimePrice(currency: $currency) {
       timestamp
