@@ -9,7 +9,7 @@ import {
   InMemoryCache,
 } from "@apollo/client"
 
-import { GRAPHQL_URI, GRAPHQL_URI_INTERNAL, NOSTR_PUBKEY } from "../../../lib/config"
+import { GRAPHQL_URL_INTERNAL, NOSTR_PUBKEY } from "../../../lib/config"
 import {
   AccountDefaultWalletDocument,
   AccountDefaultWalletQuery,
@@ -32,7 +32,7 @@ const client = new ApolloClient({
   link: concat(
     ipForwardingMiddleware,
     new HttpLink({
-      uri: GRAPHQL_URI_INTERNAL,
+      uri: GRAPHQL_URL_INTERNAL,
     }),
   ),
   cache: new InMemoryCache(),

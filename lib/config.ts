@@ -1,11 +1,18 @@
-let GRAPHQL_HOSTNAME = process.env.NEXT_PUBLIC_GRAPHQL_HOSTNAME
-let GRAPHQL_WEBSOCKET_URL = process.env.NEXT_PUBLIC_GRAPHQL_WEBSOCKET_URL ?? ""
+let GRAPHQL_URL = process.env.NEXT_PUBLIC_GRAPHQL_URL as string
+let GRAPHQL_WEBSOCKET_URL = process.env.NEXT_PUBLIC_GRAPHQL_WEBSOCKET_URL as string
 
 // we need an internal dns to properly propagate the ip related headers to api
 // if we use the api endpoints, nginx will rewrite the header to prevent spoofing
 // for example: "api.galoy-name-galoy.svc.cluster.local"
-const GRAPHQL_HOSTNAME_INTERNAL = process.env.GRAPHQL_HOSTNAME_INTERNAL as string
-const GRAPHQL_URI_INTERNAL = `http://${GRAPHQL_HOSTNAME_INTERNAL}/graphql`
+const GRAPHQL_URL_INTERNAL = process.env.GRAPHQL_URL_INTERNAL
+
+console.log(process.env)
+
+// this one should always be set
+// it's possible to always set it because it's not a NEXT_PUBLIC_ variable
+if (!GRAPHQL_URL_INTERNAL && typeof window === "undefined") {
+  throw Error("GRAPHQL_URL_INTERNAL is not defined")
+}
 
 // from https://nextjs.org/docs/pages/building-your-application/configuring/environment-variables
 // Note: After being built, your app will no longer respond to changes to these environment variables.
@@ -15,23 +22,22 @@ const GRAPHQL_URI_INTERNAL = `http://${GRAPHQL_HOSTNAME_INTERNAL}/graphql`
 // you'll have to setup your own API to provide them to the client (either on demand or during initialization).
 
 // so we always assume the api is on the same domain as the frontend
-if (!GRAPHQL_HOSTNAME) {
+if (!GRAPHQL_URL || !GRAPHQL_WEBSOCKET_URL) {
   if (typeof window !== "undefined") {
-    const hostParts = window.location.host.split(".")
+    const hostname = new URL(window.location.href).hostname
+    const hostPartsApi = hostname.split(".")
+    const hostPartsWs = hostname.split(".")
 
-    hostParts[0] = "api"
-    GRAPHQL_HOSTNAME = hostParts.join(".")
+    hostPartsApi[0] = "api"
+    hostPartsWs[0] = "ws"
 
-    hostParts[0] = "ws"
-    GRAPHQL_WEBSOCKET_URL = `wss://${hostParts.join(".")}/graphql`
+    GRAPHQL_URL = `https://${hostPartsApi.join(".")}/graphql`
+    GRAPHQL_WEBSOCKET_URL = `wss://${hostPartsWs.join(".")}/graphql`
   } else {
     console.log("window is undefined")
   }
 }
 
-const GRAPHQL_URI = `https://${GRAPHQL_HOSTNAME}/graphql`
-const GRAPHQL_SUBSCRIPTION_URI = GRAPHQL_WEBSOCKET_URL
+const NOSTR_PUBKEY = process.env.NOSTR_PUBKEY
 
-const NOSTR_PUBKEY = process.env.NOSTR_PUBKEY as string
-
-export { GRAPHQL_URI, GRAPHQL_SUBSCRIPTION_URI, GRAPHQL_URI_INTERNAL, NOSTR_PUBKEY }
+export { GRAPHQL_URL, GRAPHQL_WEBSOCKET_URL, GRAPHQL_URL_INTERNAL, NOSTR_PUBKEY }

@@ -7,7 +7,7 @@ import ListGroup from "react-bootstrap/ListGroup"
 import Row from "react-bootstrap/Row"
 import { gql, useQuery } from "@apollo/client"
 
-import { GRAPHQL_URI } from "../lib/config"
+import { GRAPHQL_URL } from "../lib/config"
 import { useRouter } from "next/router"
 import CurrencyDropdown from "../components/Currency/currency-dropdown"
 
@@ -20,7 +20,7 @@ const GET_NODE_STATS = gql`
 `
 
 function Home() {
-  const nodeUrl = GRAPHQL_URI.includes("staging")
+  const nodeUrl = GRAPHQL_URL.includes("staging")
     ? `https://mempool.space/signet/lightning/node/`
     : `https://mempool.space/lightning/node/`
   const { loading, error, data } = useQuery(GET_NODE_STATS)
