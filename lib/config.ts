@@ -32,7 +32,7 @@ if (!GRAPHQL_URL || !GRAPHQL_WEBSOCKET_URL) {
 
 const NOSTR_PUBKEY = process.env.NOSTR_PUBKEY
 
-const PAY_SERVER = GRAPHQL_URL.replace("/graphql", "").replace("api", "pay")
+const PAY_SERVER = GRAPHQL_URL?.replace("/graphql", "")?.replace("api", "pay")
 
 export {
   GRAPHQL_URL,
