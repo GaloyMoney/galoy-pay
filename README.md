@@ -10,18 +10,11 @@ With a default installation, Galoy-Pay can be accessed under `pay.domain.com`.
 
 Galoy-Pay uses query, mutation, and subscription operations from the Galoy's graphql API endpoints `api.domain.com` as defined in [schema.graphql](https://github.com/GaloyMoney/galoy/blob/main/src/graphql/public/schema.graphql)
 
-## How to run this repo locally?
+## How to run this repo locally ?
 
-In the project directory, create a file name `.env.local` and fill it for local dev with
+`.env.local` is set with values that works for local dev.
 
-```
-NEXT_PUBLIC_GRAPHQL_URL='http://localhost:4002/graphql'
-NEXT_PUBLIC_GRAPHQL_WEBSOCKET_URL='ws://localhost:4002/graphqlws'
-GRAPHQL_URL_INTERNAL="http://localhost:4002/graphql"
-```
-
-
-for staging, use
+for staging, use `.env.local` with the following properties
 
 ```
 NEXT_PUBLIC_GRAPHQL_URL='https://api.staging.galoy.io/graphql'

@@ -6,12 +6,6 @@ let GRAPHQL_WEBSOCKET_URL = process.env.NEXT_PUBLIC_GRAPHQL_WEBSOCKET_URL as str
 // for example: "api.galoy-name-galoy.svc.cluster.local"
 const GRAPHQL_URL_INTERNAL = process.env.GRAPHQL_URL_INTERNAL
 
-// this one should always be set
-// it's possible to always set it because it's not a NEXT_PUBLIC_ variable
-if (!GRAPHQL_URL_INTERNAL && typeof window === "undefined") {
-  throw Error("GRAPHQL_URL_INTERNAL is not defined")
-}
-
 // from https://nextjs.org/docs/pages/building-your-application/configuring/environment-variables
 // Note: After being built, your app will no longer respond to changes to these environment variables.
 // For instance, if you use a Heroku pipeline to promote slugs built in one environment to another environment,

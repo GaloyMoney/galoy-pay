@@ -1,77 +1,14 @@
 import { NextResponse } from "next/server"
 
-import {
-  ApolloClient,
-  ApolloLink,
-  concat,
-  gql,
-  HttpLink,
-  InMemoryCache,
-} from "@apollo/client"
-
-import { GRAPHQL_URL_INTERNAL, NOSTR_PUBKEY, PAY_SERVER } from "../../../lib/config"
+import { URL_HOST_DOMAIN } from "../../../config/config"
+import { NOSTR_PUBKEY, PAY_SERVER } from "../../../lib/config"
 import {
   AccountDefaultWalletDocument,
   AccountDefaultWalletQuery,
   RealtimePriceInitialDocument,
   RealtimePriceInitialQuery,
 } from "../../../lib/graphql/generated"
-import { URL_HOST_DOMAIN } from "../../../config/config"
-
-const ipForwardingMiddleware = new ApolloLink((operation, forward) => {
-  operation.setContext(({ headers = {} }) => ({
-    headers: {
-      ...headers,
-      "x-real-ip": operation.getContext()["x-real-ip"],
-      "x-forwarded-for": operation.getContext()["x-forwarded-for"],
-    },
-  }))
-
-  return forward(operation)
-})
-
-const client = new ApolloClient({
-  link: concat(
-    ipForwardingMiddleware,
-    new HttpLink({
-      uri: GRAPHQL_URL_INTERNAL,
-      fetchOptions: { cache: "no-store" },
-    }),
-  ),
-  cache: new InMemoryCache(),
-})
-
-gql`
-  query accountDefaultWallet($username: Username!, $walletCurrency: WalletCurrency!) {
-    accountDefaultWallet(username: $username, walletCurrency: $walletCurrency) {
-      __typename
-      id
-      walletCurrency
-    }
-  }
-
-  mutation lnInvoiceCreateOnBehalfOfRecipient(
-    $walletId: WalletId!
-    $amount: SatAmount!
-    $descriptionHash: Hex32Bytes!
-  ) {
-    mutationData: lnInvoiceCreateOnBehalfOfRecipient(
-      input: {
-        recipientWalletId: $walletId
-        amount: $amount
-        descriptionHash: $descriptionHash
-      }
-    ) {
-      errors {
-        message
-      }
-      invoice {
-        paymentRequest
-        paymentHash
-      }
-    }
-  }
-`
+import { client } from "./graphql"
 
 const nostrEnabled = !!NOSTR_PUBKEY
 
