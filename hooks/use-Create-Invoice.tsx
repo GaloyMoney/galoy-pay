@@ -63,10 +63,7 @@ const useCreateInvoice = ({ recipientWalletCurrency }: Props) => {
     onCompleted: () => setInvoiceStatus("new"),
   })
 
-  const mutation =
-    recipientWalletCurrency === "USD"
-      ? usdMutation
-      : btcMutation
+  const mutation = recipientWalletCurrency === "USD" ? usdMutation : btcMutation
 
   const [createInvoice, { loading, error, data }] = mutation
 
