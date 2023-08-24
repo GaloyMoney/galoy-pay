@@ -13,6 +13,7 @@ type Props = {
 }
 
 const AppLayout = ({ children, username }: Props) => {
+  const router = useRouter()
   const { memo } = useRouter().query
   const [openSideBar, setOpenSideBar] = React.useState<boolean>(false)
   const [copied, setCopied] = React.useState<boolean>(false)
@@ -35,12 +36,27 @@ const AppLayout = ({ children, username }: Props) => {
     setOpenSideBar(false)
   }
 
+  const navigateHome = () => {
+    let pathname = "/"
+    if (username) pathname = `/${username}`
+    router.push(
+      {
+        pathname,
+      },
+      undefined,
+      { shallow: true },
+    )
+    setTimeout(function () {
+      router.reload() // Force a reload after a short delay to allow location href to update
+    }, 200)
+  }
+
   return (
     <div className={`${openSideBar && styles.container_bg} ${styles.container}`}>
       <nav className={styles.nav_bar}>
-        <a href={`/${username}`} style={{ cursor: "pointer" }}>
+        <button className={styles.nav_home} onClick={navigateHome}>
           <Image src="/icons/blink-logo-icon.svg" alt="logo" width="50" height="50" />
-        </a>
+        </button>
         <div onClick={() => setOpenSideBar(!openSideBar)} className={styles.hamburger}>
           <span className={`${openSideBar && styles.toggle}`}></span>
           <span className={`${openSideBar && styles.toggle}`}></span>
