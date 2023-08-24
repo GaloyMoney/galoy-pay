@@ -30,7 +30,7 @@ function ReceivePayment() {
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
 
   let accountUsername: string
-  if (username == undefined) {
+  if (!username) {
     accountUsername = ""
   } else {
     accountUsername = username.toString()
@@ -52,6 +52,7 @@ function ReceivePayment() {
 
   const { data, error: usernameError } = useAccountDefaultWalletsQuery({
     variables: { username: accountUsername },
+    skip: !accountUsername,
   })
 
   const [state, dispatch] = React.useReducer(reducer, {
