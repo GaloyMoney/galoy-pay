@@ -46,10 +46,9 @@ const AppLayout = ({ children, username }: Props) => {
       undefined,
       { shallow: true },
     )
-    setTimeout(function() {
+    setTimeout(function () {
       router.reload() // Force a reload after a short delay to allow location href to update
     }, 200)
-
   }
 
   return (
