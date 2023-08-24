@@ -54,15 +54,21 @@ const useCreateInvoice = ({ recipientWalletCurrency }: Props) => {
     "loading" | "new" | "need-update" | "expired"
   >("loading")
 
-  const mutation =
-    recipientWalletCurrency === "USD"
-      ? useLnUsdInvoiceCreateOnBehalfOfRecipientMutation
-      : useLnInvoiceCreateOnBehalfOfRecipientsMutation
-
-  const [createInvoice, { loading, error, data }] = mutation({
+  const usdMutation = useLnUsdInvoiceCreateOnBehalfOfRecipientMutation({
     onError: console.error,
     onCompleted: () => setInvoiceStatus("new"),
   })
+  const btcMutation = useLnInvoiceCreateOnBehalfOfRecipientsMutation({
+    onError: console.error,
+    onCompleted: () => setInvoiceStatus("new"),
+  })
+
+  const mutation =
+    recipientWalletCurrency === "USD"
+      ? usdMutation
+      : btcMutation
+
+  const [createInvoice, { loading, error, data }] = mutation
 
   return {
     createInvoice,
