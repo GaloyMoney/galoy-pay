@@ -89,7 +89,10 @@ function ReceivePayment() {
             <div className={styles.error}>
               <p>{`${usernameError.message}.`}</p>
               <p>Please check the username in your browser URL and try again.</p>
-              <Link href={"/setuppwa"} onClick={() => localStorage.removeItem("username")}>
+              <Link
+                href={"/setuppwa"}
+                onClick={() => localStorage.removeItem("username")}
+              >
                 Back
               </Link>
             </div>
@@ -153,7 +156,7 @@ function ReceivePayment() {
             </>
           )}
         </Container>
-      ): null }
+      ) : null}
     </>
   )
 }
