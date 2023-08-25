@@ -75,82 +75,86 @@ function ReceivePayment() {
   }, [state, username, data])
 
   return (
-    <Container className={styles.payment_container}>
-      <Head>
-        <link
-          rel="manifest"
-          href={`/api/${username}/manifest?${manifestParams.toString()}`}
-          id="manifest"
-        />
-      </Head>
-      {usernameError ? (
-        <div className={styles.error}>
-          <p>{`${usernameError.message}.`}</p>
-          <p>Please check the username in your browser URL and try again.</p>
-          <Link href={"/setuppwa"} onClick={() => localStorage.removeItem("username")}>
-            Back
-          </Link>
-        </div>
-      ) : (
-        <>
-          <PinToHomescreen
-            pinnedToHomeScreenModalVisible={state.pinnedToHomeScreenModalVisible}
-            dispatch={dispatch}
-          />
-          <div className={styles.username_container}>
-            {state.createdInvoice && (
-              <button onClick={() => dispatch({ type: ACTIONS.BACK })}>
-                <Image
-                  src="/icons/chevron-left-icon.svg"
-                  alt="back button"
-                  width="10px"
-                  height="12px"
-                />
-              </button>
-            )}
-            <p className={styles.username}>{`Pay ${username}`}</p>
-            <div style={{ marginLeft: "12px", marginTop: "9px" }}>
-              <CurrencyDropdown
-                style={{
-                  border: "none",
-                  outline: "none",
-                  width: isIOS || isSafari ? "72px" : "56px",
-                  height: "42px",
-                  fontSize: "18px",
-                  backgroundColor: "white",
-                  textAlign: "center",
-                  verticalAlign: "middle",
-                }}
-                showOnlyFlag={true}
-                onSelectedDisplayCurrencyChange={(newDisplayCurrency) => {
-                  localStorage.setItem("display", newDisplayCurrency)
-                  router.push(
-                    {
-                      query: { ...router.query, display: newDisplayCurrency },
-                    },
-                    undefined,
-                    { shallow: true },
-                  )
-                  setTimeout(() => {
-                    // hard reload to re-calculate currency
-                    // in a future PR we can manage state globally for selected display currency
-                    window.location.reload()
-                  }, 100)
-                }}
-              />
+    <>
+      {router.query.username ? (
+        <Container className={styles.payment_container}>
+          <Head>
+            <link
+              rel="manifest"
+              href={`/api/${username}/manifest?${manifestParams.toString()}`}
+              id="manifest"
+            />
+          </Head>
+          {usernameError ? (
+            <div className={styles.error}>
+              <p>{`${usernameError.message}.`}</p>
+              <p>Please check the username in your browser URL and try again.</p>
+              <Link href={"/setuppwa"} onClick={() => localStorage.removeItem("username")}>
+                Back
+              </Link>
             </div>
-          </div>
-          {/* {memo && <p className={styles.memo}>{`Memo: ${memo}`}</p>} */}
+          ) : (
+            <>
+              <PinToHomescreen
+                pinnedToHomeScreenModalVisible={state.pinnedToHomeScreenModalVisible}
+                dispatch={dispatch}
+              />
+              <div className={styles.username_container}>
+                {state.createdInvoice && (
+                  <button onClick={() => dispatch({ type: ACTIONS.BACK })}>
+                    <Image
+                      src="/icons/chevron-left-icon.svg"
+                      alt="back button"
+                      width="10px"
+                      height="12px"
+                    />
+                  </button>
+                )}
+                <p className={styles.username}>{`Pay ${username}`}</p>
+                <div style={{ marginLeft: "12px", marginTop: "9px" }}>
+                  <CurrencyDropdown
+                    style={{
+                      border: "none",
+                      outline: "none",
+                      width: isIOS || isSafari ? "72px" : "56px",
+                      height: "42px",
+                      fontSize: "18px",
+                      backgroundColor: "white",
+                      textAlign: "center",
+                      verticalAlign: "middle",
+                    }}
+                    showOnlyFlag={true}
+                    onSelectedDisplayCurrencyChange={(newDisplayCurrency) => {
+                      localStorage.setItem("display", newDisplayCurrency)
+                      router.push(
+                        {
+                          query: { ...router.query, display: newDisplayCurrency },
+                        },
+                        undefined,
+                        { shallow: true },
+                      )
+                      setTimeout(() => {
+                        // hard reload to re-calculate currency
+                        // in a future PR we can manage state globally for selected display currency
+                        window.location.reload()
+                      }, 100)
+                    }}
+                  />
+                </div>
+              </div>
+              {/* {memo && <p className={styles.memo}>{`Memo: ${memo}`}</p>} */}
 
-          <ParsePayment
-            state={state}
-            dispatch={dispatch}
-            defaultWalletCurrency={data?.accountDefaultWallet.walletCurrency}
-            walletId={data?.accountDefaultWallet.id}
-          />
-        </>
-      )}
-    </Container>
+              <ParsePayment
+                state={state}
+                dispatch={dispatch}
+                defaultWalletCurrency={data?.accountDefaultWallet.walletCurrency}
+                walletId={data?.accountDefaultWallet.id}
+              />
+            </>
+          )}
+        </Container>
+      ): null }
+    </>
   )
 }
 
