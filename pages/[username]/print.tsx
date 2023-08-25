@@ -8,6 +8,7 @@ import { QRCode } from "react-qrcode-logo"
 import { useRef } from "react"
 import { URL_HOST_DOMAIN } from "../../config/config"
 import { NextRequest } from "next/server"
+import originalUrl from "original-url"
 
 export async function getServerSideProps({
   req,
@@ -16,7 +17,9 @@ export async function getServerSideProps({
   req: NextRequest
   params: { username: string }
 }) {
-  const url = new URL(req.url)
+  // eslint-disable-next-line
+  // @ts-ignore
+  const url = originalUrl(req)
 
   const lnurl = bech32.encode(
     "lnurl",
