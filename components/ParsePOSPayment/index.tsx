@@ -286,7 +286,6 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     setExchangeRateFormatted(theExchangeRate)
   }, [currencyMetadata.fractionDigits, display, satsToCurrency])
 
-
   return (
     <Container className={styles.digits_container}>
       <div className={styles.output}>
@@ -352,7 +351,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
       </div>
 
       <div className={styles.output}>
-        <span style={{paddingTop:"1rem", fontSize: 12}}>
+        <span style={{ paddingTop: "1rem", fontSize: 12 }}>
           {exchangeRateFormatted} / BTC
         </span>
       </div>
