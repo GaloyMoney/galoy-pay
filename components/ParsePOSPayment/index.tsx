@@ -58,6 +58,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   const { currencyList } = useDisplayCurrency()
   const [valueInFiat, setValueInFiat] = React.useState(0)
   const [valueInSats, setValueInSats] = React.useState(0)
+  const [exchangeRateFormatted, setExchangeRateFormatted] = React.useState("$0")
   const [currentAmount, setCurrentAmount] = React.useState(state.currentAmount)
   const [currencyMetadata, setCurrencyMetadata] = React.useState<Currency>(
     defaultCurrencyMetadata,
@@ -164,6 +165,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
 
   // Update Params From Current Amount
   const handleAmountChange = (skipRouterPush?: boolean) => {
+    calculateExchangeRate()
     if (!unit || (currentAmount === "" && numOfChanges === 0)) return
     setNumOfChanges(numOfChanges + 1)
 
@@ -275,6 +277,15 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount, sats, unit, dispatch])
 
+  const calculateExchangeRate = React.useCallback(() => {
+    const { formattedCurrency } = satsToCurrency(
+      100_000_000, // 1 BTC
+      display,
+      currencyMetadata.fractionDigits,
+    )
+    setExchangeRateFormatted(formattedCurrency)
+  }, [currencyMetadata.fractionDigits, display, satsToCurrency])
+
   return (
     <Container className={styles.digits_container}>
       <div className={styles.output}>
@@ -337,6 +348,12 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
             />
           </button>
         )}
+      </div>
+
+      <div className={styles.output}>
+        <span style={{ paddingTop: "1rem", fontSize: ".75rem" }}>
+          {exchangeRateFormatted} / BTC
+        </span>
       </div>
 
       <Memo state={state} dispatch={dispatch} />
