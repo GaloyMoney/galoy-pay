@@ -278,12 +278,12 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
   }, [amount, sats, unit, dispatch])
 
   const calculateExchangeRate = React.useCallback(() => {
-    const { formattedCurrency: theExchangeRate } = satsToCurrency(
+    const { formattedCurrency } = satsToCurrency(
       100_000_000, // 1 BTC
       display,
       currencyMetadata.fractionDigits,
     )
-    setExchangeRateFormatted(theExchangeRate)
+    setExchangeRateFormatted(formattedCurrency)
   }, [currencyMetadata.fractionDigits, display, satsToCurrency])
 
   return (
@@ -351,7 +351,7 @@ function ParsePayment({ defaultWalletCurrency, walletId, dispatch, state }: Prop
       </div>
 
       <div className={styles.output}>
-        <span style={{ paddingTop: "1rem", fontSize: 12 }}>
+        <span style={{ paddingTop: "1rem", fontSize: ".75rem" }}>
           {exchangeRateFormatted} / BTC
         </span>
       </div>
