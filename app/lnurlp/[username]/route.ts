@@ -88,6 +88,7 @@ export async function GET(
     minSendable,
     maxSendable,
     metadata,
+    commentAllowed: 2000,
     tag: "payRequest",
     ...(nostrEnabled
       ? {
