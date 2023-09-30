@@ -31,6 +31,8 @@ export type Scalars = {
   LnPubkey: { input: string; output: string; }
   /** Text field in a lightning payment transaction */
   Memo: { input: string; output: string; }
+  NotificationCategory: { input: string; output: string; }
+  Object: { input: string; output: string; }
   /** An address for an on-chain bitcoin destination */
   OnChainAddress: { input: string; output: string; }
   OnChainTxHash: { input: string; output: string; }
@@ -86,6 +88,20 @@ export type AccountUpdateStatusInput = {
   readonly comment?: InputMaybe<Scalars['String']['input']>;
   readonly status: AccountStatus;
   readonly uid: Scalars['ID']['input'];
+};
+
+export type AdminPushNotificationSendInput = {
+  readonly accountId: Scalars['String']['input'];
+  readonly body: Scalars['String']['input'];
+  readonly data?: InputMaybe<Scalars['Object']['input']>;
+  readonly notificationCategory?: InputMaybe<Scalars['NotificationCategory']['input']>;
+  readonly title: Scalars['String']['input'];
+};
+
+export type AdminPushNotificationSendPayload = {
+  readonly __typename: 'AdminPushNotificationSendPayload';
+  readonly errors: ReadonlyArray<Error>;
+  readonly success?: Maybe<Scalars['Boolean']['output']>;
 };
 
 /** Accounts are core to the Galoy architecture. they have users, and own wallets */
@@ -266,12 +282,12 @@ export type Mutation = {
   readonly __typename: 'Mutation';
   readonly accountUpdateLevel: AccountDetailPayload;
   readonly accountUpdateStatus: AccountDetailPayload;
+  readonly adminPushNotificationSend: AdminPushNotificationSendPayload;
   readonly businessDeleteMapInfo: AccountDetailPayload;
   readonly businessUpdateMapInfo: AccountDetailPayload;
   readonly captchaCreateChallenge: CaptchaCreateChallengePayload;
   readonly captchaRequestAuthCode: SuccessPayload;
   readonly userLogin: AuthTokenPayload;
-  readonly userRequestAuthCode: SuccessPayload;
   readonly userUpdatePhone: AccountDetailPayload;
 };
 
@@ -283,6 +299,11 @@ export type MutationAccountUpdateLevelArgs = {
 
 export type MutationAccountUpdateStatusArgs = {
   input: AccountUpdateStatusInput;
+};
+
+
+export type MutationAdminPushNotificationSendArgs = {
+  input: AdminPushNotificationSendInput;
 };
 
 
@@ -303,11 +324,6 @@ export type MutationCaptchaRequestAuthCodeArgs = {
 
 export type MutationUserLoginArgs = {
   input: UserLoginInput;
-};
-
-
-export type MutationUserRequestAuthCodeArgs = {
-  input: UserRequestAuthCodeInput;
 };
 
 
@@ -543,13 +559,8 @@ export type UserLoginInput = {
   readonly phone: Scalars['Phone']['input'];
 };
 
-export type UserRequestAuthCodeInput = {
-  readonly channel?: InputMaybe<PhoneCodeChannelType>;
-  readonly phone: Scalars['Phone']['input'];
-};
-
 export type UserUpdatePhoneInput = {
-  readonly accountId: Scalars['ID']['input'];
+  readonly accountUuid: Scalars['ID']['input'];
   readonly phone: Scalars['Phone']['input'];
 };
 
@@ -603,6 +614,13 @@ export type AccountDetailsByUserPhoneQueryVariables = Exact<{
 
 
 export type AccountDetailsByUserPhoneQuery = { readonly __typename: 'Query', readonly accountDetailsByUserPhone: { readonly __typename: 'AuditedAccount', readonly id: string, readonly uuid: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'AuditedUser', readonly id: string, readonly language: string, readonly phone?: string | null, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } };
+
+export type AccountDetailsByAccountIdQueryVariables = Exact<{
+  accountId: Scalars['ID']['input'];
+}>;
+
+
+export type AccountDetailsByAccountIdQuery = { readonly __typename: 'Query', readonly accountDetailsByAccountId: { readonly __typename: 'AuditedAccount', readonly id: string, readonly uuid: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'AuditedUser', readonly id: string, readonly language: string, readonly phone?: string | null, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } };
 
 export type AccountDetailsByEmailQueryVariables = Exact<{
   email: Scalars['EmailAddress']['input'];
@@ -749,6 +767,68 @@ export function useAccountDetailsByUserPhoneLazyQuery(baseOptions?: Apollo.LazyQ
 export type AccountDetailsByUserPhoneQueryHookResult = ReturnType<typeof useAccountDetailsByUserPhoneQuery>;
 export type AccountDetailsByUserPhoneLazyQueryHookResult = ReturnType<typeof useAccountDetailsByUserPhoneLazyQuery>;
 export type AccountDetailsByUserPhoneQueryResult = Apollo.QueryResult<AccountDetailsByUserPhoneQuery, AccountDetailsByUserPhoneQueryVariables>;
+export const AccountDetailsByAccountIdDocument = gql`
+    query accountDetailsByAccountId($accountId: ID!) {
+  accountDetailsByAccountId(accountId: $accountId) {
+    id
+    uuid
+    username
+    level
+    status
+    title
+    owner {
+      id
+      language
+      phone
+      email {
+        address
+        verified
+      }
+      createdAt
+    }
+    coordinates {
+      latitude
+      longitude
+    }
+    wallets {
+      id
+      walletCurrency
+      accountId
+      balance
+      pendingIncomingBalance
+    }
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useAccountDetailsByAccountIdQuery__
+ *
+ * To run a query within a React component, call `useAccountDetailsByAccountIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAccountDetailsByAccountIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAccountDetailsByAccountIdQuery({
+ *   variables: {
+ *      accountId: // value for 'accountId'
+ *   },
+ * });
+ */
+export function useAccountDetailsByAccountIdQuery(baseOptions: Apollo.QueryHookOptions<AccountDetailsByAccountIdQuery, AccountDetailsByAccountIdQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AccountDetailsByAccountIdQuery, AccountDetailsByAccountIdQueryVariables>(AccountDetailsByAccountIdDocument, options);
+      }
+export function useAccountDetailsByAccountIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AccountDetailsByAccountIdQuery, AccountDetailsByAccountIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AccountDetailsByAccountIdQuery, AccountDetailsByAccountIdQueryVariables>(AccountDetailsByAccountIdDocument, options);
+        }
+export type AccountDetailsByAccountIdQueryHookResult = ReturnType<typeof useAccountDetailsByAccountIdQuery>;
+export type AccountDetailsByAccountIdLazyQueryHookResult = ReturnType<typeof useAccountDetailsByAccountIdLazyQuery>;
+export type AccountDetailsByAccountIdQueryResult = Apollo.QueryResult<AccountDetailsByAccountIdQuery, AccountDetailsByAccountIdQueryVariables>;
 export const AccountDetailsByEmailDocument = gql`
     query accountDetailsByEmail($email: EmailAddress!) {
   accountDetailsByEmail(email: $email) {

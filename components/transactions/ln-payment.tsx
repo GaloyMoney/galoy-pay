@@ -1,7 +1,5 @@
-"use client"
-
 import { LightningPayment, LnPaymentStatus } from "../../generated"
-import { formatDate } from "../../utils"
+import { formatDate } from "../../app/utils"
 
 const emptyPayment: LightningPayment = {
   __typename: "LightningPayment",
@@ -17,49 +15,46 @@ const emptyPayment: LightningPayment = {
 
 type Props = {
   payment: LightningPayment
-  loading: boolean
 }
 
-const LnPayment: React.FC<Props> = ({ payment, loading = false }) => {
+const LnPayment: React.FC<Props> = ({ payment }) => {
   const data = payment || emptyPayment
-  let emptyClass = data === emptyPayment || loading ? "filter blur-sm" : ""
-  emptyClass = emptyClass + (loading ? " animate-pulse" : "")
 
   return (
     <div className="shadow p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-3 gap-4">
       <div>
         <p className="mb-4 font-semibold text-gray-600">Status</p>
-        <p className={`text-gray-600 ${emptyClass}`}>{data.status}</p>
+        <p className={`text-gray-600`}>{data.status}</p>
       </div>
       <div>
         <p className="mb-4 font-semibold text-gray-600">Amount</p>
-        <p className={`text-gray-600 ${emptyClass}`}>{data.amount}</p>
+        <p className={`text-gray-600`}>{data.amount}</p>
       </div>
       <div>
         <p className="mb-4 font-semibold text-gray-600">Fee</p>
-        <p className={`text-gray-600 ${emptyClass}`}>{data.roundedUpFee}</p>
+        <p className={`text-gray-600`}>{data.roundedUpFee}</p>
       </div>
       <div>
         <p className="mb-4 font-semibold text-gray-600">Created At</p>
-        <p className={`text-gray-600 ${emptyClass}`}>{formatDate(data.createdAt ?? 0)}</p>
+        <p className={`text-gray-600`}>{formatDate(data.createdAt ?? 0)}</p>
       </div>
       <div>
         <p className="mb-4 font-semibold text-gray-600">Confirmed At</p>
-        <p className={`text-gray-600 ${emptyClass}`}>
+        <p className={`text-gray-600`}>
           {data.confirmedAt ? formatDate(data.confirmedAt) : "--"}
         </p>
       </div>
       <div className="col-span-3">
         <p className="mb-4 font-semibold text-gray-600">Secret</p>
-        <p className={`text-gray-600 break-all ${emptyClass}`}>{data.revealedPreImage}</p>
+        <p className={`text-gray-600 break-all`}>{data.revealedPreImage}</p>
       </div>
       <div className="col-span-3">
         <p className="mb-4 font-semibold text-gray-600">Destination</p>
-        <p className={`text-gray-600 break-all ${emptyClass}`}>{data.destination}</p>
+        <p className={`text-gray-600 break-all`}>{data.destination}</p>
       </div>
       <div className="col-span-3">
         <p className="mb-4 font-semibold text-gray-600">Request</p>
-        <p className={`text-gray-600 break-all ${emptyClass}`}>{data.request || "--"}</p>
+        <p className={`text-gray-600 break-all`}>{data.request || "--"}</p>
       </div>
     </div>
   )

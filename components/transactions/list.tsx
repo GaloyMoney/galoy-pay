@@ -1,11 +1,7 @@
-"use client"
-
-import { TransactionListType } from "."
-import { formatDate, formatNumber } from "../../utils"
+import { formatDate, formatNumber } from "../../app/utils"
 
 type Props = {
-  transactions: any /* TransactionListType */
-  loading: boolean
+  transactions: any
 }
 
 /* eslint @typescript-eslint/ban-ts-comment: "off" */
@@ -42,7 +38,7 @@ const hashOrCounterParty = (txn: TransactionListType[number]) => {
   return "--"
 }
 
-const Transactions: React.FC<Props> = ({ transactions, loading = false }) => {
+const Transactions: React.FC<Props> = ({ transactions }) => {
   const mapViaType = (value: string) => {
     switch (value) {
       case "InitiationViaIntraLedger":
@@ -109,7 +105,7 @@ const Transactions: React.FC<Props> = ({ transactions, loading = false }) => {
             {!hasData && (
               <tr className="text-gray-700 dark:text-gray-400">
                 <td colSpan={11} className="px-4 py-3 text-center">
-                  {loading ? "Loading..." : "No data"}
+                  {"No data"}
                 </td>
               </tr>
             )}

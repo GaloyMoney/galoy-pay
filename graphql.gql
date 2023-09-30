@@ -31,6 +31,39 @@ query accountDetailsByUserPhone($phone: Phone!) {
   }
 }
 
+query accountDetailsByAccountId($accountId: ID!) {
+  accountDetailsByAccountId(accountId: $accountId) {
+    id
+    uuid
+    username
+    level
+    status
+    title
+    owner {
+      id
+      language
+      phone
+      email {
+        address
+        verified
+      }
+      createdAt
+    }
+    coordinates {
+      latitude
+      longitude
+    }
+    wallets {
+      id
+      walletCurrency
+      accountId
+      balance
+      pendingIncomingBalance
+    }
+    createdAt
+  }
+}
+
 query accountDetailsByEmail($email: EmailAddress!) {
   accountDetailsByEmail(email: $email) {
     id

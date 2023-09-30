@@ -54,3 +54,5 @@ generates:
         Feedback: "string"
         Minutes: "string"
         LnPubkey: "string"
+        NotificationCategory: "string"
+        Object: "string"

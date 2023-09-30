@@ -1,56 +1,52 @@
-"use client"
-
 import { AuditedAccount } from "../../generated"
-import { formatDate } from "../../utils"
+import { formatDate } from "../../app/utils"
 
 const Details: React.FC<{
-  accountDetails: AuditedAccount
-  loading?: boolean
-}> = ({ accountDetails, loading = false }) => {
-  const data = accountDetails
-  const emptyClass = loading ? "filter blur-sm animate-pulse" : ""
-
+  auditedAccount: AuditedAccount
+}> = ({ auditedAccount }) => {
   return (
     <div className="shadow p-6 min-w-0 rounded-lg shadow-xs overflow-hidden bg-white grid grid-cols-2 gap-4">
       <div>
         <p className="mb-4 font-semibold text-gray-600">Account ID</p>
-        <p className={`text-gray-600 ${emptyClass}`}>{data?.uuid}</p>
+        <p className={`text-gray-600`}>{auditedAccount.uuid}</p>
       </div>
       <div>
         <p className="mb-4 font-semibold text-gray-600">Phone</p>
-        <p className={`text-gray-600 ${emptyClass}`}>{data?.owner?.phone}</p>
+        <p className={`text-gray-600`}>{auditedAccount.owner?.phone}</p>
       </div>
       <div>
         <p className="mb-4 font-semibold text-gray-600">Email address</p>
-        <p className={`text-gray-600 ${emptyClass}`}>{data?.owner?.email?.address}</p>
+        <p className={`text-gray-600`}>{auditedAccount.owner?.email?.address}</p>
       </div>
       <div>
         <p className="mb-4 font-semibold text-gray-600">Email verified</p>
-        <p className={`text-gray-600 ${emptyClass}`}>
-          {String(data?.owner?.email?.verified)}
-        </p>
+        <p className={`text-gray-600`}>{String(auditedAccount.owner?.email?.verified)}</p>
       </div>
       <div>
         <p className="mb-4 font-semibold text-gray-600">Username</p>
-        <p className={`text-gray-600 ${emptyClass}`}>{data?.username || "--"}</p>
+        <p className={`text-gray-600`}>{auditedAccount.username || "--"}</p>
       </div>
       <div>
         <p className="mb-4 font-semibold text-gray-600">Title</p>
-        <p className={`text-gray-600 ${emptyClass}`}>{data?.title || "--"}</p>
+        <p className={`text-gray-600`}>{auditedAccount.title || "--"}</p>
       </div>
       <div>
         <p className="mb-4 font-semibold text-gray-600">Coordinates</p>
-        <p className={`text-gray-600 ${emptyClass}`}>
-          {data?.coordinates ? (
+        <p className={`text-gray-600`}>
+          {auditedAccount.coordinates ? (
             <a
               target="_blank"
               rel="noreferrer"
               className="underline"
               href={`https://maps.google.com/?q=${
-                data.coordinates?.latitude + "," + data.coordinates?.longitude
+                auditedAccount.coordinates?.latitude +
+                "," +
+                auditedAccount.coordinates?.longitude
               }`}
             >
-              {data.coordinates?.latitude + ", " + data.coordinates?.longitude}
+              {auditedAccount.coordinates?.latitude +
+                ", " +
+                auditedAccount.coordinates?.longitude}
             </a>
           ) : (
             "--"
@@ -59,7 +55,7 @@ const Details: React.FC<{
       </div>
       <div className="col-span-2">
         <p className="mb-4 font-semibold text-gray-600">Created At</p>
-        <p className={`text-gray-600 ${emptyClass}`}>{formatDate(data?.createdAt)}</p>
+        <p className={`text-gray-600`}>{formatDate(auditedAccount.createdAt)}</p>
       </div>
     </div>
   )
