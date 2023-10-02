@@ -1,18 +1,19 @@
-import { NodeSDK } from "@opentelemetry/sdk-node";
-import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
-import { Resource } from "@opentelemetry/resources";
-import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
-import { SimpleSpanProcessor } from "@opentelemetry/sdk-trace-node";
-import { NetInstrumentation } from "@opentelemetry/instrumentation-net";
-import { HttpInstrumentation } from "@opentelemetry/instrumentation-http";
-import { GraphQLInstrumentation } from "@opentelemetry/instrumentation-graphql";
+import { NodeSDK } from "@opentelemetry/sdk-node"
+import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http"
+import { Resource } from "@opentelemetry/resources"
+import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions"
+import { SimpleSpanProcessor } from "@opentelemetry/sdk-trace-node"
+import { NetInstrumentation } from "@opentelemetry/instrumentation-net"
+import { HttpInstrumentation } from "@opentelemetry/instrumentation-http"
+import { GraphQLInstrumentation } from "@opentelemetry/instrumentation-graphql"
 import { propagation } from "@opentelemetry/api"
 import { W3CTraceContextPropagator } from "@opentelemetry/core"
 
 const sdk = new NodeSDK({
   textMapPropagator: new W3CTraceContextPropagator(),
   resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: process.env.TRACING_SERVICE_NAME || "blink-fiat",
+    [SemanticResourceAttributes.SERVICE_NAME]:
+      process.env.TRACING_SERVICE_NAME || "blink-fiat",
   }),
   spanProcessor: new SimpleSpanProcessor(new OTLPTraceExporter()),
   instrumentations: [
@@ -23,13 +24,13 @@ const sdk = new NodeSDK({
       allowValues: true,
     }),
   ],
-});
-sdk.start();
+})
+sdk.start()
 
 process.on("SIGTERM", () => {
   sdk
     .shutdown()
     .then(() => console.log("Tracing terminated"))
     .catch((error) => console.log("Error terminating tracing", error))
-    .finally(() => process.exit(0));
-});
+    .finally(() => process.exit(0))
+})

@@ -6,7 +6,7 @@ import {
 } from "@apollo/experimental-nextjs-app-support/ssr"
 import { cookies } from "next/headers"
 import { env } from "./env"
-import { propagation, context } from '@opentelemetry/api';
+import { propagation, context } from "@opentelemetry/api"
 
 export const { getClient } = registerApolloClient(() => {
   const cookieStore = cookies()
