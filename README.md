@@ -10,7 +10,7 @@ With a default installation, Admin Panel can be accessed with `admin.domain.com`
 
 ## How to run this repo locally?
 
-copy `.env` to `.env.local`. and edit environement variable accordingly.
+copy `.env` to `.env.local`. and edit environment variable accordingly.
 
 ```
 yarn install

@@ -6,6 +6,7 @@ import {
 } from "@apollo/experimental-nextjs-app-support/ssr"
 import { cookies } from "next/headers"
 import { env } from "./env"
+import { propagation, context } from '@opentelemetry/api';
 
 export const { getClient } = registerApolloClient(() => {
   const cookieStore = cookies()
@@ -18,6 +19,14 @@ export const { getClient } = registerApolloClient(() => {
       fetchOptions: { cache: "no-store" },
       headers: {
         cookie: cookieStore.toString(),
+      },
+      fetch: (uri, options) => {
+        const headersWithTrace = options?.headers || {}
+        propagation.inject(context.active(), headersWithTrace)
+        return fetch(uri, {
+          ...options,
+          headers: headersWithTrace,
+        })
       },
     }),
   })
