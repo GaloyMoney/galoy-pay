@@ -6,6 +6,7 @@ import {
   LightningInvoiceQuery,
   LightningPaymentDocument,
   LightningPaymentQuery,
+  Transaction,
   TransactionByIdDocument,
   TransactionByIdQuery,
   TransactionsByHashDocument,
@@ -26,23 +27,25 @@ export const transactionSearch = async (_prevState: unknown, formData: FormData)
   }
 
   if (isValidHash(search)) {
+    let tx: unknown | undefined
+
     try {
       const data = await getClient().query<TransactionsByHashQuery>({
         query: TransactionsByHashDocument,
         variables: { hash: search },
       })
 
-      const tx =
+      tx =
         data.data?.transactionsByHash &&
         data.data?.transactionsByHash.length > 0 &&
         data.data?.transactionsByHash[0]
-
-      if (!!tx) {
-        redirect(`/transactions/hash/${search}`)
-      }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error"
       return { message: `Failed to fetch: ${message}` }
+    }
+
+    if (!!tx) {
+      redirect(`/transactions/hash/${search}`)
     }
 
     try {
@@ -51,15 +54,17 @@ export const transactionSearch = async (_prevState: unknown, formData: FormData)
         variables: { hash: search },
       })
 
-      const tx = data.data?.lightningPayment
-
-      if (!!tx) {
-        redirect(`/transactions/payment/${search}`)
-      }
+      tx = data.data?.lightningPayment
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error"
       return { message: `Failed to fetch: ${message}` }
     }
+
+    if (!!tx) {
+      redirect(`/transactions/payment/${search}`)
+    }
+
+    let invoice: unknown | undefined
 
     try {
       const data = await getClient().query<LightningInvoiceQuery>({
@@ -67,31 +72,32 @@ export const transactionSearch = async (_prevState: unknown, formData: FormData)
         variables: { id: search },
       })
 
-      const invoice = data.data.lightningInvoice
-
-      if (!!invoice) {
-        redirect(`/transactions/invoice/${search}`)
-      }
+      invoice = data.data.lightningInvoice
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error"
       return { message: `Failed to fetch: ${message}` }
     }
+
+    if (!!invoice) {
+      redirect(`/transactions/invoice/${search}`)
+    }
   }
   if (isValidTxId(search)) {
+    let txid: string | undefined
+
     try {
       const data = await getClient().query<TransactionByIdQuery>({
         query: TransactionByIdDocument,
         variables: { id: search },
       })
 
-      const tx = data.data?.transactionById
-
-      if (!!tx) {
-        redirect(`/transactions/id/${tx.id}`)
-      }
+      txid = data.data?.transactionById?.id
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error"
       return { message: `Failed to fetch: ${message}` }
+    }
+    if (!!txid) {
+      redirect(`/transactions/id/${txid}`)
     }
   }
 

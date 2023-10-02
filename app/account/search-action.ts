@@ -20,48 +20,57 @@ export const accountSearch = async (_prevState: unknown, formData: FormData) => 
   }
 
   if (validPhone(search)) {
+    let uuid: string | undefined
+
     try {
       const data = await getClient().query<AccountDetailsByUserPhoneQuery>({
         query: AccountDetailsByUserPhoneDocument,
         variables: { phone: search },
       })
-
-      if (data.data?.accountDetailsByUserPhone.uuid) {
-        redirect(`/account/${data.data?.accountDetailsByUserPhone.uuid}`)
-      }
+      uuid = data.data?.accountDetailsByUserPhone.uuid
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error"
       return { message: `Failed to fetch: ${message}` }
     }
+
+    if (uuid) {
+      redirect(`/account/${uuid}`)
+    }
   }
   if (validUsername(search)) {
+    let uuid: string | undefined
+
     try {
       const data = await getClient().query<AccountDetailsByUsernameQuery>({
         query: AccountDetailsByUsernameDocument,
         variables: { username: search },
       })
-
-      if (data.data?.accountDetailsByUsername) {
-        redirect(`/account/${data.data.accountDetailsByUsername.uuid}`)
-      }
+      uuid = data.data?.accountDetailsByUsername.uuid
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error"
       return { message: `Failed to fetch: ${message}` }
     }
+    if (uuid) {
+      redirect(`/account/${uuid}`)
+    }
   }
   if (validEmail(search)) {
+    let uuid: string | undefined
+
     try {
       const data = await getClient().query<AccountDetailsByEmailQuery>({
         query: AccountDetailsByEmailDocument,
         variables: { email: search },
       })
 
-      if (data.data?.accountDetailsByEmail) {
-        redirect(`/account/${data.data.accountDetailsByEmail.uuid}`)
-      }
+      uuid = data.data?.accountDetailsByEmail.uuid
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error"
       return { message: `Failed to fetch: ${message}` }
+    }
+
+    if (uuid) {
+      redirect(`/account/${uuid}`)
     }
   }
 
