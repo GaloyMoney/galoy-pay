@@ -13,7 +13,7 @@ const sdk = new NodeSDK({
   textMapPropagator: new W3CTraceContextPropagator(),
   resource: new Resource({
     [SemanticResourceAttributes.SERVICE_NAME]:
-      process.env.TRACING_SERVICE_NAME || "blink-fiat",
+      process.env.TRACING_SERVICE_NAME || "admin-panel",
   }),
   spanProcessor: new SimpleSpanProcessor(new OTLPTraceExporter()),
   instrumentations: [
