@@ -9,9 +9,14 @@ export const env = createEnv({
   server: {
     GOOGLE_CLIENT_ID: z.string().min(1),
     GOOGLE_CLIENT_SECRET: z.string().min(1),
+    GITHUB_CLIENT_ID: z.string().min(1),
+    GITHUB_CLIENT_SECRET: z.string().min(1),
     ADMIN_CORE_API: z.string().url(),
     NEXTAUTH_URL: z.string().url(),
     NEXTAUTH_SECRET: z.string().min(8),
+    AUTHORIZED_EMAILS: z
+      .string()
+      .transform((x) => x.split(",").map((email) => email.trim())),
   },
   /*
    * Environment variables available on the client (and server).
@@ -28,8 +33,11 @@ export const env = createEnv({
   runtimeEnv: {
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+    GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     ADMIN_CORE_API: process.env.ADMIN_CORE_API,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    AUTHORIZED_EMAILS: process.env.AUTHORIZED_EMAILS,
   },
 })
