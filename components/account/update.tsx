@@ -3,12 +3,15 @@ import { getClient } from "../../app/graphql-rsc"
 import {
   AccountDetailsByAccountIdDocument,
   AccountDetailsByAccountIdQuery,
+  AccountDetailsByAccountIdQueryVariables,
   AccountLevel,
   AccountStatus,
   AccountUpdateLevelDocument,
   AccountUpdateLevelMutation,
+  AccountUpdateLevelMutationVariables,
   AccountUpdateStatusDocument,
   AccountUpdateStatusMutation,
+  AccountUpdateStatusMutationVariables,
   AuditedAccount,
 } from "../../generated"
 import ConfirmForm from "./confirm"
@@ -23,14 +26,20 @@ const updateLevel = async (formData: FormData) => {
 
   const id = formData.get("id") as string
 
-  const { data } = await getClient().query<AccountDetailsByAccountIdQuery>({
+  const { data } = await getClient().query<
+    AccountDetailsByAccountIdQuery,
+    AccountDetailsByAccountIdQueryVariables
+  >({
     query: AccountDetailsByAccountIdDocument,
     variables: { accountId: id },
   })
 
   const auditedAccount = data?.accountDetailsByAccountId
 
-  await getClient().mutate<AccountUpdateLevelMutation>({
+  await getClient().mutate<
+    AccountUpdateLevelMutation,
+    AccountUpdateLevelMutationVariables
+  >({
     mutation: AccountUpdateLevelDocument,
     variables: { input: { uid: auditedAccount.id, level: AccountLevel.Two } },
   })
@@ -42,7 +51,10 @@ const updateStatus = async (formData: FormData) => {
   "use server"
   const id = formData.get("id") as string
 
-  const { data } = await getClient().query<AccountDetailsByAccountIdQuery>({
+  const { data } = await getClient().query<
+    AccountDetailsByAccountIdQuery,
+    AccountDetailsByAccountIdQueryVariables
+  >({
     query: AccountDetailsByAccountIdDocument,
     variables: { accountId: id },
   })
@@ -52,7 +64,10 @@ const updateStatus = async (formData: FormData) => {
   const targetStatus =
     auditedAccount.status === "ACTIVE" ? AccountStatus.Locked : AccountStatus.Active
 
-  await getClient().mutate<AccountUpdateStatusMutation>({
+  await getClient().mutate<
+    AccountUpdateStatusMutation,
+    AccountUpdateStatusMutationVariables
+  >({
     mutation: AccountUpdateStatusDocument,
     variables: { input: { uid: auditedAccount.id, status: targetStatus } },
   })

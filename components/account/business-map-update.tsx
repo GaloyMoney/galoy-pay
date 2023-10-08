@@ -2,8 +2,10 @@ import {
   AuditedAccount,
   BusinessDeleteMapInfoDocument,
   BusinessDeleteMapInfoMutation,
+  BusinessDeleteMapInfoMutationVariables,
   BusinessUpdateMapInfoDocument,
   BusinessUpdateMapInfoMutation,
+  BusinessUpdateMapInfoMutationVariables,
 } from "../../generated"
 import ConfirmForm from "./confirm"
 import { getClient } from "../../app/graphql-rsc"
@@ -20,7 +22,10 @@ const deleteBusiness = async (formData: FormData) => {
 
   const username = formData.get("username") as string
 
-  await getClient().mutate<BusinessDeleteMapInfoMutation>({
+  await getClient().mutate<
+    BusinessDeleteMapInfoMutation,
+    BusinessDeleteMapInfoMutationVariables
+  >({
     mutation: BusinessDeleteMapInfoDocument,
     variables: { input: { username } },
   })
@@ -45,7 +50,10 @@ const update = async (formData: FormData) => {
   ) {
     const input = { username, title, latitude, longitude }
 
-    await getClient().mutate<BusinessUpdateMapInfoMutation>({
+    await getClient().mutate<
+      BusinessUpdateMapInfoMutation,
+      BusinessUpdateMapInfoMutationVariables
+    >({
       mutation: BusinessUpdateMapInfoDocument,
       variables: { input },
     })

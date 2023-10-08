@@ -6,6 +6,7 @@ import {
   AccountDetailsByEmailQuery,
   AccountDetailsByUserPhoneDocument,
   AccountDetailsByUserPhoneQuery,
+  AccountDetailsByUserPhoneQueryVariables,
   AccountDetailsByUsernameDocument,
   AccountDetailsByUsernameQuery,
 } from "../../generated"
@@ -23,7 +24,10 @@ export const accountSearch = async (_prevState: unknown, formData: FormData) => 
     let uuid: string | undefined
 
     try {
-      const data = await getClient().query<AccountDetailsByUserPhoneQuery>({
+      const data = await getClient().query<
+        AccountDetailsByUserPhoneQuery,
+        AccountDetailsByUserPhoneQueryVariables
+      >({
         query: AccountDetailsByUserPhoneDocument,
         variables: { phone: search },
       })

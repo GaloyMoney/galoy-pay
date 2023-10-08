@@ -1,4 +1,8 @@
-import { TransactionByIdDocument, TransactionByIdQuery } from "../../../../generated"
+import {
+  TransactionByIdDocument,
+  TransactionByIdQuery,
+  TransactionByIdQueryVariables,
+} from "../../../../generated"
 
 import TransactionList from "../../../../components/transactions/list"
 import { getClient } from "../../../graphql-rsc"
@@ -6,7 +10,10 @@ import { getClient } from "../../../graphql-rsc"
 export default async function TransactionDetails({ params }: { params: { id: string } }) {
   const id = params.id
 
-  const data = await getClient().query<TransactionByIdQuery>({
+  const data = await getClient().query<
+    TransactionByIdQuery,
+    TransactionByIdQueryVariables
+  >({
     query: TransactionByIdDocument,
     variables: { id },
   })

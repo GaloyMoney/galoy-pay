@@ -1,4 +1,8 @@
-import { LightningInvoiceDocument, LightningInvoiceQuery } from "../../../../generated"
+import {
+  LightningInvoiceDocument,
+  LightningInvoiceQuery,
+  LightningInvoiceQueryVariables,
+} from "../../../../generated"
 
 import LnInvoice from "../../../../components/transactions/ln-invoice"
 import { getClient } from "../../../graphql-rsc"
@@ -6,9 +10,12 @@ import { getClient } from "../../../graphql-rsc"
 export default async function InvoiceDetails({ params }: { params: { id: string } }) {
   const id = params.id
 
-  const data = await getClient().query<LightningInvoiceQuery>({
+  const data = await getClient().query<
+    LightningInvoiceQuery,
+    LightningInvoiceQueryVariables
+  >({
     query: LightningInvoiceDocument,
-    variables: { id },
+    variables: { hash: id },
   })
 
   const invoice = data.data.lightningInvoice

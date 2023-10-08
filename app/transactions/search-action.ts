@@ -4,13 +4,16 @@ import { redirect } from "next/navigation"
 import {
   LightningInvoiceDocument,
   LightningInvoiceQuery,
+  LightningInvoiceQueryVariables,
   LightningPaymentDocument,
   LightningPaymentQuery,
-  Transaction,
+  LightningPaymentQueryVariables,
   TransactionByIdDocument,
   TransactionByIdQuery,
+  TransactionByIdQueryVariables,
   TransactionsByHashDocument,
   TransactionsByHashQuery,
+  TransactionsByHashQueryVariables,
 } from "../../generated"
 import { getClient } from "../graphql-rsc"
 
@@ -30,7 +33,10 @@ export const transactionSearch = async (_prevState: unknown, formData: FormData)
     let tx: unknown | undefined
 
     try {
-      const data = await getClient().query<TransactionsByHashQuery>({
+      const data = await getClient().query<
+        TransactionsByHashQuery,
+        TransactionsByHashQueryVariables
+      >({
         query: TransactionsByHashDocument,
         variables: { hash: search },
       })
@@ -49,7 +55,10 @@ export const transactionSearch = async (_prevState: unknown, formData: FormData)
     }
 
     try {
-      const data = await getClient().query<LightningPaymentQuery>({
+      const data = await getClient().query<
+        LightningPaymentQuery,
+        LightningPaymentQueryVariables
+      >({
         query: LightningPaymentDocument,
         variables: { hash: search },
       })
@@ -67,9 +76,12 @@ export const transactionSearch = async (_prevState: unknown, formData: FormData)
     let invoice: unknown | undefined
 
     try {
-      const data = await getClient().query<LightningInvoiceQuery>({
+      const data = await getClient().query<
+        LightningInvoiceQuery,
+        LightningInvoiceQueryVariables
+      >({
         query: LightningInvoiceDocument,
-        variables: { id: search },
+        variables: { hash: search },
       })
 
       invoice = data.data.lightningInvoice
@@ -82,11 +94,15 @@ export const transactionSearch = async (_prevState: unknown, formData: FormData)
       redirect(`/transactions/invoice/${search}`)
     }
   }
+
   if (isValidTxId(search)) {
     let txid: string | undefined
 
     try {
-      const data = await getClient().query<TransactionByIdQuery>({
+      const data = await getClient().query<
+        TransactionByIdQuery,
+        TransactionByIdQueryVariables
+      >({
         query: TransactionByIdDocument,
         variables: { id: search },
       })
