@@ -1,7 +1,7 @@
 import { formatDate, formatNumber } from "../../app/utils"
 
 type Props = {
-  transactions: any
+  transactions: unknown[]
 }
 
 /* eslint @typescript-eslint/ban-ts-comment: "off" */
