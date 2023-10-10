@@ -31,7 +31,7 @@ export const accountSearch = async (_prevState: unknown, formData: FormData) => 
         query: AccountDetailsByUserPhoneDocument,
         variables: { phone: search },
       })
-      uuid = data.data?.accountDetailsByUserPhone.uuid
+      uuid = data.data?.accountDetailsByUserPhone.id
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error"
       return { message: `Failed to fetch: ${message}` }
@@ -49,7 +49,7 @@ export const accountSearch = async (_prevState: unknown, formData: FormData) => 
         query: AccountDetailsByUsernameDocument,
         variables: { username: search },
       })
-      uuid = data.data?.accountDetailsByUsername.uuid
+      uuid = data.data?.accountDetailsByUsername.id
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error"
       return { message: `Failed to fetch: ${message}` }
@@ -67,7 +67,7 @@ export const accountSearch = async (_prevState: unknown, formData: FormData) => 
         variables: { email: search },
       })
 
-      uuid = data.data?.accountDetailsByEmail.uuid
+      uuid = data.data?.accountDetailsByEmail.id
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error"
       return { message: `Failed to fetch: ${message}` }

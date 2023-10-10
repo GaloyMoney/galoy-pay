@@ -1,6 +1,6 @@
 overwrite: true
 schema:
-  - "https://raw.githubusercontent.com/GaloyMoney/galoy/main/src/graphql/admin/schema.graphql"
+  - "https://raw.githubusercontent.com/GaloyMoney/galoy/main/core/api/src/graphql/admin/schema.graphql"
 documents:
   - "graphql.gql"
 generates:
@@ -56,3 +56,4 @@ generates:
         LnPubkey: "string"
         NotificationCategory: "string"
         Object: "string"
+        AccountId: "string"

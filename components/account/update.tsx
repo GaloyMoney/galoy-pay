@@ -91,7 +91,7 @@ const AccountUpdate: React.FC<PropType> = ({ auditedAccount }) => {
               action={updateLevel}
               message="Are you sure you want to update the level?"
             >
-              <input type="hidden" name="id" value={auditedAccount.uuid} />
+              <input type="hidden" name="id" value={auditedAccount.id} />
               <button className="text-sm mx-4 bg-green-500 hover:bg-green-700 text-white font-bold p-2 border border-green-700 rounded disabled:opacity-50">
                 {"Upgrade"}
               </button>
@@ -107,7 +107,7 @@ const AccountUpdate: React.FC<PropType> = ({ auditedAccount }) => {
             action={updateStatus}
             message="Are you sure you want to update the status?"
           >
-            <input type="hidden" name="id" value={auditedAccount.uuid} />
+            <input type="hidden" name="id" value={auditedAccount.id} />
             <button
               className={`text-sm mx-4 bg-${statusColor}-500 hover:bg-${statusColor}-700 text-white font-bold p-2 border border-${statusColor}-700 rounded disabled:opacity-50`}
             >

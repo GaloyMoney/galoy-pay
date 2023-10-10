@@ -17,8 +17,8 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
-  /** An Opaque Bearer token */
-  AuthToken: { input: string; output: string; }
+  /** Unique identifier of an account */
+  AccountId: { input: string; output: string; }
   /** Display currency of an account */
   DisplayCurrency: { input: string; output: string; }
   /** Email address */
@@ -36,8 +36,6 @@ export type Scalars = {
   /** An address for an on-chain bitcoin destination */
   OnChainAddress: { input: string; output: string; }
   OnChainTxHash: { input: string; output: string; }
-  /** An authentication code valid for a single use */
-  OneTimeAuthCode: { input: string; output: string; }
   PaymentHash: { input: string; output: string; }
   /** Phone number which includes country code */
   Phone: { input: string; output: string; }
@@ -116,7 +114,6 @@ export type AuditedAccount = {
   readonly status: AccountStatus;
   readonly title?: Maybe<Scalars['String']['output']>;
   readonly username?: Maybe<Scalars['Username']['output']>;
-  readonly uuid: Scalars['String']['output'];
   readonly wallets: ReadonlyArray<Wallet>;
 };
 
@@ -128,13 +125,6 @@ export type AuditedUser = {
   readonly id: Scalars['ID']['output'];
   readonly language: Scalars['Language']['output'];
   readonly phone?: Maybe<Scalars['Phone']['output']>;
-};
-
-export type AuthTokenPayload = {
-  readonly __typename: 'AuthTokenPayload';
-  readonly authToken?: Maybe<Scalars['AuthToken']['output']>;
-  readonly errors: ReadonlyArray<Error>;
-  readonly totpRequired?: Maybe<Scalars['Boolean']['output']>;
 };
 
 /** A wallet belonging to an account which contains a BTC balance and a list of transactions. */
@@ -180,28 +170,6 @@ export type BusinessUpdateMapInfoInput = {
   readonly longitude: Scalars['Float']['input'];
   readonly title: Scalars['String']['input'];
   readonly username: Scalars['Username']['input'];
-};
-
-export type CaptchaCreateChallengePayload = {
-  readonly __typename: 'CaptchaCreateChallengePayload';
-  readonly errors: ReadonlyArray<Error>;
-  readonly result?: Maybe<CaptchaCreateChallengeResult>;
-};
-
-export type CaptchaCreateChallengeResult = {
-  readonly __typename: 'CaptchaCreateChallengeResult';
-  readonly challengeCode: Scalars['String']['output'];
-  readonly failbackMode: Scalars['Boolean']['output'];
-  readonly id: Scalars['String']['output'];
-  readonly newCaptcha: Scalars['Boolean']['output'];
-};
-
-export type CaptchaRequestAuthCodeInput = {
-  readonly challengeCode: Scalars['String']['input'];
-  readonly channel?: InputMaybe<PhoneCodeChannelType>;
-  readonly phone: Scalars['Phone']['input'];
-  readonly secCode: Scalars['String']['input'];
-  readonly validationCode: Scalars['String']['input'];
 };
 
 export type Coordinates = {
@@ -285,9 +253,6 @@ export type Mutation = {
   readonly adminPushNotificationSend: AdminPushNotificationSendPayload;
   readonly businessDeleteMapInfo: AccountDetailPayload;
   readonly businessUpdateMapInfo: AccountDetailPayload;
-  readonly captchaCreateChallenge: CaptchaCreateChallengePayload;
-  readonly captchaRequestAuthCode: SuccessPayload;
-  readonly userLogin: AuthTokenPayload;
   readonly userUpdatePhone: AccountDetailPayload;
 };
 
@@ -317,16 +282,6 @@ export type MutationBusinessUpdateMapInfoArgs = {
 };
 
 
-export type MutationCaptchaRequestAuthCodeArgs = {
-  input: CaptchaRequestAuthCodeInput;
-};
-
-
-export type MutationUserLoginArgs = {
-  input: UserLoginInput;
-};
-
-
 export type MutationUserUpdatePhoneArgs = {
   input: UserUpdatePhoneInput;
 };
@@ -344,12 +299,6 @@ export type PageInfo = {
   readonly startCursor?: Maybe<Scalars['String']['output']>;
 };
 
-export const PhoneCodeChannelType = {
-  Sms: 'SMS',
-  Whatsapp: 'WHATSAPP'
-} as const;
-
-export type PhoneCodeChannelType = typeof PhoneCodeChannelType[keyof typeof PhoneCodeChannelType];
 export type PriceInterface = {
   readonly base: Scalars['SafeInt']['output'];
   /** @deprecated Deprecated due to type renaming */
@@ -455,12 +404,6 @@ export type SettlementViaOnChain = {
   readonly vout?: Maybe<Scalars['Int']['output']>;
 };
 
-export type SuccessPayload = {
-  readonly __typename: 'SuccessPayload';
-  readonly errors: ReadonlyArray<Error>;
-  readonly success?: Maybe<Scalars['Boolean']['output']>;
-};
-
 /**
  * Give details about an individual transaction.
  * Galoy have a smart routing system which is automatically
@@ -554,13 +497,8 @@ export type UsdWalletTransactionsByAddressArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type UserLoginInput = {
-  readonly code: Scalars['OneTimeAuthCode']['input'];
-  readonly phone: Scalars['Phone']['input'];
-};
-
 export type UserUpdatePhoneInput = {
-  readonly accountUuid: Scalars['ID']['input'];
+  readonly accountId: Scalars['AccountId']['input'];
   readonly phone: Scalars['Phone']['input'];
 };
 
@@ -613,21 +551,21 @@ export type AccountDetailsByUserPhoneQueryVariables = Exact<{
 }>;
 
 
-export type AccountDetailsByUserPhoneQuery = { readonly __typename: 'Query', readonly accountDetailsByUserPhone: { readonly __typename: 'AuditedAccount', readonly id: string, readonly uuid: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'AuditedUser', readonly id: string, readonly language: string, readonly phone?: string | null, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } };
+export type AccountDetailsByUserPhoneQuery = { readonly __typename: 'Query', readonly accountDetailsByUserPhone: { readonly __typename: 'AuditedAccount', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'AuditedUser', readonly id: string, readonly language: string, readonly phone?: string | null, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } };
 
 export type AccountDetailsByAccountIdQueryVariables = Exact<{
   accountId: Scalars['ID']['input'];
 }>;
 
 
-export type AccountDetailsByAccountIdQuery = { readonly __typename: 'Query', readonly accountDetailsByAccountId: { readonly __typename: 'AuditedAccount', readonly id: string, readonly uuid: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'AuditedUser', readonly id: string, readonly language: string, readonly phone?: string | null, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } };
+export type AccountDetailsByAccountIdQuery = { readonly __typename: 'Query', readonly accountDetailsByAccountId: { readonly __typename: 'AuditedAccount', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'AuditedUser', readonly id: string, readonly language: string, readonly phone?: string | null, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } };
 
 export type AccountDetailsByEmailQueryVariables = Exact<{
   email: Scalars['EmailAddress']['input'];
 }>;
 
 
-export type AccountDetailsByEmailQuery = { readonly __typename: 'Query', readonly accountDetailsByEmail: { readonly __typename: 'AuditedAccount', readonly id: string, readonly uuid: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'AuditedUser', readonly id: string, readonly language: string, readonly phone?: string | null, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } };
+export type AccountDetailsByEmailQuery = { readonly __typename: 'Query', readonly accountDetailsByEmail: { readonly __typename: 'AuditedAccount', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'AuditedUser', readonly id: string, readonly language: string, readonly phone?: string | null, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } };
 
 export type BusinessDeleteMapInfoMutationVariables = Exact<{
   input: BusinessDeleteMapInfoInput;
@@ -641,40 +579,28 @@ export type AccountUpdateLevelMutationVariables = Exact<{
 }>;
 
 
-export type AccountUpdateLevelMutation = { readonly __typename: 'Mutation', readonly accountUpdateLevel: { readonly __typename: 'AccountDetailPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly accountDetails?: { readonly __typename: 'AuditedAccount', readonly id: string, readonly uuid: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'AuditedUser', readonly id: string, readonly language: string, readonly phone?: string | null, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } | null } };
+export type AccountUpdateLevelMutation = { readonly __typename: 'Mutation', readonly accountUpdateLevel: { readonly __typename: 'AccountDetailPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly accountDetails?: { readonly __typename: 'AuditedAccount', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'AuditedUser', readonly id: string, readonly language: string, readonly phone?: string | null, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } | null } };
 
 export type BusinessUpdateMapInfoMutationVariables = Exact<{
   input: BusinessUpdateMapInfoInput;
 }>;
 
 
-export type BusinessUpdateMapInfoMutation = { readonly __typename: 'Mutation', readonly businessUpdateMapInfo: { readonly __typename: 'AccountDetailPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly accountDetails?: { readonly __typename: 'AuditedAccount', readonly id: string, readonly uuid: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'AuditedUser', readonly id: string, readonly language: string, readonly phone?: string | null, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } | null } };
+export type BusinessUpdateMapInfoMutation = { readonly __typename: 'Mutation', readonly businessUpdateMapInfo: { readonly __typename: 'AccountDetailPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly accountDetails?: { readonly __typename: 'AuditedAccount', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'AuditedUser', readonly id: string, readonly language: string, readonly phone?: string | null, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } | null } };
 
 export type AccountUpdateStatusMutationVariables = Exact<{
   input: AccountUpdateStatusInput;
 }>;
 
 
-export type AccountUpdateStatusMutation = { readonly __typename: 'Mutation', readonly accountUpdateStatus: { readonly __typename: 'AccountDetailPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly accountDetails?: { readonly __typename: 'AuditedAccount', readonly id: string, readonly uuid: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'AuditedUser', readonly id: string, readonly language: string, readonly phone?: string | null, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } | null } };
+export type AccountUpdateStatusMutation = { readonly __typename: 'Mutation', readonly accountUpdateStatus: { readonly __typename: 'AccountDetailPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly accountDetails?: { readonly __typename: 'AuditedAccount', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'AuditedUser', readonly id: string, readonly language: string, readonly phone?: string | null, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } | null } };
 
 export type AccountDetailsByUsernameQueryVariables = Exact<{
   username: Scalars['Username']['input'];
 }>;
 
 
-export type AccountDetailsByUsernameQuery = { readonly __typename: 'Query', readonly accountDetailsByUsername: { readonly __typename: 'AuditedAccount', readonly id: string, readonly uuid: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'AuditedUser', readonly id: string, readonly language: string, readonly phone?: string | null, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } };
-
-export type CaptchaCreateChallengeMutationVariables = Exact<{ [key: string]: never; }>;
-
-
-export type CaptchaCreateChallengeMutation = { readonly __typename: 'Mutation', readonly captchaCreateChallenge: { readonly __typename: 'CaptchaCreateChallengePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly result?: { readonly __typename: 'CaptchaCreateChallengeResult', readonly id: string, readonly challengeCode: string, readonly newCaptcha: boolean, readonly failbackMode: boolean } | null } };
-
-export type CaptchaRequestAuthCodeMutationVariables = Exact<{
-  input: CaptchaRequestAuthCodeInput;
-}>;
-
-
-export type CaptchaRequestAuthCodeMutation = { readonly __typename: 'Mutation', readonly captchaRequestAuthCode: { readonly __typename: 'SuccessPayload', readonly success?: boolean | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type AccountDetailsByUsernameQuery = { readonly __typename: 'Query', readonly accountDetailsByUsername: { readonly __typename: 'AuditedAccount', readonly id: string, readonly username?: string | null, readonly level: AccountLevel, readonly status: AccountStatus, readonly title?: string | null, readonly createdAt: number, readonly owner: { readonly __typename: 'AuditedUser', readonly id: string, readonly language: string, readonly phone?: string | null, readonly createdAt: number, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null }, readonly coordinates?: { readonly __typename: 'Coordinates', readonly latitude: number, readonly longitude: number } | null, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number } | { readonly __typename: 'UsdWallet', readonly id: string, readonly walletCurrency: WalletCurrency, readonly accountId: string, readonly balance: number, readonly pendingIncomingBalance: number }> } };
 
 export type LightningInvoiceQueryVariables = Exact<{
   hash: Scalars['PaymentHash']['input'];
@@ -709,7 +635,6 @@ export const AccountDetailsByUserPhoneDocument = gql`
     query accountDetailsByUserPhone($phone: Phone!) {
   accountDetailsByUserPhone(phone: $phone) {
     id
-    uuid
     username
     level
     status
@@ -771,7 +696,6 @@ export const AccountDetailsByAccountIdDocument = gql`
     query accountDetailsByAccountId($accountId: ID!) {
   accountDetailsByAccountId(accountId: $accountId) {
     id
-    uuid
     username
     level
     status
@@ -833,7 +757,6 @@ export const AccountDetailsByEmailDocument = gql`
     query accountDetailsByEmail($email: EmailAddress!) {
   accountDetailsByEmail(email: $email) {
     id
-    uuid
     username
     level
     status
@@ -934,7 +857,6 @@ export const AccountUpdateLevelDocument = gql`
     }
     accountDetails {
       id
-      uuid
       username
       level
       status
@@ -999,7 +921,6 @@ export const BusinessUpdateMapInfoDocument = gql`
     }
     accountDetails {
       id
-      uuid
       username
       level
       status
@@ -1064,7 +985,6 @@ export const AccountUpdateStatusDocument = gql`
     }
     accountDetails {
       id
-      uuid
       username
       level
       status
@@ -1125,7 +1045,6 @@ export const AccountDetailsByUsernameDocument = gql`
     query accountDetailsByUsername($username: Username!) {
   accountDetailsByUsername(username: $username) {
     id
-    uuid
     username
     level
     status
@@ -1183,82 +1102,6 @@ export function useAccountDetailsByUsernameLazyQuery(baseOptions?: Apollo.LazyQu
 export type AccountDetailsByUsernameQueryHookResult = ReturnType<typeof useAccountDetailsByUsernameQuery>;
 export type AccountDetailsByUsernameLazyQueryHookResult = ReturnType<typeof useAccountDetailsByUsernameLazyQuery>;
 export type AccountDetailsByUsernameQueryResult = Apollo.QueryResult<AccountDetailsByUsernameQuery, AccountDetailsByUsernameQueryVariables>;
-export const CaptchaCreateChallengeDocument = gql`
-    mutation captchaCreateChallenge {
-  captchaCreateChallenge {
-    errors {
-      message
-    }
-    result {
-      id
-      challengeCode
-      newCaptcha
-      failbackMode
-    }
-  }
-}
-    `;
-export type CaptchaCreateChallengeMutationFn = Apollo.MutationFunction<CaptchaCreateChallengeMutation, CaptchaCreateChallengeMutationVariables>;
-
-/**
- * __useCaptchaCreateChallengeMutation__
- *
- * To run a mutation, you first call `useCaptchaCreateChallengeMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCaptchaCreateChallengeMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [captchaCreateChallengeMutation, { data, loading, error }] = useCaptchaCreateChallengeMutation({
- *   variables: {
- *   },
- * });
- */
-export function useCaptchaCreateChallengeMutation(baseOptions?: Apollo.MutationHookOptions<CaptchaCreateChallengeMutation, CaptchaCreateChallengeMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CaptchaCreateChallengeMutation, CaptchaCreateChallengeMutationVariables>(CaptchaCreateChallengeDocument, options);
-      }
-export type CaptchaCreateChallengeMutationHookResult = ReturnType<typeof useCaptchaCreateChallengeMutation>;
-export type CaptchaCreateChallengeMutationResult = Apollo.MutationResult<CaptchaCreateChallengeMutation>;
-export type CaptchaCreateChallengeMutationOptions = Apollo.BaseMutationOptions<CaptchaCreateChallengeMutation, CaptchaCreateChallengeMutationVariables>;
-export const CaptchaRequestAuthCodeDocument = gql`
-    mutation captchaRequestAuthCode($input: CaptchaRequestAuthCodeInput!) {
-  captchaRequestAuthCode(input: $input) {
-    errors {
-      message
-    }
-    success
-  }
-}
-    `;
-export type CaptchaRequestAuthCodeMutationFn = Apollo.MutationFunction<CaptchaRequestAuthCodeMutation, CaptchaRequestAuthCodeMutationVariables>;
-
-/**
- * __useCaptchaRequestAuthCodeMutation__
- *
- * To run a mutation, you first call `useCaptchaRequestAuthCodeMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCaptchaRequestAuthCodeMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [captchaRequestAuthCodeMutation, { data, loading, error }] = useCaptchaRequestAuthCodeMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCaptchaRequestAuthCodeMutation(baseOptions?: Apollo.MutationHookOptions<CaptchaRequestAuthCodeMutation, CaptchaRequestAuthCodeMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CaptchaRequestAuthCodeMutation, CaptchaRequestAuthCodeMutationVariables>(CaptchaRequestAuthCodeDocument, options);
-      }
-export type CaptchaRequestAuthCodeMutationHookResult = ReturnType<typeof useCaptchaRequestAuthCodeMutation>;
-export type CaptchaRequestAuthCodeMutationResult = Apollo.MutationResult<CaptchaRequestAuthCodeMutation>;
-export type CaptchaRequestAuthCodeMutationOptions = Apollo.BaseMutationOptions<CaptchaRequestAuthCodeMutation, CaptchaRequestAuthCodeMutationVariables>;
 export const LightningInvoiceDocument = gql`
     query lightningInvoice($hash: PaymentHash!) {
   lightningInvoice(hash: $hash) {

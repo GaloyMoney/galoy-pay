@@ -1,7 +1,6 @@
 query accountDetailsByUserPhone($phone: Phone!) {
   accountDetailsByUserPhone(phone: $phone) {
     id
-    uuid
     username
     level
     status
@@ -34,7 +33,6 @@ query accountDetailsByUserPhone($phone: Phone!) {
 query accountDetailsByAccountId($accountId: ID!) {
   accountDetailsByAccountId(accountId: $accountId) {
     id
-    uuid
     username
     level
     status
@@ -67,7 +65,6 @@ query accountDetailsByAccountId($accountId: ID!) {
 query accountDetailsByEmail($email: EmailAddress!) {
   accountDetailsByEmail(email: $email) {
     id
-    uuid
     username
     level
     status
@@ -112,7 +109,6 @@ mutation accountUpdateLevel($input: AccountUpdateLevelInput!) {
     }
     accountDetails {
       id
-      uuid
       username
       level
       status
@@ -150,7 +146,6 @@ mutation businessUpdateMapInfo($input: BusinessUpdateMapInfoInput!) {
     }
     accountDetails {
       id
-      uuid
       username
       level
       status
@@ -188,7 +183,6 @@ mutation accountUpdateStatus($input: AccountUpdateStatusInput!) {
     }
     accountDetails {
       id
-      uuid
       username
       level
       status
@@ -222,7 +216,6 @@ mutation accountUpdateStatus($input: AccountUpdateStatusInput!) {
 query accountDetailsByUsername($username: Username!) {
   accountDetailsByUsername(username: $username) {
     id
-    uuid
     username
     level
     status
@@ -249,29 +242,6 @@ query accountDetailsByUsername($username: Username!) {
       pendingIncomingBalance
     }
     createdAt
-  }
-}
-
-mutation captchaCreateChallenge {
-  captchaCreateChallenge {
-    errors {
-      message
-    }
-    result {
-      id
-      challengeCode
-      newCaptcha
-      failbackMode
-    }
-  }
-}
-
-mutation captchaRequestAuthCode($input: CaptchaRequestAuthCodeInput!) {
-  captchaRequestAuthCode(input: $input) {
-    errors {
-      message
-    }
-    success
   }
 }
 
