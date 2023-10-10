@@ -4,11 +4,13 @@ import { redirect } from "next/navigation"
 import {
   AccountDetailsByEmailDocument,
   AccountDetailsByEmailQuery,
+  AccountDetailsByEmailQueryVariables,
   AccountDetailsByUserPhoneDocument,
   AccountDetailsByUserPhoneQuery,
   AccountDetailsByUserPhoneQueryVariables,
   AccountDetailsByUsernameDocument,
   AccountDetailsByUsernameQuery,
+  AccountDetailsByUsernameQueryVariables,
 } from "../../generated"
 import { getClient } from "../graphql-rsc"
 import { validEmail, validPhone, validUsername } from "../utils"
@@ -45,7 +47,10 @@ export const accountSearch = async (_prevState: unknown, formData: FormData) => 
     let uuid: string | undefined
 
     try {
-      const data = await getClient().query<AccountDetailsByUsernameQuery>({
+      const data = await getClient().query<
+        AccountDetailsByUsernameQuery,
+        AccountDetailsByUsernameQueryVariables
+      >({
         query: AccountDetailsByUsernameDocument,
         variables: { username: search },
       })
@@ -62,7 +67,10 @@ export const accountSearch = async (_prevState: unknown, formData: FormData) => 
     let uuid: string | undefined
 
     try {
-      const data = await getClient().query<AccountDetailsByEmailQuery>({
+      const data = await getClient().query<
+        AccountDetailsByEmailQuery,
+        AccountDetailsByEmailQueryVariables
+      >({
         query: AccountDetailsByEmailDocument,
         variables: { email: search },
       })

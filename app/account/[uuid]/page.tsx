@@ -4,11 +4,15 @@ import AccountUpdate from "../../../components/account/update"
 import {
   AccountDetailsByAccountIdDocument,
   AccountDetailsByAccountIdQuery,
+  AccountDetailsByAccountIdQueryVariables,
 } from "../../../generated"
 import { getClient } from "../../graphql-rsc"
 
 export default async function AccountDetails({ params }: { params: { uuid: string } }) {
-  const { data } = await getClient().query<AccountDetailsByAccountIdQuery>({
+  const { data } = await getClient().query<
+    AccountDetailsByAccountIdQuery,
+    AccountDetailsByAccountIdQueryVariables
+  >({
     query: AccountDetailsByAccountIdDocument,
     variables: { accountId: params.uuid },
   })

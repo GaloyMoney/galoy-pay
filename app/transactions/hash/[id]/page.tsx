@@ -2,11 +2,14 @@ import {
   LightningInvoice,
   LightningInvoiceDocument,
   LightningInvoiceQuery,
+  LightningInvoiceQueryVariables,
   LightningPayment,
   LightningPaymentDocument,
   LightningPaymentQuery,
+  LightningPaymentQueryVariables,
   TransactionsByHashDocument,
   TransactionsByHashQuery,
+  TransactionsByHashQueryVariables,
 } from "../../../../generated"
 
 import TransactionList from "../../../../components/transactions/list"
@@ -20,7 +23,10 @@ export default async function TransactionDetails({ params }: { params: { id: str
   let txs: any
 
   try {
-    const data = await getClient().query<TransactionsByHashQuery>({
+    const data = await getClient().query<
+      TransactionsByHashQuery,
+      TransactionsByHashQueryVariables
+    >({
       query: TransactionsByHashDocument,
       variables: { hash: id },
     })
@@ -35,7 +41,10 @@ export default async function TransactionDetails({ params }: { params: { id: str
   let invoice: LightningInvoice | undefined
 
   try {
-    const data = await getClient().query<LightningInvoiceQuery>({
+    const data = await getClient().query<
+      LightningInvoiceQuery,
+      LightningInvoiceQueryVariables
+    >({
       query: LightningInvoiceDocument,
       variables: { hash: id },
     })
@@ -50,7 +59,10 @@ export default async function TransactionDetails({ params }: { params: { id: str
   let payment: LightningPayment | undefined
 
   try {
-    const data = await getClient().query<LightningPaymentQuery>({
+    const data = await getClient().query<
+      LightningPaymentQuery,
+      LightningPaymentQueryVariables
+    >({
       query: LightningPaymentDocument,
       variables: { hash: id },
     })
