@@ -78,14 +78,14 @@ export const AccountStatus = {
 
 export type AccountStatus = typeof AccountStatus[keyof typeof AccountStatus];
 export type AccountUpdateLevelInput = {
+  readonly accountId: Scalars['AccountId']['input'];
   readonly level: AccountLevel;
-  readonly uid: Scalars['ID']['input'];
 };
 
 export type AccountUpdateStatusInput = {
+  readonly accountId: Scalars['AccountId']['input'];
   readonly comment?: InputMaybe<Scalars['String']['input']>;
   readonly status: AccountStatus;
-  readonly uid: Scalars['ID']['input'];
 };
 
 export type AdminPushNotificationSendInput = {

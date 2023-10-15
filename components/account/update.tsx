@@ -41,7 +41,7 @@ const updateLevel = async (formData: FormData) => {
     AccountUpdateLevelMutationVariables
   >({
     mutation: AccountUpdateLevelDocument,
-    variables: { input: { uid: auditedAccount.id, level: AccountLevel.Two } },
+    variables: { input: { accountId: auditedAccount.id, level: AccountLevel.Two } },
   })
 
   revalidatePath("/account")
@@ -69,7 +69,7 @@ const updateStatus = async (formData: FormData) => {
     AccountUpdateStatusMutationVariables
   >({
     mutation: AccountUpdateStatusDocument,
-    variables: { input: { uid: auditedAccount.id, status: targetStatus } },
+    variables: { input: { accountId: auditedAccount.id, status: targetStatus } },
   })
 
   revalidatePath("/account")
