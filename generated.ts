@@ -321,6 +321,7 @@ export type Query = {
   readonly __typename: 'Query';
   readonly accountDetailsByAccountId: AuditedAccount;
   readonly accountDetailsByEmail: AuditedAccount;
+  readonly accountDetailsByUserId: AuditedAccount;
   readonly accountDetailsByUserPhone: AuditedAccount;
   readonly accountDetailsByUsername: AuditedAccount;
   readonly allLevels: ReadonlyArray<AccountLevel>;
@@ -340,6 +341,11 @@ export type QueryAccountDetailsByAccountIdArgs = {
 
 export type QueryAccountDetailsByEmailArgs = {
   email: Scalars['EmailAddress']['input'];
+};
+
+
+export type QueryAccountDetailsByUserIdArgs = {
+  userId: Scalars['ID']['input'];
 };
 
 

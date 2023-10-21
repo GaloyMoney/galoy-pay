@@ -97,7 +97,7 @@ const BusinessMapUpdate: React.FC<{
             name="longitude"
             required
             type="text"
-            pattern="^(-|\+)??(180(\.0+?)??|([0-8]??\d)(\.\d+?)??)$"
+            pattern="^[-+]?(180(\.0{1,6})?|((\d{1,2}|[0-9][0-9][0-9])?(\.\d{1,12})?))$"
             placeholder="Enter longitude"
             className={`mt-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-600 focus:outline-none focus:shadow-outline`}
           />
