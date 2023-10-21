@@ -20,7 +20,9 @@ import LnPayment from "../../../../components/transactions/ln-payment"
 export default async function TransactionDetails({ params }: { params: { id: string } }) {
   const id = params.id
 
-  let txs: any
+  /* eslint @typescript-eslint/ban-ts-comment: "off" */
+  // @ts-ignore-next-line no-implicit-any error
+  let txs
 
   try {
     const data = await getClient().query<

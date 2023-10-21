@@ -1,7 +1,9 @@
 import { formatDate, formatNumber } from "../../app/utils"
 
 type Props = {
-  transactions: unknown[]
+  /* eslint @typescript-eslint/ban-ts-comment: "off" */
+  // @ts-ignore-next-line no-implicit-any error
+  transactions
 }
 
 /* eslint @typescript-eslint/ban-ts-comment: "off" */
@@ -58,7 +60,9 @@ const Transactions: React.FC<Props> = ({ transactions }) => {
   const isInternalTx =
     hasData &&
     transactions.every(
-      (txn: any) => txn?.initiationVia.__typename === "InitiationViaIntraLedger",
+      /* eslint @typescript-eslint/ban-ts-comment: "off" */
+      // @ts-ignore-next-line no-implicit-any error
+      (txn) => txn?.initiationVia.__typename === "InitiationViaIntraLedger",
     )
   return (
     <div className="shadow w-full overflow-hidden rounded-lg shadow-xs">
@@ -81,7 +85,8 @@ const Transactions: React.FC<Props> = ({ transactions }) => {
           </thead>
           <tbody className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
             {hasData &&
-              transactions.map((txn: any) => (
+              // @ts-ignore-next-line no-implicit-any error
+              transactions.map((txn) => (
                 <tr key={txn?.id} className="text-gray-700 dark:text-gray-400">
                   <td className="px-4 py-3">{txn?.id}</td>
                   <td className="px-4 py-3">
