@@ -25,6 +25,7 @@ const updateLevel = async (formData: FormData) => {
   console.log("update level")
 
   const id = formData.get("id") as string
+  const level = formData.get("level") as AccountLevel
 
   const { data } = await getClient().query<
     AccountDetailsByAccountIdQuery,
@@ -41,7 +42,7 @@ const updateLevel = async (formData: FormData) => {
     AccountUpdateLevelMutationVariables
   >({
     mutation: AccountUpdateLevelDocument,
-    variables: { input: { accountId: auditedAccount.id, level: AccountLevel.Two } },
+    variables: { input: { accountId: auditedAccount.id, level } },
   })
 
   revalidatePath("/account")
@@ -77,7 +78,6 @@ const updateStatus = async (formData: FormData) => {
 
 const AccountUpdate: React.FC<PropType> = ({ auditedAccount }) => {
   const isActiveStatus = auditedAccount.status === "ACTIVE"
-  const statusColor = isActiveStatus ? "red" : "green"
   const statusButtonLabel = isActiveStatus ? "Lock" : "Activate"
 
   return (
@@ -89,11 +89,24 @@ const AccountUpdate: React.FC<PropType> = ({ auditedAccount }) => {
           {auditedAccount.level === "ONE" && (
             <ConfirmForm
               action={updateLevel}
-              message="Are you sure you want to update the level?"
+              message="Are you sure you want to upgrade the user to level 2?"
             >
               <input type="hidden" name="id" value={auditedAccount.id} />
+              <input type="hidden" name="level" value={AccountLevel.Two} />
               <button className="text-sm mx-4 bg-green-500 hover:bg-green-700 text-white font-bold p-2 border border-green-700 rounded disabled:opacity-50">
                 {"Upgrade"}
+              </button>
+            </ConfirmForm>
+          )}
+          {auditedAccount.level === "TWO" && (
+            <ConfirmForm
+              action={updateLevel}
+              message="Are you sure you want to downgrade the user to level 1?"
+            >
+              <input type="hidden" name="id" value={auditedAccount.id} />
+              <input type="hidden" name="level" value={AccountLevel.One} />
+              <button className="text-sm mx-4 bg-green-500 hover:bg-green-700 text-white font-bold p-2 border border-green-700 rounded disabled:opacity-50">
+                {"Downgrade"}
               </button>
             </ConfirmForm>
           )}
@@ -109,7 +122,11 @@ const AccountUpdate: React.FC<PropType> = ({ auditedAccount }) => {
           >
             <input type="hidden" name="id" value={auditedAccount.id} />
             <button
-              className={`text-sm mx-4 bg-${statusColor}-500 hover:bg-${statusColor}-700 text-white font-bold p-2 border border-${statusColor}-700 rounded disabled:opacity-50`}
+              className={`text-sm mx-4 ${
+                isActiveStatus
+                  ? "bg-red-500 hover:bg-red-700 border-red-700"
+                  : "bg-green-500 hover:bg-green-700 border-green-700"
+              } text-white font-bold p-2 border rounded disabled:opacity-50`}
             >
               {statusButtonLabel}
             </button>
