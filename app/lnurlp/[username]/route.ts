@@ -10,6 +10,8 @@ import {
 } from "../../../lib/graphql/generated"
 import { client } from "./graphql"
 
+const COMMENT_SIZE = 2000 // 2000 characters max for GET
+
 const nostrEnabled = !!NOSTR_PUBKEY
 
 export async function GET(
@@ -88,7 +90,7 @@ export async function GET(
     minSendable,
     maxSendable,
     metadata,
-    commentAllowed: 2000,
+    commentAllowed: COMMENT_SIZE,
     tag: "payRequest",
     ...(nostrEnabled
       ? {
