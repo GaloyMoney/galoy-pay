@@ -2,14 +2,14 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: 'chore: more generic test-on-docker-host'
-      sha: 0c17e2d69a71a42b83b8fbd0136abd27b8d97a74
+      commitTitle: 'ci: new metadata scheme (#36)'
+      sha: 3edfe7d25e5fe2162fd49b944dd0d512eeabd512
     path: .
   path: ../.github/workflows/vendor
 - contents:
   - git:
-      commitTitle: 'chore: more generic test-on-docker-host'
-      sha: 0c17e2d69a71a42b83b8fbd0136abd27b8d97a74
+      commitTitle: 'ci: new metadata scheme (#36)'
+      sha: 3edfe7d25e5fe2162fd49b944dd0d512eeabd512
     path: .
   path: ./vendor
 kind: LockConfig
