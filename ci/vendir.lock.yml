@@ -2,14 +2,14 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: 'ci: new metadata scheme (#36)'
-      sha: 3edfe7d25e5fe2162fd49b944dd0d512eeabd512
+      commitTitle: 'fix: edge image resource repo (#38)'
+      sha: cb7ccce0f5b99eec23fbc5ce1cc0b753b58961e2
     path: .
   path: ../.github/workflows/vendor
 - contents:
   - git:
-      commitTitle: 'ci: new metadata scheme (#36)'
-      sha: 3edfe7d25e5fe2162fd49b944dd0d512eeabd512
+      commitTitle: 'fix: edge image resource repo (#38)'
+      sha: cb7ccce0f5b99eec23fbc5ce1cc0b753b58961e2
     path: .
   path: ./vendor
 kind: LockConfig
