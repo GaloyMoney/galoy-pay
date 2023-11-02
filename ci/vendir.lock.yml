@@ -2,14 +2,14 @@ apiVersion: vendir.k14s.io/v1alpha1
 directories:
 - contents:
   - git:
-      commitTitle: 'fix: edge image resource repo (#38)'
-      sha: cb7ccce0f5b99eec23fbc5ce1cc0b753b58961e2
+      commitTitle: 'fix: add repo input to open chart pr task (#39)'
+      sha: 64581226f53d8bfcca1f96eec1d5e76318f859d9
     path: .
   path: ../.github/workflows/vendor
 - contents:
   - git:
-      commitTitle: 'fix: edge image resource repo (#38)'
-      sha: cb7ccce0f5b99eec23fbc5ce1cc0b753b58961e2
+      commitTitle: 'fix: add repo input to open chart pr task (#39)'
+      sha: 64581226f53d8bfcca1f96eec1d5e76318f859d9
     path: .
   path: ./vendor
 kind: LockConfig
