@@ -2179,10 +2179,10 @@
   dependencies:
     "@types/react" "^17"
 
-"@types/react-lottie@^1.2.6":
-  version "1.2.6"
-  resolved "https://registry.yarnpkg.com/@types/react-lottie/-/react-lottie-1.2.6.tgz#4f351dfdf5f93a46a3a9714fbb319f1e0f030eaf"
-  integrity sha512-fvGJHD7SeUdVESHo7f7erRnXkTWaa/6Mo5TB+R0/ieSftKoFspA4sMlF2qMH6BljXI7ehFJbBtrD5bzDxPCkGg==
+"@types/react-lottie@^1.2.9":
+  version "1.2.9"
+  resolved "https://registry.yarnpkg.com/@types/react-lottie/-/react-lottie-1.2.9.tgz#c3c1001d99f95354a901efe40825a975b087bc25"
+  integrity sha512-G4EebckAIEZgNc0/5+6mtaUJX+3ZxKg601PJlZl665G4sJATPr1T6G6Lz5iXZsllZ8T/waYO3wzlOLXCkkJltA==
   dependencies:
     "@types/react" "*"
 
