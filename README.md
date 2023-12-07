@@ -1,5 +1,7 @@
 # Galoy Pay
 
+Archived in favor of [pay section in GaloyMoney/galoy](https://github.com/GaloyMoney/galoy/tree/main/apps/pay)
+
 ## What is it for?
 
 This repo is a web application that can be used to send tips or payments to users.
